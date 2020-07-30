@@ -1,0 +1,12 @@
+Source: ros-foxy-rmw-gurumdds-cpp
+Section: misc
+Priority: optional
+Maintainer: Junho Lee <junho@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-2.6, ros-foxy-ament-cmake-ros, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-gurumdds-cmake-module, ros-foxy-rcutils, ros-foxy-rmw, ros-foxy-rmw-gurumdds-shared-cpp, ros-foxy-rosidl-cmake, ros-foxy-rosidl-generator-dds-idl, ros-foxy-rosidl-runtime-c, ros-foxy-rosidl-runtime-cpp, ros-foxy-rosidl-typesupport-introspection-c, ros-foxy-rosidl-typesupport-introspection-cpp, ros-foxy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-foxy-rmw-gurumdds-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gurumdds-2.6, ros-foxy-gurumdds-cmake-module, ros-foxy-rcutils, ros-foxy-rmw, ros-foxy-rmw-gurumdds-shared-cpp, ros-foxy-rosidl-runtime-c, ros-foxy-rosidl-runtime-cpp, ros-foxy-rosidl-typesupport-introspection-c, ros-foxy-rosidl-typesupport-introspection-cpp, ros-foxy-ros-workspace
+Description: Implement the ROS middleware interface using GurumNetworks GurumDDS static code generation in C++.
