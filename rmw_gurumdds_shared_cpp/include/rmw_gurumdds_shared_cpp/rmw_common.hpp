@@ -22,11 +22,10 @@
 #include "rmw/types.h"
 #include "rmw/names_and_types.h"
 #include "rmw/event.h"
-#include "rmw/topic_endpoint_info_array.h"
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_guard_condition_t *
-shared__rmw_create_guard_condition(const char * implementation_identifier);
+shared__rmw_create_guard_condition(const char * identifier);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
@@ -43,17 +42,16 @@ shared__rmw_trigger_guard_condition(
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_node_t *
 shared__rmw_create_node(
-  const char * implementation_identifier,
-  rmw_context_t * context,
+  const char * identifier,
   const char * name,
   const char * namespace_,
   size_t domain_id,
-  bool localhost_only);
+  const rmw_node_security_options_t * security_options);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_destroy_node(
-  const char * implementation_identifier,
+  const char * identifier,
   rmw_node_t * node);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
@@ -63,38 +61,29 @@ shared__rmw_node_get_graph_guard_condition(const rmw_node_t * node);
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_get_node_names(
-  const char * implementation_identifier,
+  const char * identifier,
   const rmw_node_t * node,
   rcutils_string_array_t * node_names,
   rcutils_string_array_t * node_namespaces);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
-shared__rmw_get_node_names_with_enclaves(
-  const char * implementation_identifier,
-  const rmw_node_t * node,
-  rcutils_string_array_t * node_names,
-  rcutils_string_array_t * node_namespaces,
-  rcutils_string_array_t * enclaves);
-
-RMW_GURUMDDS_SHARED_CPP_PUBLIC
-rmw_ret_t
 shared__rmw_publish(
-  const char * implementation_identifier,
+  const char * identifier,
   const rmw_publisher_t * publisher,
   const void * ros_message);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_publish_serialized_message(
-  const char * implementation_identifier,
+  const char * identifier,
   const rmw_publisher_t * publisher,
   const rmw_serialized_message_t * serialized_message);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_take(
-  const char * implementation_identifier,
+  const char * identifier,
   const rmw_subscription_t * subscription,
   void * ros_message,
   bool * taken);
@@ -102,7 +91,7 @@ shared__rmw_take(
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_take_with_info(
-  const char * implementation_identifier,
+  const char * identifier,
   const rmw_subscription_t * subscription,
   void * ros_message,
   bool * taken,
@@ -118,7 +107,7 @@ shared__rmw_create_wait_set(
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_destroy_wait_set(
-  const char * implementation_identifier,
+  const char * identifier,
   rmw_wait_set_t * wait_set);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
@@ -152,16 +141,6 @@ shared__rmw_get_service_names_and_types_by_node(
   const char * node_name,
   const char * node_namespace,
   rmw_names_and_types_t * service_names_and_types);
-
-RMW_GURUMDDS_SHARED_CPP_PUBLIC
-rmw_ret_t
-shared__rmw_get_client_names_and_types_by_node(
-  const char * implementation_identifier,
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  const char * node_name,
-  const char * node_namespace,
-  rmw_names_and_types_t * client_names_and_types);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
@@ -200,14 +179,6 @@ RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_set_log_severity(rmw_log_severity_t severity);
 
-rmw_ret_t
-shared__rmw_init_event(
-  const char * identifier,
-  rmw_event_t * rmw_event,
-  const char * topic_endpoint_impl_identifier,
-  void * data,
-  rmw_event_type_t event_type);
-
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_take_event(
@@ -221,25 +192,5 @@ rmw_ret_t
 shared__rmw_node_assert_liveliness(
   const char * implementation_identifier,
   const rmw_node_t * node);
-
-RMW_GURUMDDS_SHARED_CPP_PUBLIC
-rmw_ret_t
-shared__rmw_get_publishers_info_by_topic(
-  const char * implementation_identifier,
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  const char * topic_name,
-  bool no_mangle,
-  rmw_topic_endpoint_info_array_t * publishers_info);
-
-RMW_GURUMDDS_SHARED_CPP_PUBLIC
-rmw_ret_t
-shared__rmw_get_subscriptions_info_by_topic(
-  const char * implementation_identifier,
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  const char * topic_name,
-  bool no_mangle,
-  rmw_topic_endpoint_info_array_t * subscriptions_info);
 
 #endif  // RMW_GURUMDDS_SHARED_CPP__RMW_COMMON_HPP_

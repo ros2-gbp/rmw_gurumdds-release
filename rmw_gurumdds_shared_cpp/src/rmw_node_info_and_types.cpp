@@ -42,8 +42,6 @@
 #include "rmw_gurumdds_shared_cpp/names_and_types_helpers.hpp"
 #include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
 
-typedef std::map<std::string, std::set<std::string>> TopicMap;
-
 bool
 __is_node_match(
   dds_UserDataQosPolicy user_data,
@@ -128,7 +126,7 @@ __get_key(
   }
   RMW_SET_ERROR_MSG("failed to match node name/namespace with discovered nodes");
   dds_InstanceHandleSeq_delete(handle_seq);
-  return RMW_RET_NODE_NAME_NON_EXISTENT;
+  return RMW_RET_ERROR;
 }
 
 rmw_ret_t
@@ -186,17 +184,17 @@ shared__rmw_get_subscriber_names_and_types_by_node(
   }
 
   GuidPrefix_t key;
-  ret = __get_key(node_info, node_name, node_namespace, key);
-  if (ret != RMW_RET_OK) {
-    return ret;
+  rmw_ret_t rmw_ret = __get_key(node_info, node_name, node_namespace, key);
+  if (rmw_ret != RMW_RET_OK) {
+    return rmw_ret;
   }
 
-  TopicMap topics;
+  std::map<std::string, std::set<std::string>> topics;
   node_info->sub_listener->fill_topic_names_and_types_by_guid(no_demangle, topics, key);
 
-  ret = copy_topics_names_and_types(topics, allocator, no_demangle, topic_names_and_types);
+  rmw_ret = copy_topics_names_and_types(topics, allocator, no_demangle, topic_names_and_types);
 
-  return ret;
+  return rmw_ret;
 }
 
 rmw_ret_t
@@ -236,28 +234,27 @@ shared__rmw_get_publisher_names_and_types_by_node(
   }
 
   GuidPrefix_t key;
-  ret = __get_key(node_info, node_name, node_namespace, key);
-  if (ret != RMW_RET_OK) {
-    return ret;
+  rmw_ret_t rmw_ret = __get_key(node_info, node_name, node_namespace, key);
+  if (rmw_ret != RMW_RET_OK) {
+    return rmw_ret;
   }
 
-  TopicMap topics;
+  std::map<std::string, std::set<std::string>> topics;
   node_info->pub_listener->fill_topic_names_and_types_by_guid(no_demangle, topics, key);
 
-  ret = copy_topics_names_and_types(topics, allocator, no_demangle, topic_names_and_types);
+  rmw_ret = copy_topics_names_and_types(topics, allocator, no_demangle, topic_names_and_types);
 
-  return ret;
+  return rmw_ret;
 }
 
 rmw_ret_t
-__get_service_names_and_types_by_node(
+shared__rmw_get_service_names_and_types_by_node(
   const char * implementation_identifier,
   const rmw_node_t * node,
   rcutils_allocator_t * allocator,
   const char * node_name,
   const char * node_namespace,
-  rmw_names_and_types_t * service_names_and_types,
-  bool is_service)
+  rmw_names_and_types_t * service_names_and_types)
 {
   if (node == nullptr) {
     RMW_SET_ERROR_MSG("node handle is null");
@@ -286,45 +283,15 @@ __get_service_names_and_types_by_node(
   }
 
   GuidPrefix_t key;
-  ret = __get_key(node_info, node_name, node_namespace, key);
-  if (ret != RMW_RET_OK) {
-    return ret;
+  rmw_ret_t rmw_ret = __get_key(node_info, node_name, node_namespace, key);
+  if (rmw_ret != RMW_RET_OK) {
+    return rmw_ret;
   }
 
-  TopicMap services;
-  node_info->sub_listener->fill_service_names_and_types_by_guid(
-    services, key, is_service ? "Request" : "Reply");
+  std::map<std::string, std::set<std::string>> services;
+  node_info->sub_listener->fill_service_names_and_types_by_guid(services, key);
 
-  ret = copy_services_to_names_and_types(
-    services, allocator, service_names_and_types);
+  rmw_ret = copy_services_to_names_and_types(services, allocator, service_names_and_types);
 
-  return ret;
-}
-
-rmw_ret_t
-shared__rmw_get_service_names_and_types_by_node(
-  const char * implementation_identifier,
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  const char * node_name,
-  const char * node_namespace,
-  rmw_names_and_types_t * service_names_and_types)
-{
-  return __get_service_names_and_types_by_node(
-    implementation_identifier, node, allocator, node_name,
-    node_namespace, service_names_and_types, true);
-}
-
-rmw_ret_t
-shared__rmw_get_client_names_and_types_by_node(
-  const char * implementation_identifier,
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  const char * node_name,
-  const char * node_namespace,
-  rmw_names_and_types_t * client_names_and_types)
-{
-  return __get_service_names_and_types_by_node(
-    implementation_identifier, node, allocator, node_name,
-    node_namespace, client_names_and_types, false);
+  return rmw_ret;
 }

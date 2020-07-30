@@ -40,7 +40,7 @@ extern "C"
 rmw_ret_t
 rmw_init_publisher_allocation(
   const rosidl_message_type_support_t * type_support,
-  const rosidl_runtime_c__Sequence__bound * message_bounds,
+  const rosidl_message_bounds_t * message_bounds,
   rmw_publisher_allocation_t * allocation)
 {
   (void)type_support;
@@ -64,8 +64,7 @@ rmw_publisher_t *
 rmw_create_publisher(
   const rmw_node_t * node,
   const rosidl_message_type_support_t * type_supports,
-  const char * topic_name, const rmw_qos_profile_t * qos_policies,
-  const rmw_publisher_options_t * publisher_options)
+  const char * topic_name, const rmw_qos_profile_t * qos_policies)
 {
   if (node == nullptr) {
     RMW_SET_ERROR_MSG("node handle is null");
@@ -84,11 +83,6 @@ rmw_create_publisher(
 
   if (qos_policies == nullptr) {
     RMW_SET_ERROR_MSG("qos profile is null");
-    return nullptr;
-  }
-
-  if (publisher_options == nullptr) {
-    RMW_SET_ERROR_MSG("publisher_options is null");
     return nullptr;
   }
 
@@ -255,8 +249,6 @@ rmw_create_publisher(
     goto fail;
   }
   memcpy(const_cast<char *>(rmw_publisher->topic_name), topic_name, strlen(topic_name) + 1);
-  rmw_publisher->options = *publisher_options;
-  rmw_publisher->can_loan_messages = false;
 
   rmw_ret = rmw_trigger_guard_condition(node_info->graph_guard_condition);
   if (rmw_ret != RMW_RET_OK) {
@@ -565,6 +557,9 @@ rmw_publisher_get_actual_qos(
     case dds_AUTOMATIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
       break;
+    case dds_MANUAL_BY_PARTICIPANT_LIVELINESS_QOS:
+      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_NODE;
+      break;
     case dds_MANUAL_BY_TOPIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;
       break;
@@ -703,45 +698,5 @@ rmw_publish_serialized_message(
   RCUTILS_LOG_DEBUG_NAMED("rmw_gurumdds_cpp", "Published data on topic %s", topic_name);
 
   return RMW_RET_OK;
-}
-
-rmw_ret_t
-rmw_publish_loaned_message(
-  const rmw_publisher_t * publisher,
-  void * ros_message,
-  rmw_publisher_allocation_t * allocation)
-{
-  (void)publisher;
-  (void)ros_message;
-  (void)allocation;
-
-  RMW_SET_ERROR_MSG("rmw_publish_loaned_message is not supported");
-  return RMW_RET_UNSUPPORTED;
-}
-
-rmw_ret_t
-rmw_borrow_loaned_message(
-  const rmw_publisher_t * publisher,
-  const rosidl_message_type_support_t * type_support,
-  void ** ros_message)
-{
-  (void)publisher;
-  (void)type_support;
-  (void)ros_message;
-
-  RMW_SET_ERROR_MSG("rmw_borrow_loaned_message is not supported");
-  return RMW_RET_UNSUPPORTED;
-}
-
-rmw_ret_t
-rmw_return_loaned_message_from_publisher(
-  const rmw_publisher_t * publisher,
-  void * loaned_message)
-{
-  (void)publisher;
-  (void)loaned_message;
-
-  RMW_SET_ERROR_MSG("rmw_return_loaned_message_from_publisher is not supported");
-  return RMW_RET_UNSUPPORTED;
 }
 }  // extern "C"
