@@ -2,21 +2,13 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.0.1 (2020-07-29)
+1.0.2 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-2.0.0 (2020-07-09)
+1.0.1 (2020-07-06)
 ------------------
-* Removed parameters domain_id and localhost_only from rmw_create_node()
-* Updated init/shutdown/init option functions
-* Contributors: junho
-
-1.1.0 (2020-07-09)
-------------------
-* Finalize rmw context only if it's shutdown
-* Added support for sample_lost event
 * Renamed rmw_gurumdds_dynamic_cpp to rmw_gurumdds_cpp
 * Renamed rmw_gurumdds_cpp to rmw_gurumdds_static_cpp
 * Contributors: junho

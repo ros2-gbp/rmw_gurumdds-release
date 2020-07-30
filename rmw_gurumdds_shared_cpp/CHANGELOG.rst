@@ -2,20 +2,13 @@
 Changelog for package rmw_gurumdds_shared_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.0.1 (2020-07-29)
+1.0.2 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-2.0.0 (2020-07-09)
+1.0.1 (2020-07-06)
 ------------------
-* Removed parameters domain_id and localhost_only from rmw_create_node()
-* Contributors: junho
-
-1.1.0 (2020-07-09)
-------------------
-* Handle RMW_DEFAULT_DOMAIN_ID
-* Added support for sample_lost event
 * Set resource_limit explicitly
 * Fixed compile warnings
 * Contributors: junho
