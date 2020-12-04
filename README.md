@@ -1,3 +1,28 @@
+## rmw_gurumdds (dashing) - 0.7.9-1
+
+The packages in the `rmw_gurumdds` repository were released into the `dashing` distro by running `/usr/local/bin/bloom-release --ros-distro dashing --track dashing rmw_gurumdds` on `Fri, 04 Dec 2020 02:17:17 -0000`
+
+These packages were released:
+- `rmw_gurumdds_cpp`
+- `rmw_gurumdds_shared_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `0.7.8-1`
+- old version: `0.7.8-1`
+- new version: `0.7.9-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.7`
+- catkin_pkg version: `0.4.16`
+- rosdep version: `0.19.0`
+- rosdistro version: `0.8.2`
+- vcstools version: `0.1.40`
+
+
 ## rmw_gurumdds (dashing) - 0.7.8-1
 
 The packages in the `rmw_gurumdds` repository were released into the `dashing` distro by running `/usr/local/bin/bloom-release --ros-distro dashing --track dashing rmw_gurumdds` on `Thu, 30 Jul 2020 00:56:56 -0000`
