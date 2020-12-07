@@ -43,7 +43,6 @@ typedef struct _GurumddsSubscriberInfo : GurumddsEventInfo
   dds_DataReader * topic_reader;
   dds_ReadCondition * read_condition;
   dds_TypeSupport * dds_typesupport;
-  bool ignore_local_publications;
   const rosidl_message_type_support_t * rosidl_message_typesupport;
   const char * implementation_identifier;
 

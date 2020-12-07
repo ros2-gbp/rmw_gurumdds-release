@@ -15,5 +15,5 @@
 find_package(gurumdds_cmake_module REQUIRED)
 find_package(GurumDDS REQUIRED MODULE)
 
-list(APPEND rmw_gurumdds_static_cpp_INCLUDE_DIRS ${GurumDDS_INCLUDE_DIR})
+list(APPEND rmw_gurumdds_static_cpp_INCLUDE_DIRS ${GurumDDS_INCLUDE_DIRS})
 list(APPEND rmw_gurumdds_static_cpp_LIBRARIES ${GurumDDS_LIBRARIES})
