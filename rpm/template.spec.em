@@ -1,3 +1,8 @@
+@{
+# Drop membership in rmw_implementation_packages group
+Provides.remove('ros-' + Rosdistro + '-rmw-implementation-packages(member)')
+Supplements.remove('ros-' + Rosdistro + '-rmw-implementation-packages(all)')
+}@
 %bcond_without tests
 %bcond_without weak_deps
 
