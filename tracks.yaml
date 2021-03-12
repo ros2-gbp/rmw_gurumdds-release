@@ -11,9 +11,7 @@ tracks:
     - git-bloom-generate -y rosdebian --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --os-name debian --os-not-required
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name fedora
-    - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name rhel
+      :{release_inc}
     devel_branch: dashing
     last_version: 0.7.10
     name: upstream
@@ -37,9 +35,7 @@ tracks:
     - git-bloom-generate -y rosdebian --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --os-name debian --os-not-required
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name fedora
-    - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name rhel
+      :{release_inc}
     devel_branch: foxy
     last_version: 1.0.4
     name: upstream
@@ -63,9 +59,9 @@ tracks:
     - git-bloom-generate -y rosdebian --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --os-name debian --os-not-required
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name fedora --skip-keys gurumdds-2.6
+      :{release_inc} --os-name fedora --skip-keys gurumdds-2.6 gurumdds-2.7
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name rhel --skip-keys gurumdds-2.6
+      :{release_inc} --os-name rhel --skip-keys gurumdds-2.6 gurumdds-2.7
     devel_branch: master
     last_version: 2.0.1
     name: upstream
