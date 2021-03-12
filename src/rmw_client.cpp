@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
+#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
 #include "rmw/rmw.h"
@@ -79,9 +80,11 @@ rmw_create_client(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -94,12 +97,13 @@ rmw_create_client(
   dds_PublisherQos publisher_qos;
   dds_DataReaderQos datareader_qos;
   dds_DataWriterQos datawriter_qos;
+  dds_DataReaderListener datareader_listener = {};
 
   dds_Publisher * dds_publisher = nullptr;
   dds_Subscriber * dds_subscriber = nullptr;
   dds_DataWriter * request_writer = nullptr;
   dds_DataReader * response_reader = nullptr;
-  dds_ReadCondition * read_condition = nullptr;
+  dds_GuardCondition * queue_guard_condition = nullptr;
   dds_TypeSupport * request_typesupport = nullptr;
   dds_TypeSupport * response_typesupport = nullptr;
 
@@ -212,6 +216,12 @@ rmw_create_client(
       RMW_SET_ERROR_MSG("failed to create topic");
       goto fail;
     }
+
+    ret = dds_TopicQos_finalize(&topic_qos);
+    if (ret != dds_RETCODE_OK) {
+      RMW_SET_ERROR_MSG("failed to finalize topic qos");
+      goto fail;
+    }
   } else {
     dds_Duration_t timeout;
     timeout.sec = 0;
@@ -239,6 +249,12 @@ rmw_create_client(
       participant, response_topic_name.c_str(), response_type_name.c_str(), &topic_qos, nullptr, 0);
     if (response_topic == nullptr) {
       RMW_SET_ERROR_MSG("failed to create topic");
+      goto fail;
+    }
+
+    ret = dds_TopicQos_finalize(&topic_qos);
+    if (ret != dds_RETCODE_OK) {
+      RMW_SET_ERROR_MSG("failed to finalize topic qos");
       goto fail;
     }
   } else {
@@ -287,6 +303,12 @@ rmw_create_client(
   }
   client_info->request_writer = request_writer;
 
+  ret = dds_DataWriterQos_finalize(&datawriter_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("failed to finalize datawriter qos");
+    goto fail;
+  }
+
   // Create datareader for response
   ret = dds_DomainParticipant_get_default_subscriber_qos(participant, &subscriber_qos);
   if (ret != dds_RETCODE_OK) {
@@ -314,21 +336,31 @@ rmw_create_client(
     goto fail;
   }
 
+  datareader_listener.on_data_available = reader_on_data_available<GurumddsClientInfo>;
+
   response_reader = dds_Subscriber_create_datareader(
-    dds_subscriber, response_topic, &datareader_qos, nullptr, 0);
+    dds_subscriber, response_topic, &datareader_qos, &datareader_listener,
+    dds_DATA_AVAILABLE_STATUS);
   if (response_reader == nullptr) {
     RMW_SET_ERROR_MSG("failed to create datareader");
     goto fail;
   }
   client_info->response_reader = response_reader;
 
-  read_condition = dds_DataReader_create_readcondition(
-    response_reader, dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
-  if (read_condition == nullptr) {
-    RMW_SET_ERROR_MSG("failed to create read condition");
+  ret = dds_DataReaderQos_finalize(&datareader_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("failed to finalize datareader qos");
     goto fail;
   }
-  client_info->read_condition = read_condition;
+
+  dds_DataReader_set_listener_context(client_info->response_reader, client_info);
+
+  queue_guard_condition = dds_GuardCondition_create();
+  if (queue_guard_condition == nullptr) {
+    RMW_SET_ERROR_MSG("failed to create guard condition");
+    goto fail;
+  }
+  client_info->queue_guard_condition = queue_guard_condition;
 
   // Set GUID
   guid_temp = uniform_dist(dre);
@@ -387,8 +419,8 @@ fail:
 
   if (dds_subscriber != nullptr) {
     if (response_reader != nullptr) {
-      if (read_condition != nullptr) {
-        dds_DataReader_delete_readcondition(response_reader, read_condition);
+      if (queue_guard_condition != nullptr) {
+        dds_GuardCondition_delete(queue_guard_condition);
       }
       dds_Subscriber_delete_datareader(dds_subscriber, response_reader);
     }
@@ -449,23 +481,12 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 
       if (client_info->dds_subscriber != nullptr) {
         if (client_info->response_reader != nullptr) {
-          if (client_info->read_condition != nullptr) {
-            ret = dds_DataReader_delete_readcondition(
-              client_info->response_reader, client_info->read_condition);
-            if (ret != dds_RETCODE_OK) {
-              RMW_SET_ERROR_MSG("failed to delete readcondition");
-              rmw_ret = RMW_RET_ERROR;
-            }
-          }
           ret = dds_Subscriber_delete_datareader(
             client_info->dds_subscriber, client_info->response_reader);
           if (ret != dds_RETCODE_OK) {
             RMW_SET_ERROR_MSG("failed to delete datareader");
             rmw_ret = RMW_RET_ERROR;
           }
-        } else if (client_info->read_condition != nullptr) {
-          RMW_SET_ERROR_MSG("cannot delete readcondition because the datareader is null");
-          rmw_ret = RMW_RET_ERROR;
         }
         ret = dds_DomainParticipant_delete_subscriber(
           client_info->participant, client_info->dds_subscriber);
@@ -482,6 +503,22 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
       RMW_SET_ERROR_MSG(
         "cannot delete publisher and subscriber because the domain participant is null");
       rmw_ret = RMW_RET_ERROR;
+    }
+
+    if (client_info->queue_guard_condition != nullptr) {
+      dds_GuardCondition_delete(client_info->queue_guard_condition);
+      client_info->queue_guard_condition = nullptr;
+    }
+
+    while (!client_info->message_queue.empty()) {
+      auto msg = client_info->message_queue.front();
+      if (msg.sample != nullptr) {
+        free(msg.sample);
+      }
+      if (msg.info != nullptr) {
+        free(msg.info);
+      }
+      client_info->message_queue.pop();
     }
 
     delete client_info;
