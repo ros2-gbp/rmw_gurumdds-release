@@ -15,19 +15,15 @@
 #ifndef RMW_GURUMDDS_SHARED_CPP__TOPIC_CACHE_HPP_
 #define RMW_GURUMDDS_SHARED_CPP__TOPIC_CACHE_HPP_
 
-#include <algorithm>
-#include <iterator>
-#include <map>
-#include <mutex>
-#include <set>
-#include <sstream>
-#include <string>
-#include <unordered_map>
 #include <utility>
-#include <vector>
+#include <set>
+#include <string>
+#include <map>
+#include <sstream>
+#include <iterator>
+#include <algorithm>
+#include <mutex>
 #include "rcutils/logging_macros.h"
-
-#include "rmw/types.h"
 
 typedef std::map<std::string, std::set<std::string>> TopicsTypes;
 
@@ -38,46 +34,31 @@ public:
   struct TopicInfo
   {
     GUID_t participant_guid;
-    GUID_t entity_guid;
+    GUID_t topic_guid;
     std::string name;
     std::string type;
-    rmw_qos_profile_t qos;
   };
 
-  typedef std::map<GUID_t, std::multiset<GUID_t>> ParticipantToEntityGuidMap;
-  typedef std::map<GUID_t, TopicInfo> EntityGuidToInfo;
-  typedef std::unordered_map<std::string, std::vector<TopicInfo>> TopicNameToInfo;
+  typedef std::map<GUID_t, std::multiset<GUID_t>> ParticipantToTopicGuidMap;
+  typedef std::map<GUID_t, TopicInfo> TopicGuidToInfo;
 
-  const EntityGuidToInfo & get_entity_guid_to_info() const
+  const TopicGuidToInfo & get_topic_guid_to_info() const
   {
-    return entity_guid_to_info_;
+    return topic_guid_to_info_;
   }
 
-  const ParticipantToEntityGuidMap & get_participant_to_entity_guid_map() const
+  const ParticipantToTopicGuidMap & get_participant_to_topic_guid_map() const
   {
-    return participant_to_entity_guids_;
-  }
-
-  const TopicNameToInfo get_topic_name_to_info() const
-  {
-    TopicNameToInfo tnti;
-    for (auto & i : entity_guid_to_info_) {
-      if (tnti.find(i.second.name) == tnti.end()) {
-        tnti[i.second.name] = std::vector<TopicInfo>();
-      }
-      tnti[i.second.name].push_back(i.second);
-    }
-    return tnti;
+    return participant_to_topic_guids_;
   }
 
   bool add_topic(
     const GUID_t & participant_guid,
-    const GUID_t & entity_guid,
+    const GUID_t & topic_guid,
     const std::string & topic_name,
-    const std::string & type_name,
-    rmw_qos_profile_t & qos)
+    const std::string & type_name)
   {
-    initialize_participant_map(participant_to_entity_guids_, participant_guid);
+    initialize_participant_map(participant_to_topic_guids_, participant_guid);
     if (rcutils_logging_logger_is_enabled_for(
         "rmw_gurumdds_shared_cpp", RCUTILS_LOG_SEVERITY_DEBUG))
     {
@@ -88,24 +69,24 @@ public:
         "Adding topic '%s' with type '%s' for node '%s'",
         topic_name.c_str(), type_name.c_str(), guid_stream.str().c_str());
     }
-    auto topic_info_it = entity_guid_to_info_.find(entity_guid);
-    if (topic_info_it != entity_guid_to_info_.end()) {
+    auto topic_info_it = topic_guid_to_info_.find(topic_guid);
+    if (topic_info_it != topic_guid_to_info_.end()) {
       RCUTILS_LOG_DEBUG_NAMED(
         "rmw_gurumdds_shared_cpp",
         "unique topic '%s' with type '%s' attempted to be added twice, ignoring",
         topic_name.c_str(), type_name.c_str());
       return false;
     }
-    entity_guid_to_info_[entity_guid] =
-      TopicInfo {participant_guid, entity_guid, topic_name, type_name, qos};
-    participant_to_entity_guids_[participant_guid].insert(entity_guid);
+    topic_guid_to_info_[topic_guid] =
+      TopicInfo {participant_guid, topic_guid, topic_name, type_name};
+    participant_to_topic_guids_[participant_guid].insert(topic_guid);
     return true;
   }
 
-  bool get_topic(const GUID_t & entity_guid, TopicInfo & topic_info) const
+  bool get_topic(const GUID_t & topic_guid, TopicInfo & topic_info) const
   {
-    auto topic_info_it = entity_guid_to_info_.find(entity_guid);
-    if (topic_info_it == entity_guid_to_info_.end()) {
+    auto topic_info_it = topic_guid_to_info_.find(topic_guid);
+    if (topic_info_it == topic_guid_to_info_.end()) {
       RCUTILS_LOG_DEBUG_NAMED(
         "rmw_gurumdds_shared_cpp",
         "topic not available");
@@ -114,10 +95,10 @@ public:
     return true;
   }
 
-  bool remove_topic(const GUID_t & entity_guid)
+  bool remove_topic(const GUID_t & topic_guid)
   {
-    auto topic_info_it = entity_guid_to_info_.find(entity_guid);
-    if (topic_info_it == entity_guid_to_info_.end()) {
+    auto topic_info_it = topic_guid_to_info_.find(topic_guid);
+    if (topic_info_it == topic_guid_to_info_.end()) {
       RCUTILS_LOG_DEBUG_NAMED(
         "rmw_gurumdds_shared_cpp",
         "unexpected topic removal");
@@ -128,8 +109,8 @@ public:
     std::string type_name = topic_info_it->second.type;
 
     auto participant_guid = topic_info_it->second.participant_guid;
-    auto participant_to_entity_guid = participant_to_entity_guids_.find(participant_guid);
-    if (participant_to_entity_guid == participant_to_entity_guids_.end()) {
+    auto participant_to_topic_guid = participant_to_topic_guids_.find(participant_guid);
+    if (participant_to_topic_guid == participant_to_topic_guids_.end()) {
       RCUTILS_LOG_WARN_NAMED(
         "rmw_gurumdds_shared_cpp",
         "unable to remove topic, "
@@ -138,8 +119,8 @@ public:
       return false;
     }
 
-    auto entity_guid_to_remove = participant_to_entity_guid->second.find(entity_guid);
-    if (entity_guid_to_remove == participant_to_entity_guid->second.end()) {
+    auto topic_guid_to_remove = participant_to_topic_guid->second.find(topic_guid);
+    if (topic_guid_to_remove == participant_to_topic_guid->second.end()) {
       RCUTILS_LOG_WARN_NAMED(
         "rmw_gurumdds_shared_cpp",
         "unable to remove topic, "
@@ -148,10 +129,10 @@ public:
       return false;
     }
 
-    entity_guid_to_info_.erase(topic_info_it);
-    participant_to_entity_guid->second.erase(entity_guid_to_remove);
-    if (participant_to_entity_guids_.empty()) {
-      participant_to_entity_guids_.erase(participant_to_entity_guid);
+    topic_guid_to_info_.erase(topic_info_it);
+    participant_to_topic_guid->second.erase(topic_guid_to_remove);
+    if (participant_to_topic_guids_.empty()) {
+      participant_to_topic_guids_.erase(participant_to_topic_guid);
     }
 
     return true;
@@ -160,14 +141,14 @@ public:
   TopicsTypes get_topic_types_by_guid(const GUID_t & participant_guid)
   {
     TopicsTypes topics_types;
-    const auto participant_to_entity_guids = participant_to_entity_guids_.find(participant_guid);
-    if (participant_to_entity_guids == participant_to_entity_guids_.end()) {
+    const auto participant_to_topic_guids = participant_to_topic_guids_.find(participant_guid);
+    if (participant_to_topic_guids == participant_to_topic_guids_.end()) {
       return topics_types;
     }
 
-    for (auto & entity_guid : participant_to_entity_guids->second) {
-      auto topic_info = entity_guid_to_info_.find(entity_guid);
-      if (topic_info == entity_guid_to_info_.end()) {
+    for (auto & topic_guid : participant_to_topic_guids->second) {
+      auto topic_info = topic_guid_to_info_.find(topic_guid);
+      if (topic_info == topic_guid_to_info_.end()) {
         continue;
       }
       auto topic_name = topic_info->second.name;
@@ -182,15 +163,15 @@ public:
 
   void clear_cache(void)
   {
-    entity_guid_to_info_.clear();
-    participant_to_entity_guids_.clear();
+    topic_guid_to_info_.clear();
+    participant_to_topic_guids_.clear();
   }
 
 private:
-  EntityGuidToInfo entity_guid_to_info_;
-  ParticipantToEntityGuidMap participant_to_entity_guids_;
+  TopicGuidToInfo topic_guid_to_info_;
+  ParticipantToTopicGuidMap participant_to_topic_guids_;
 
-  void initialize_participant_map(ParticipantToEntityGuidMap & map, const GUID_t & participant_guid)
+  void initialize_participant_map(ParticipantToTopicGuidMap & map, const GUID_t & participant_guid)
   {
     if (map.find(participant_guid) == map.end()) {
       map[participant_guid] = std::multiset<GUID_t>();
