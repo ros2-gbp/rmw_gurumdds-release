@@ -8,10 +8,8 @@ Required version of GurumDDS depends on the version of this project.
 
 | rmw_gurumdds            | GurumDDS                    |
 |-------------------------|-----------------------------|
-| 0.7.9                   | 2.7.x                       |
-| 0.7.8<br>0.7.7<br>0.7.6 | 2.6.x                       |
-| 0.7.5<br>0.7.4          | 2.5.x, higher than 2.5.1861 |
-| 0.7.3 or lower          | 2.5.x                       |
+| 1.0.3                   | 2.7.x                       |
+| 1.0.2 or lower          | 2.6.x                       |
 
 ## Packages
 This project consists of four packages, `rmw_gurumdds_cpp`, `rmw_gurumdds_static_cpp`, `rmw_gurumdds_shared_cpp` and `demo_nodes_cpp_native_gurumdds`.
@@ -40,9 +38,9 @@ This package is disabled by default.
 This package is disabled by default.
 
 ## Branches
-There are four branches in this project: master, eloquent, dashing, and crystal.  
+There are four active branches in this project: master, foxy, eloquent and dashing.  
 New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the master branch, so this branch might be unstable.
-If you want to use this project with ROS2 Eloquent Elusor, Dashing Diademata or Crystal Clemmys, please use eloquent, dashing or crystal branch.
+If you want to use this project with ROS2 Foxy Fitzroy, Eloquent Elusor or Dashing Diademata, please use foxy, eloquent or dashing branch, respectively.  
 
 ## Implementation Status
 Currently some features are not fully implemented.
