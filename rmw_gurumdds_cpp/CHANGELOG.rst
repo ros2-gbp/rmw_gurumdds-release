@@ -2,6 +2,20 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.1 (2021-03-12)
+------------------
+* Update packages to use gurumdds-2.7
+* Contributors: youngjin
+
+2.1.0 (2021-02-23)
+------------------
+* Change maintainer
+* Handle typesupport errors on retrieval
+* Set actual domain id into context
+* Fix wrong error messages
+* Use DataReader listener for taking data samples
+* Contributors: junho, youngjin
+
 2.0.1 (2020-07-29)
 ------------------
 * Change maintainer
