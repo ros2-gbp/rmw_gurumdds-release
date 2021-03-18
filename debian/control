@@ -1,0 +1,12 @@
+Source: ros-eloquent-rmw-gurumdds-cpp
+Section: misc
+Priority: optional
+Maintainer: Youngjin Yun <youngjin@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-2.7, ros-eloquent-ament-cmake-ros, ros-eloquent-ament-lint-auto, ros-eloquent-ament-lint-common, ros-eloquent-gurumdds-cmake-module, ros-eloquent-rcutils, ros-eloquent-rmw, ros-eloquent-rmw-gurumdds-shared-cpp, ros-eloquent-rosidl-cmake, ros-eloquent-rosidl-generator-c, ros-eloquent-rosidl-generator-cpp, ros-eloquent-rosidl-generator-dds-idl, ros-eloquent-rosidl-typesupport-introspection-c, ros-eloquent-rosidl-typesupport-introspection-cpp, ros-eloquent-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-eloquent-rmw-gurumdds-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gurumdds-2.7, ros-eloquent-gurumdds-cmake-module, ros-eloquent-rcutils, ros-eloquent-rmw, ros-eloquent-rmw-gurumdds-shared-cpp, ros-eloquent-rosidl-generator-c, ros-eloquent-rosidl-generator-cpp, ros-eloquent-rosidl-typesupport-introspection-c, ros-eloquent-rosidl-typesupport-introspection-cpp, ros-eloquent-ros-workspace
+Description: Implement the ROS middleware interface using GurumNetworks GurumDDS static code generation in C++.
