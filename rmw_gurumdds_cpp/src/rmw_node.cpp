@@ -40,7 +40,10 @@ rmw_node_t *
 rmw_create_node(
   rmw_context_t * context,
   const char * name,
-  const char * namespace_)
+  const char * namespace_,
+  size_t domain_id,
+  const rmw_node_security_options_t * security_options,
+  bool localhost_only)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, nullptr);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -49,13 +52,20 @@ rmw_create_node(
     gurum_gurumdds_identifier,
     return nullptr);
   return shared__rmw_create_node(
-    gurum_gurumdds_identifier, context, name, namespace_);
+    gurum_gurumdds_identifier, name, namespace_,
+    domain_id, security_options, localhost_only);
 }
 
 rmw_ret_t
 rmw_destroy_node(rmw_node_t * node)
 {
   return shared__rmw_destroy_node(gurum_gurumdds_identifier, node);
+}
+
+rmw_ret_t
+rmw_node_assert_liveliness(const rmw_node_t * node)
+{
+  return shared__rmw_node_assert_liveliness(gurum_gurumdds_identifier, node);
 }
 
 const rmw_guard_condition_t *
@@ -72,16 +82,5 @@ rmw_get_node_names(
 {
   return shared__rmw_get_node_names(
     gurum_gurumdds_identifier, node, node_names, node_namespaces);
-}
-
-rmw_ret_t
-rmw_get_node_names_with_enclaves(
-  const rmw_node_t * node,
-  rcutils_string_array_t * node_names,
-  rcutils_string_array_t * node_namespaces,
-  rcutils_string_array_t * enclaves)
-{
-  return shared__rmw_get_node_names_with_enclaves(
-    gurum_gurumdds_identifier, node, node_names, node_namespaces, enclaves);
 }
 }  // extern "C"

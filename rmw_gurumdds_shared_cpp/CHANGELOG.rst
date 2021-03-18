@@ -2,54 +2,40 @@
 Changelog for package rmw_gurumdds_shared_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.1.1 (2021-03-12)
+0.8.8 (2021-03-02)
 ------------------
+* Use DataReader listener for taking data samples
+* Delete contained entities before deleting domain participant
+* Change maintainer
 * Update packages to use gurumdds-2.7
-* fix typo
 * Contributors: youngjin
 
-2.1.0 (2021-02-23)
-------------------
-* Change maintainer
-* Set actual domain id into context
-* Use DataReader listener for taking data samples
-* Contributors: junho, youngjin
-
-2.0.1 (2020-07-29)
+0.8.7 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-2.0.0 (2020-07-09)
+0.8.6 (2020-07-06)
 ------------------
-* Removed parameters domain_id and localhost_only from rmw_create_node()
-* Contributors: junho
-
-1.1.0 (2020-07-09)
-------------------
-* Handle RMW_DEFAULT_DOMAIN_ID
-* Added support for sample_lost event
 * Set resource_limit explicitly
 * Fixed compile warnings
 * Contributors: junho
 
-1.0.0 (2020-06-04)
+0.8.5 (2020-06-04)
 ------------------
-* MANUAL_BY_NODE liveliness is deprecated
 * Updated packages to use gurumdds-2.6
-* security_context is renamed to enclave
-* Added incompatible qos support
-* Apply one participant per context API changes
+* Contributors: junho
+
+0.8.4 (2020-04-16)
+------------------
+
+0.8.3 (2020-04-01)
+------------------
 * Fixed some errors
   * added missing qos finalization
   * fixed issue that topic endpoint info was not handled correctly
   * added null check to builtin datareader callbacks
 * Fixed missing string array finalization
-* Added event init functions
-* Follow changes made to rmw_topic_endpoint_info_array
-* Minor refactoring
-* Fixed some errors
-* Implemented rmw_get_publishers/subscriptions_info_by_topic()
 * Contributors: junho
 
 0.8.2 (2019-12-19)

@@ -18,7 +18,6 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
-#include "rcutils/error_handling.h"
 
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/names_and_types.h"
@@ -77,11 +76,9 @@ rmw_create_service(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -286,7 +283,6 @@ rmw_create_service(
   }
 
   datareader_listener.on_data_available = reader_on_data_available<GurumddsServiceInfo>;
-
   request_reader = dds_Subscriber_create_datareader(
     dds_subscriber, request_topic, &datareader_qos, &datareader_listener,
     dds_DATA_AVAILABLE_STATUS);

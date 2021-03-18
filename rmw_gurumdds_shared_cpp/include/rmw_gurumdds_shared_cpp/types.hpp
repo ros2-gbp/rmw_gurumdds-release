@@ -31,13 +31,11 @@
 
 #include "rmw/rmw.h"
 #include "rmw/ret_types.h"
-
 #include "rmw_gurumdds_shared_cpp/dds_include.hpp"
-#include "rmw_gurumdds_shared_cpp/guid.hpp"
-#include "rmw_gurumdds_shared_cpp/qos.hpp"
-#include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
-#include "rmw_gurumdds_shared_cpp/topic_cache.hpp"
 #include "rmw_gurumdds_shared_cpp/visibility_control.h"
+#include "rmw_gurumdds_shared_cpp/guid.hpp"
+#include "rmw_gurumdds_shared_cpp/topic_cache.hpp"
+#include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
 
 enum EntityType {Publisher, Subscriber};
 
@@ -48,6 +46,7 @@ typedef struct _ListenerContext
   rmw_guard_condition_t * graph_guard_condition;
   const char * implementation_identifier;
 } ListenerContext;
+
 
 typedef struct _GurumddsMessage
 {
@@ -109,18 +108,7 @@ static void pub_on_data_available(const dds_DataReader * a_reader)
       dds_BuiltinTopicKey_to_GUID(&participant_guid, pbtd->participant_key);
       topic_name = std::string(pbtd->topic_name);
       type_name = std::string(pbtd->type_name);
-      rmw_qos_profile_t qos = {
-        RMW_QOS_POLICY_HISTORY_UNKNOWN,  // TODO(clemjh): pbtd doesn't contain history qos policy
-        RMW_QOS_POLICY_DEPTH_SYSTEM_DEFAULT,
-        convert_reliability(pbtd->reliability),
-        convert_durability(pbtd->durability),
-        convert_deadline(pbtd->deadline),
-        convert_lifespan(pbtd->lifespan),
-        convert_liveliness(pbtd->liveliness),
-        convert_liveliness_lease_duration(pbtd->liveliness),
-        false,
-      };
-      context->topic_cache->add_topic(participant_guid, guid, topic_name, type_name, qos);
+      context->topic_cache->add_topic(participant_guid, guid, topic_name, type_name);
     } else {
       context->topic_cache->remove_topic(guid);
     }
@@ -195,18 +183,7 @@ static void sub_on_data_available(const dds_DataReader * a_reader)
       dds_BuiltinTopicKey_to_GUID(&participant_guid, sbtd->participant_key);
       topic_name = sbtd->topic_name;
       type_name = sbtd->type_name;
-      rmw_qos_profile_t qos = {
-        RMW_QOS_POLICY_HISTORY_UNKNOWN,  // TODO(clemjh): sbtd doesn't contain history qos policy
-        RMW_QOS_POLICY_DEPTH_SYSTEM_DEFAULT,
-        convert_reliability(sbtd->reliability),
-        convert_durability(sbtd->durability),
-        convert_deadline(sbtd->deadline),
-        RMW_QOS_LIFESPAN_DEFAULT,
-        convert_liveliness(sbtd->liveliness),
-        convert_liveliness_lease_duration(sbtd->liveliness),
-        false,
-      };
-      context->topic_cache->add_topic(participant_guid, guid, topic_name, type_name, qos);
+      context->topic_cache->add_topic(participant_guid, guid, topic_name, type_name);
     } else {
       context->topic_cache->remove_topic(guid);
     }
@@ -306,7 +283,6 @@ public:
     const GuidPrefix_t & topic_guid,
     const std::string & topic_name,
     const std::string & type_name,
-    rmw_qos_profile_t & qos,
     EntityType entity_type);
 
   RMW_GURUMDDS_SHARED_CPP_PUBLIC
