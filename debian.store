@@ -1,1 +1,1 @@
-{"trim": "", "base": "7f67528", "trimbase": "", "parent": "debian/rolling/rmw_gurumdds_cpp", "previous": "819470f"}
+{"base": "a803753", "parent": "debian/rolling/rmw_gurumdds_cpp", "previous": "691671e", "trim": "", "trimbase": ""}
