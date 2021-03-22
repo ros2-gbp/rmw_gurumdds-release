@@ -32,6 +32,7 @@
 #include "rmw_gurumdds_static_cpp/types.hpp"
 
 #include "rcutils/types.h"
+#include "rcutils/error_handling.h"
 
 #include "./type_support_common.hpp"
 
@@ -40,7 +41,7 @@ extern "C"
 rmw_ret_t
 rmw_init_publisher_allocation(
   const rosidl_message_type_support_t * type_support,
-  const rosidl_message_bounds_t * message_bounds,
+  const rosidl_runtime_c__Sequence__bound * message_bounds,
   rmw_publisher_allocation_t * allocation)
 {
   (void)type_support;
@@ -107,8 +108,10 @@ rmw_create_publisher(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_C);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_CPP);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -214,7 +217,8 @@ rmw_create_publisher(
   publisher_info->callbacks = callbacks;
   publisher_info->publisher_gid.implementation_identifier = gurum_gurumdds_static_identifier;
 
-  static_assert(sizeof(GurumddsPublisherGID) <= RMW_GID_STORAGE_SIZE,
+  static_assert(
+    sizeof(GurumddsPublisherGID) <= RMW_GID_STORAGE_SIZE,
     "RMW_GID_STORAGE_SIZE insufficient to store the rmw_gurumdds_static_cpp GID implementation.");
   memset(publisher_info->publisher_gid.data, 0, RMW_GID_STORAGE_SIZE);
   {
@@ -233,7 +237,7 @@ rmw_create_publisher(
   rmw_publisher->data = publisher_info;
   rmw_publisher->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (rmw_publisher->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
     goto fail;
   }
   memcpy(const_cast<char *>(rmw_publisher->topic_name), topic_name, strlen(topic_name) + 1);
@@ -248,7 +252,8 @@ rmw_create_publisher(
 
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-  RCUTILS_LOG_DEBUG_NAMED("rmw_gurumdds_static_cpp",
+  RCUTILS_LOG_DEBUG_NAMED(
+    "rmw_gurumdds_static_cpp",
     "Created publisher with topic '%s' on node '%s%s%s'",
     topic_name, node->namespace_,
     node->namespace_[strlen(node->namespace_) - 1] == '/' ? "" : "/", node->name);
@@ -405,7 +410,8 @@ rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
     delete publisher_info;
     publisher->data = nullptr;
     if (publisher->topic_name != nullptr) {
-      RCUTILS_LOG_DEBUG_NAMED("rmw_gurumdds_static_cpp",
+      RCUTILS_LOG_DEBUG_NAMED(
+        "rmw_gurumdds_static_cpp",
         "Deleted publisher with topic '%s' on node '%s%s%s'",
         publisher->topic_name, node->namespace_,
         node->namespace_[strlen(node->namespace_) - 1] == '/' ? "" : "/", node->name);
@@ -539,9 +545,6 @@ rmw_publisher_get_actual_qos(
   switch (dds_qos.liveliness.kind) {
     case dds_AUTOMATIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
-      break;
-    case dds_MANUAL_BY_PARTICIPANT_LIVELINESS_QOS:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_NODE;
       break;
     case dds_MANUAL_BY_TOPIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;

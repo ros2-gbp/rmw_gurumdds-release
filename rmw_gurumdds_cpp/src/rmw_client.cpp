@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
+#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
 #include "rmw/rmw.h"
@@ -79,9 +80,11 @@ rmw_create_client(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -334,6 +337,7 @@ rmw_create_client(
   }
 
   datareader_listener.on_data_available = reader_on_data_available<GurumddsClientInfo>;
+
   response_reader = dds_Subscriber_create_datareader(
     dds_subscriber, response_topic, &datareader_qos, &datareader_listener,
     dds_DATA_AVAILABLE_STATUS);
@@ -511,7 +515,7 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
       if (msg.sample != nullptr) {
         free(msg.sample);
       }
-      if (msg.info !- nullptr) {
+      if (msg.info != nullptr) {
         free(msg.info);
       }
       client_info->message_queue.pop();

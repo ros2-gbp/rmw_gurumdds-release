@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
+#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
 #include "rmw/rmw.h"
@@ -79,8 +80,10 @@ rmw_create_client(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_C);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_service_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_CPP);
     if (type_support == nullptr) {
+      recutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -337,7 +340,8 @@ rmw_create_client(
 
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-  RCUTILS_LOG_DEBUG_NAMED("rmw_gurumdds_static_cpp",
+  RCUTILS_LOG_DEBUG_NAMED(
+    "rmw_gurumdds_static_cpp",
     "Created client with service '%s' on node '%s%s%s'",
     service_name, node->namespace_,
     node->namespace_[strlen(node->namespace_) - 1] == '/' ? "" : "/", node->name);
@@ -458,7 +462,8 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
     delete client_info;
     client->data = nullptr;
     if (client->service_name != nullptr) {
-      RCUTILS_LOG_DEBUG_NAMED("rmw_gurumdds_static_cpp",
+      RCUTILS_LOG_DEBUG_NAMED(
+        "rmw_gurumdds_static_cpp",
         "Deleted client with service '%s' on node '%s%s%s'",
         client->service_name, node->namespace_,
         node->namespace_[strlen(node->namespace_) - 1] == '/' ? "" : "/", node->name);

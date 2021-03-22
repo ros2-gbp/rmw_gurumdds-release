@@ -20,6 +20,7 @@
 
 #include "rmw/error_handling.h"
 #include "rmw/types.h"
+#include "rmw/incompatible_qos_events_statuses.h"
 
 #include "rmw_gurumdds_shared_cpp/visibility_control.h"
 
@@ -38,5 +39,34 @@ get_datareader_qos(
   dds_Subscriber * subscriber,
   const rmw_qos_profile_t * qos_profile,
   dds_DataReaderQos * datareader_qos);
+
+enum rmw_qos_reliability_policy_t
+convert_reliability(
+  dds_ReliabilityQosPolicy policy);
+
+enum rmw_qos_durability_policy_t
+convert_durability(
+  dds_DurabilityQosPolicy policy);
+
+struct rmw_time_t
+convert_deadline(
+  dds_DeadlineQosPolicy policy);
+
+struct rmw_time_t
+convert_lifespan(
+  dds_LifespanQosPolicy policy);
+
+enum rmw_qos_liveliness_policy_t
+convert_liveliness(
+  dds_LivelinessQosPolicy policy);
+
+struct rmw_time_t
+convert_liveliness_lease_duration(
+  dds_LivelinessQosPolicy policy);
+
+RMW_GURUMDDS_SHARED_CPP_PUBLIC
+rmw_qos_policy_kind_t
+convert_qos_policy(
+  dds_QosPolicyId_t policy_id);
 
 #endif  // RMW_GURUMDDS_SHARED_CPP__QOS_HPP_

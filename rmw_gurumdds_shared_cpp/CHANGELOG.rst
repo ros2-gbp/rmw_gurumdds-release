@@ -2,40 +2,63 @@
 Changelog for package rmw_gurumdds_shared_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.8.8 (2021-03-02)
+2.1.1 (2021-03-12)
 ------------------
-* Use DataReader listener for taking data samples
-* Delete contained entities before deleting domain participant
-* Change maintainer
 * Update packages to use gurumdds-2.7
+* fix typo
 * Contributors: youngjin
 
-0.8.7 (2020-07-29)
+2.1.2 (2021-03-22)
+------------------
+* Update code about build error on windows
+* Add RMW function to check QoS compatibility
+* 2.1.1
+* Update packages to use gurumdds-2.7
+* fix typo
+* Contributors: Youngjin Yun, youngjin
+
+2.1.0 (2021-02-23)
+------------------
+* Change maintainer
+* Set actual domain id into context
+* Use DataReader listener for taking data samples
+* Contributors: junho, youngjin
+
+2.0.1 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-0.8.6 (2020-07-06)
+2.0.0 (2020-07-09)
 ------------------
+* Removed parameters domain_id and localhost_only from rmw_create_node()
+* Contributors: junho
+
+1.1.0 (2020-07-09)
+------------------
+* Handle RMW_DEFAULT_DOMAIN_ID
+* Added support for sample_lost event
 * Set resource_limit explicitly
 * Fixed compile warnings
 * Contributors: junho
 
-0.8.5 (2020-06-04)
+1.0.0 (2020-06-04)
 ------------------
+* MANUAL_BY_NODE liveliness is deprecated
 * Updated packages to use gurumdds-2.6
-* Contributors: junho
-
-0.8.4 (2020-04-16)
-------------------
-
-0.8.3 (2020-04-01)
-------------------
+* security_context is renamed to enclave
+* Added incompatible qos support
+* Apply one participant per context API changes
 * Fixed some errors
   * added missing qos finalization
   * fixed issue that topic endpoint info was not handled correctly
   * added null check to builtin datareader callbacks
 * Fixed missing string array finalization
+* Added event init functions
+* Follow changes made to rmw_topic_endpoint_info_array
+* Minor refactoring
+* Fixed some errors
+* Implemented rmw_get_publishers/subscriptions_info_by_topic()
 * Contributors: junho
 
 0.8.2 (2019-12-19)

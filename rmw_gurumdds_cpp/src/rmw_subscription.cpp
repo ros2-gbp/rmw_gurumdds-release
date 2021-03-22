@@ -23,6 +23,8 @@
 #include "rmw/serialized_message.h"
 #include "rmw/rmw.h"
 
+#include "rcutils/error_handling.h"
+
 #include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
 #include "rmw_gurumdds_shared_cpp/types.hpp"
 #include "rmw_gurumdds_shared_cpp/dds_include.hpp"
@@ -40,7 +42,7 @@ extern "C"
 rmw_ret_t
 rmw_init_subscription_allocation(
   const rosidl_message_type_support_t * type_support,
-  const rosidl_message_bounds_t * message_bounds,
+  const rosidl_runtime_c__Sequence__bound * message_bounds,
   rmw_subscription_allocation_t * allocation)
 {
   (void)type_support;
@@ -107,9 +109,11 @@ rmw_create_subscription(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -221,7 +225,6 @@ rmw_create_subscription(
     goto fail;
   }
 
-
   datareader_listener.on_data_available = reader_on_data_available<GurumddsSubscriberInfo>;
 
   topic_reader = dds_Subscriber_create_datareader(
@@ -234,7 +237,7 @@ rmw_create_subscription(
 
   ret = dds_DataReaderQos_finalize(&datareader_qos);
   if (ret != dds_RETCODE_OK) {
-    RMW_SET_ERROR_MSG("failed to finalize datareadere qos");
+    RMW_SET_ERROR_MSG("failed to finalize datareader qos");
     goto fail;
   }
 
@@ -258,6 +261,7 @@ rmw_create_subscription(
   subscriber_info->rosidl_message_typesupport = type_support;
 
   dds_DataReader_set_listener_context(subscriber_info->topic_reader, subscriber_info);
+
   subscription = rmw_subscription_allocate();
   if (subscription == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate subscription");
@@ -268,7 +272,7 @@ rmw_create_subscription(
   subscription->data = subscriber_info;
   subscription->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (subscription->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
     goto fail;
   }
   memcpy(const_cast<char *>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
@@ -444,9 +448,6 @@ rmw_subscription_get_actual_qos(
     case dds_AUTOMATIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
       break;
-    case dds_MANUAL_BY_PARTICIPANT_LIVELINESS_QOS:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_NODE;
-      break;
     case dds_MANUAL_BY_TOPIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;
       break;
@@ -600,7 +601,6 @@ _take(
   info->queue_mutex.lock();
   auto msg = info->message_queue.front();
   info->message_queue.pop();
-
   if (info->message_queue.empty()) {
     dds_GuardCondition_set_trigger_value(info->queue_guard_condition, false);
   }
@@ -613,7 +613,7 @@ _take(
   }
 
   if (!ignore_sample) {
-    if (msg.smaple == nullptr) {
+    if (msg.sample == nullptr) {
       RMW_SET_ERROR_MSG("Received invalid message");
       free(msg.info);
       return RMW_RET_ERROR;
@@ -626,7 +626,7 @@ _take(
       static_cast<size_t>(msg.size)
     );
     if (!result) {
-      RMW_SET_ERROR_MSG("failed to deserialize message");
+      RMW_SET_ERROR_MSG("Failed to deserialize message");
       free(msg.sample);
       free(msg.info);
       return RMW_RET_ERROR;
@@ -635,6 +635,11 @@ _take(
     *taken = true;
 
     if (message_info != nullptr) {
+      message_info->source_timestamp =
+        msg.info->source_timestamp.sec * static_cast<int64_t>(1000000000) +
+        msg.info->source_timestamp.nanosec;
+      // TODO(clemjh): SampleInfo doesn't contain received_timestamp
+      message_info->received_timestamp = 0;
       rmw_gid_t * sender_gid = &message_info->publisher_gid;
       sender_gid->implementation_identifier = identifier;
       memset(sender_gid->data, 0, RMW_GID_STORAGE_SIZE);
@@ -656,6 +661,7 @@ _take(
   if (msg.info != nullptr) {
     free(msg.info);
   }
+
   return RMW_RET_OK;
 }
 
@@ -698,6 +704,124 @@ rmw_take_with_info(
     gurum_gurumdds_identifier, subscription, ros_message, taken, message_info, allocation);
 }
 
+rmw_ret_t
+rmw_take_sequence(
+  const rmw_subscription_t * subscription,
+  size_t count,
+  rmw_message_sequence_t * message_sequence,
+  rmw_message_info_sequence_t * message_info_sequence,
+  size_t * taken,
+  rmw_subscription_allocation_t * allocation)
+{
+  (void)allocation;
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    subscription, "subscription handle is null", return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    message_sequence, "message sequence is null", return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    message_info_sequence, "message info sequence is null", return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    taken, "taken handle is null", return RMW_RET_INVALID_ARGUMENT);
+
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    subscription handle,
+    subscription->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION)
+
+  if (message_sequence->capacity < count) {
+    RMW_SET_ERROR_MSG("message sequence capacity is not sufficient");
+    return RMW_RET_ERROR;
+  }
+
+  if (message_info_sequence->capacity < count) {
+    RMW_SET_ERROR_MSG("message info sequence capacity is not sufficient");
+    return RMW_RET_ERROR;
+  }
+
+  GurumddsSubscriberInfo * info = static_cast<GurumddsSubscriberInfo *>(subscription->data);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "custom subscriber info is null", return RMW_RET_ERROR);
+
+  dds_DataReader * topic_reader = info->topic_reader;
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(topic_reader, "topic reader is null", return RMW_RET_ERROR);
+
+  if (info->message_queue.empty()) {
+    return RMW_RET_OK;
+  }
+
+  info->queue_mutex.lock();
+  while (!info->message_queue.empty()) {
+    auto msg = info->message_queue.front();
+    info->message_queue.pop();
+    if (info->message_queue.empty()) {
+      dds_GuardCondition_set_trigger_value(info->queue_guard_condition, false);
+    }
+    bool ignore_sample = false;
+
+    if (!msg.info->valid_data) {
+      ignore_sample = true;
+    }
+
+    if (!ignore_sample) {
+      if (msg.sample == nullptr) {
+        RMW_SET_ERROR_MSG("Received invalid message");
+        free(msg.info);
+        return RMW_RET_ERROR;
+      }
+      bool result = deserialize_cdr_to_ros(
+        info->rosidl_message_typesupport->data,
+        info->rosidl_message_typesupport->typesupport_identifier,
+        message_sequence->data[*taken],
+        msg.sample,
+        static_cast<size_t>(msg.size)
+      );
+      if (!result) {
+        RMW_SET_ERROR_MSG("Failed to deserialize message");
+        free(msg.sample);
+        free(msg.info);
+        return RMW_RET_ERROR;
+      }
+
+      auto message_info = &(message_info_sequence->data[*taken]);
+
+      message_info->source_timestamp =
+        msg.info->source_timestamp.sec * static_cast<int64_t>(1000000000) +
+        msg.info->source_timestamp.nanosec;
+      // TODO(clemjh): SampleInfo doesn't contain received_timestamp
+      message_info->received_timestamp = 0;
+      rmw_gid_t * sender_gid = &message_info->publisher_gid;
+      sender_gid->implementation_identifier = gurum_gurumdds_identifier;
+      memset(sender_gid->data, 0, RMW_GID_STORAGE_SIZE);
+      auto custom_gid = reinterpret_cast<GurumddsPublisherGID *>(sender_gid->data);
+      dds_ReturnCode_t ret = dds_DataReader_get_guid_from_publication_handle(
+        topic_reader, msg.info->publication_handle, custom_gid->publication_handle);
+      if (ret != dds_RETCODE_OK) {
+        if (ret == dds_RETCODE_ERROR) {
+          RCUTILS_LOG_WARN_NAMED("rmw_gurumdds_cpp", "Failed to get publication handle");
+        }
+        memset(custom_gid->publication_handle, 0, sizeof(custom_gid->publication_handle));
+      }
+
+      (*taken)++;
+    }
+
+    if (msg.sample != nullptr) {
+      free(msg.sample);
+    }
+    if (msg.info != nullptr) {
+      free(msg.info);
+    }
+  }
+  info->queue_mutex.unlock();
+
+  // =============================================================================================
+
+  message_sequence->size = *taken;
+  message_info_sequence->size = *taken;
+
+  return RMW_RET_OK;
+}
+
 static rmw_ret_t
 _take_serialized(
   const char * identifier,
@@ -728,7 +852,6 @@ _take_serialized(
   info->queue_mutex.lock();
   auto msg = info->message_queue.front();
   info->message_queue.pop();
-
   if (info->message_queue.empty()) {
     dds_GuardCondition_set_trigger_value(info->queue_guard_condition, false);
   }
@@ -763,6 +886,11 @@ _take_serialized(
     *taken = true;
 
     if (message_info != nullptr) {
+      message_info->source_timestamp =
+        msg.info->source_timestamp.sec * static_cast<int64_t>(1000000000) +
+        msg.info->source_timestamp.nanosec;
+      // TODO(clemjh): SampleInfo doesn't contain received_timestamp
+      message_info->received_timestamp = 0;
       rmw_gid_t * sender_gid = &message_info->publisher_gid;
       sender_gid->implementation_identifier = identifier;
       memset(sender_gid->data, 0, RMW_GID_STORAGE_SIZE);
