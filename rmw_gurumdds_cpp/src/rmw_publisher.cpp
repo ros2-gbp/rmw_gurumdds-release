@@ -32,7 +32,6 @@
 #include "rmw_gurumdds_cpp/types.hpp"
 
 #include "rcutils/types.h"
-#include "rcutils/error_handling.h"
 
 #include "./type_support_common.hpp"
 
@@ -41,7 +40,7 @@ extern "C"
 rmw_ret_t
 rmw_init_publisher_allocation(
   const rosidl_message_type_support_t * type_support,
-  const rosidl_runtime_c__Sequence__bound * message_bounds,
+  const rosidl_message_bounds_t * message_bounds,
   rmw_publisher_allocation_t * allocation)
 {
   (void)type_support;
@@ -65,8 +64,7 @@ rmw_publisher_t *
 rmw_create_publisher(
   const rmw_node_t * node,
   const rosidl_message_type_support_t * type_supports,
-  const char * topic_name, const rmw_qos_profile_t * qos_policies,
-  const rmw_publisher_options_t * publisher_options)
+  const char * topic_name, const rmw_qos_profile_t * qos_policies)
 {
   if (node == nullptr) {
     RMW_SET_ERROR_MSG("node handle is null");
@@ -88,11 +86,6 @@ rmw_create_publisher(
     return nullptr;
   }
 
-  if (publisher_options == nullptr) {
-    RMW_SET_ERROR_MSG("publisher_options is null");
-    return nullptr;
-  }
-
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
     RMW_SET_ERROR_MSG("node info is null");
@@ -108,11 +101,9 @@ rmw_create_publisher(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -266,12 +257,10 @@ rmw_create_publisher(
   rmw_publisher->data = publisher_info;
   rmw_publisher->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (rmw_publisher->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
   memcpy(const_cast<char *>(rmw_publisher->topic_name), topic_name, strlen(topic_name) + 1);
-  rmw_publisher->options = *publisher_options;
-  rmw_publisher->can_loan_messages = false;
 
   rmw_ret = rmw_trigger_guard_condition(node_info->graph_guard_condition);
   if (rmw_ret != RMW_RET_OK) {
@@ -580,6 +569,9 @@ rmw_publisher_get_actual_qos(
     case dds_AUTOMATIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
       break;
+    case dds_MANUAL_BY_PARTICIPANT_LIVELINESS_QOS:
+      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_NODE;
+      break;
     case dds_MANUAL_BY_TOPIC_LIVELINESS_QOS:
       qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;
       break;
@@ -724,45 +716,5 @@ rmw_publish_serialized_message(
   RCUTILS_LOG_DEBUG_NAMED("rmw_gurumdds_cpp", "Published data on topic %s", topic_name);
 
   return RMW_RET_OK;
-}
-
-rmw_ret_t
-rmw_publish_loaned_message(
-  const rmw_publisher_t * publisher,
-  void * ros_message,
-  rmw_publisher_allocation_t * allocation)
-{
-  (void)publisher;
-  (void)ros_message;
-  (void)allocation;
-
-  RMW_SET_ERROR_MSG("rmw_publish_loaned_message is not supported");
-  return RMW_RET_UNSUPPORTED;
-}
-
-rmw_ret_t
-rmw_borrow_loaned_message(
-  const rmw_publisher_t * publisher,
-  const rosidl_message_type_support_t * type_support,
-  void ** ros_message)
-{
-  (void)publisher;
-  (void)type_support;
-  (void)ros_message;
-
-  RMW_SET_ERROR_MSG("rmw_borrow_loaned_message is not supported");
-  return RMW_RET_UNSUPPORTED;
-}
-
-rmw_ret_t
-rmw_return_loaned_message_from_publisher(
-  const rmw_publisher_t * publisher,
-  void * loaned_message)
-{
-  (void)publisher;
-  (void)loaned_message;
-
-  RMW_SET_ERROR_MSG("rmw_return_loaned_message_from_publisher is not supported");
-  return RMW_RET_UNSUPPORTED;
 }
 }  // extern "C"

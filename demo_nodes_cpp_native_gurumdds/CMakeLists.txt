@@ -60,20 +60,20 @@ if(rmw_gurumdds_cpp_FOUND)
       list(APPEND RMW_GURUMDDS_DEMO_EXECUTABLE "$<TARGET_FILE:${executable}>")
     endforeach()
 
-    string(REPLACE ";" "_" exe_list_underscore "${executables}")
+    string(REPLACE ";" "_" exe_list_undersgurum "${executables}")
     configure_file(
       test/test_executables.py.in
-      test_${exe_list_underscore}.py.configured
+      test_${exe_list_undersgurum}.py.configured
       @ONLY
     )
     file(GENERATE
-      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test_${exe_list_underscore}_$<CONFIG>.py"
-      INPUT "${CMAKE_CURRENT_BINARY_DIR}/test_${exe_list_underscore}.py.configured"
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test_${exe_list_undersgurum}_$<CONFIG>.py"
+      INPUT "${CMAKE_CURRENT_BINARY_DIR}/test_${exe_list_undersgurum}.py.configured"
     )
 
     add_launch_test(
-      "${CMAKE_CURRENT_BINARY_DIR}/test_${exe_list_underscore}_$<CONFIG>.py"
-      TARGET test_tutorial_${exe_list_underscore}
+      "${CMAKE_CURRENT_BINARY_DIR}/test_${exe_list_undersgurum}_$<CONFIG>.py"
+      TARGET test_${exe_list_undersgurum}
       TIMEOUT 30
       ENV
       RCL_ASSERT_RMW_ID_MATCHES=rmw_gurumdds_cpp
@@ -82,7 +82,7 @@ if(rmw_gurumdds_cpp_FOUND)
 
     foreach(executable ${executables})
       set_property(
-        TEST test_tutorial_${exe_list_underscore}
+        TEST test_${exe_list_undersgurum}
         APPEND PROPERTY DEPENDS ${executable})
     endforeach()
   endif()
