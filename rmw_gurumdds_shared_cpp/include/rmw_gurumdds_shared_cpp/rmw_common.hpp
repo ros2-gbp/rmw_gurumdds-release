@@ -46,7 +46,9 @@ shared__rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_);
+  const char * namespace_,
+  size_t domain_id,
+  bool localhost_only);
 
 RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
@@ -198,7 +200,6 @@ RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_set_log_severity(rmw_log_severity_t severity);
 
-RMW_GURUMDDS_SHARED_CPP_PUBLIC
 rmw_ret_t
 shared__rmw_init_event(
   const char * identifier,

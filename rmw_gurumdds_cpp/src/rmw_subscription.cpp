@@ -23,8 +23,6 @@
 #include "rmw/serialized_message.h"
 #include "rmw/rmw.h"
 
-#include "rcutils/error_handling.h"
-
 #include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
 #include "rmw_gurumdds_shared_cpp/types.hpp"
 #include "rmw_gurumdds_shared_cpp/dds_include.hpp"
@@ -109,11 +107,9 @@ rmw_create_subscription(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -272,7 +268,7 @@ rmw_create_subscription(
   subscription->data = subscriber_info;
   subscription->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (subscription->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
   memcpy(const_cast<char *>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
@@ -538,10 +534,10 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
     while (!subscriber_info->message_queue.empty()) {
       auto msg = subscriber_info->message_queue.front();
       if (msg.sample != nullptr) {
-        free(msg.sample);
+        dds_free(msg.sample);
       }
       if (msg.info != nullptr) {
-        free(msg.info);
+        dds_free(msg.info);
       }
       subscriber_info->message_queue.pop();
     }
@@ -615,7 +611,7 @@ _take(
   if (!ignore_sample) {
     if (msg.sample == nullptr) {
       RMW_SET_ERROR_MSG("Received invalid message");
-      free(msg.info);
+      dds_free(msg.info);
       return RMW_RET_ERROR;
     }
     bool result = deserialize_cdr_to_ros(
@@ -627,8 +623,8 @@ _take(
     );
     if (!result) {
       RMW_SET_ERROR_MSG("Failed to deserialize message");
-      free(msg.sample);
-      free(msg.info);
+      dds_free(msg.sample);
+      dds_free(msg.info);
       return RMW_RET_ERROR;
     }
 
@@ -656,10 +652,10 @@ _take(
   }
 
   if (msg.sample != nullptr) {
-    free(msg.sample);
+    dds_free(msg.sample);
   }
   if (msg.info != nullptr) {
-    free(msg.info);
+    dds_free(msg.info);
   }
 
   return RMW_RET_OK;
@@ -765,7 +761,7 @@ rmw_take_sequence(
     if (!ignore_sample) {
       if (msg.sample == nullptr) {
         RMW_SET_ERROR_MSG("Received invalid message");
-        free(msg.info);
+        dds_free(msg.info);
         return RMW_RET_ERROR;
       }
       bool result = deserialize_cdr_to_ros(
@@ -777,8 +773,8 @@ rmw_take_sequence(
       );
       if (!result) {
         RMW_SET_ERROR_MSG("Failed to deserialize message");
-        free(msg.sample);
-        free(msg.info);
+        dds_free(msg.sample);
+        dds_free(msg.info);
         return RMW_RET_ERROR;
       }
 
@@ -806,10 +802,10 @@ rmw_take_sequence(
     }
 
     if (msg.sample != nullptr) {
-      free(msg.sample);
+      dds_free(msg.sample);
     }
     if (msg.info != nullptr) {
-      free(msg.info);
+      dds_free(msg.info);
     }
   }
   info->queue_mutex.unlock();
@@ -866,7 +862,7 @@ _take_serialized(
   if (!ignore_sample) {
     if (msg.sample == nullptr) {
       RMW_SET_ERROR_MSG("Received invalid message");
-      free(msg.info);
+      dds_free(msg.info);
       return RMW_RET_ERROR;
     }
 
@@ -875,8 +871,8 @@ _take_serialized(
       rmw_ret_t rmw_ret = rmw_serialized_message_resize(serialized_message, msg.size);
       if (rmw_ret != RMW_RET_OK) {
         // Error message already set
-        free(msg.sample);
-        free(msg.info);
+        dds_free(msg.sample);
+        dds_free(msg.info);
         return rmw_ret;
       }
     }
@@ -907,10 +903,10 @@ _take_serialized(
   }
 
   if (msg.sample != nullptr) {
-    free(msg.sample);
+    dds_free(msg.sample);
   }
   if (msg.info != nullptr) {
-    free(msg.info);
+    dds_free(msg.info);
   }
 
   return RMW_RET_OK;

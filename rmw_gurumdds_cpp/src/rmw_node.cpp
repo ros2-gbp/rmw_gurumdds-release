@@ -40,7 +40,9 @@ rmw_node_t *
 rmw_create_node(
   rmw_context_t * context,
   const char * name,
-  const char * namespace_)
+  const char * namespace_,
+  size_t domain_id,
+  bool localhost_only)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, nullptr);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -49,7 +51,7 @@ rmw_create_node(
     gurum_gurumdds_identifier,
     return nullptr);
   return shared__rmw_create_node(
-    gurum_gurumdds_identifier, context, name, namespace_);
+    gurum_gurumdds_identifier, context, name, namespace_, domain_id, localhost_only);
 }
 
 rmw_ret_t
