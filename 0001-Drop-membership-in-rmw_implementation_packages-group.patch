@@ -1,4 +1,4 @@
-From 6569fcbc4167d19b0e56a5739319ecd67daf2f9a Mon Sep 17 00:00:00 2001
+From 64238e10aeed6be995de276e93b73dd1151f5e1e Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Thu, 11 Feb 2021 18:39:10 -0800
 Subject: [PATCH] Drop membership in rmw_implementation_packages group
@@ -14,7 +14,7 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/package.xml b/package.xml
-index c4f3a54..2f22e9b 100644
+index 2642342..8387a13 100644
 --- a/package.xml
 +++ b/package.xml
 @@ -36,8 +36,6 @@
@@ -27,7 +27,7 @@ index c4f3a54..2f22e9b 100644
      <build_type>ament_cmake</build_type>
    </export>
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index d2872c6..d361b61 100644
+index 836b2af..efde1e0 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -1,3 +1,8 @@
