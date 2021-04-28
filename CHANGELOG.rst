@@ -8,6 +8,16 @@ Changelog for package rmw_gurumdds_shared_cpp
 * fix typo
 * Contributors: youngjin
 
+2.1.5 (2021-04-28)
+------------------
+* Revise for lint
+* Contributors: Youngjin Yun
+
+2.1.4 (2021-04-22)
+------------------
+* Take and return new RMW_DURATION_INFINITE
+* Contributors: Youngjin Yun
+
 2.1.3 (2021-04-12)
 ------------------
 * fix typo
