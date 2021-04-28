@@ -1,0 +1,130 @@
+ros-galactic-rmw-gurumdds-cpp (2.1.5-1focal) focal; urgency=high
+
+  * Revise for lint
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 27 Apr 2021 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.1.4-1focal) focal; urgency=high
+
+  * Indicate missing support for unique network flows
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 21 Apr 2021 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.1.3-1focal) focal; urgency=high
+
+  * Use dds_free instead of free for dll library
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 11 Apr 2021 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.1.2-1focal) focal; urgency=high
+
+  * Update code about build error on windows
+  * Add RMW function to check QoS compatibility
+  * 2.1.1
+  * Update packages to use gurumdds-2.7
+  * Contributors: Youngjin Yun, youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 21 Mar 2021 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.1.1-1focal) focal; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * Contributors: youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 11 Mar 2021 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.1.0-1focal) focal; urgency=high
+
+  * Change maintainer
+  * Handle typesupport errors on retrieval
+  * Set actual domain id into context
+  * Fix wrong error messages
+  * Use DataReader listener for taking data samples
+  * Contributors: junho, youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 22 Feb 2021 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.0.1-1focal) focal; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Junho Lee <junho@gurum.cc>  Tue, 28 Jul 2020 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (2.0.0-1focal) focal; urgency=high
+
+  * Removed parameters domain_id and localhost_only from rmw_create_node()
+  * Updated init/shutdown/init option functions
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Wed, 08 Jul 2020 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (1.1.0-1focal) focal; urgency=high
+
+  * Finalize rmw context only if it's shutdown
+  * Added support for sample_lost event
+  * Renamed rmw_gurumdds_dynamic_cpp to rmw_gurumdds_cpp
+  * Renamed rmw_gurumdds_cpp to rmw_gurumdds_static_cpp
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Wed, 08 Jul 2020 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (1.0.0-1focal) focal; urgency=high
+
+  * Fixed wrong package version
+  * MANUAL_BY_NODE liveliness is deprecated
+  * Updated packages to use gurumdds-2.6
+  * Replaced rosidl_message_bounds_t with rosidl_runtime_c__Sequence__bound
+  * Replaced rmw_request_id_t with rmw_service_info_t
+  * Added rmw_take_sequence()
+  * Fill timestamps in message info
+  * Fixed template specialization
+  * security_context is renamed to enclave
+  * Replaced rosidl_generator_* with rosidl_runtime_*
+  * Added incompatible qos support
+  * Apply one participant per context API changes
+  * Fixed serialization/deserialization errors
+  * Fixed some errors
+    * added missing qos finalization
+    * fixed issue that topic endpoint info was not handled correctly
+    * added null check to builtin datareader callbacks
+  * Added qos finalization after creating publisher/subscriber
+  * Added event init functions
+  * Implemented rmw_serialize/rmw_deserialize
+  * Implemented client
+  * Implemented service
+  * Fixed code style divergence
+  * Implemented subscription
+  * Fixed some errors in cdr buffer
+  * Implemented publisher
+  * Implemented serialization/deserialization
+  * Suppress complie warnings
+  * Modified structures in types.hpp
+  * Implemented create_metastring()
+  * added rmw_gurumdds_cpp
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Wed, 03 Jun 2020 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (0.8.2-1focal) focal; urgency=high
+
+
+
+ -- junhui <junhui@gurum.cc>  Wed, 18 Dec 2019 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (0.8.1-1focal) focal; urgency=high
+
+
+
+ -- junhui <junhui@gurum.cc>  Thu, 14 Nov 2019 15:00:00 -0000
+
+ros-galactic-rmw-gurumdds-cpp (0.8.0-1focal) focal; urgency=high
+
+
+
+ -- junhui <junhui@gurum.cc>  Tue, 05 Nov 2019 15:00:00 -0000
+
+
