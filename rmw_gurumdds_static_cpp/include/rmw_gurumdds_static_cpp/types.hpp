@@ -35,7 +35,7 @@ typedef struct _GurumddsPublisherInfo : GurumddsEventInfo
 
 typedef struct _GurumddsPublisherGID
 {
-  uint8_t publication_handle[16];
+  dds_InstanceHandle_t publication_handle;
 } GurumddsPublisherGID;
 
 typedef struct _GurumddsSubscriberInfo : GurumddsEventInfo
@@ -43,6 +43,7 @@ typedef struct _GurumddsSubscriberInfo : GurumddsEventInfo
   dds_Subscriber * subscriber;
   dds_DataReader * topic_reader;
   dds_ReadCondition * read_condition;
+  bool ignore_local_publications;
   const message_type_support_callbacks_t * callbacks;
   const char * implementation_identifier;
 

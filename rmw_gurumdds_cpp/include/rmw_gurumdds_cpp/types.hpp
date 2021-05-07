@@ -47,6 +47,7 @@ typedef struct _GurumddsSubscriberInfo : GurumddsEventInfo
   dds_GuardCondition * queue_guard_condition;
   std::mutex queue_mutex;
   dds_TypeSupport * dds_typesupport;
+  bool ignore_local_publications;
   const rosidl_message_type_support_t * rosidl_message_typesupport;
   const char * implementation_identifier;
 
