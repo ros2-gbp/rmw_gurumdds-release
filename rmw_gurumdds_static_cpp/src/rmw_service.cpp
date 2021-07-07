@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <condition_variable>
 #include <limits>
 #include <list>
@@ -23,11 +24,11 @@
 #include <utility>
 #include <set>
 #include <string>
-#include <vector>
-#include <chrono>
 #include <thread>
+#include <vector>
 
 #include "rcutils/logging_macros.h"
+#inlcude "rcutils/error_handling.h"
 
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/names_and_types.h"
@@ -86,8 +87,10 @@ rmw_create_service(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_C);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_service_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_CPP);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -332,6 +335,12 @@ rmw_create_service(
 
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
+  RCUTILS_LOG_DEBUG_NAMED(
+    "rmw_gurumdds_static_cpp",
+    "Created server with service '%s' on node '%s%s%s'",
+    service_name, node->namespace_,
+    node->namespace_[strlen(node->namespace_) - 1] == '/' ? "" : "/", node->name);
+
   return rmw_service;
 
 fail:
@@ -342,48 +351,18 @@ fail:
   if (dds_subscriber != nullptr) {
     if (request_reader != nullptr) {
       if (read_condition != nullptr) {
-        ret = dds_DataReader_delete_readcondition(request_reader, read_condition);
-        if (ret != dds_RETCODE_OK) {
-          std::stringstream ss;
-          ss << "leaking readcondition while handling failure at " <<
-            __FILE__ << ":" << __LINE__ << '\n';
-          (std::cerr << ss.str()).flush();
-        }
+        dds_DataReader_delete_readcondition(request_reader, read_condition);
       }
-      ret = dds_Subscriber_delete_datareader(dds_subscriber, request_reader);
-      if (ret != dds_RETCODE_OK) {
-        std::stringstream ss;
-        ss << "leaking datareader while handling failure at " <<
-          __FILE__ << ":" << __LINE__ << '\n';
-        (std::cerr << ss.str()).flush();
-      }
+      dds_Subscriber_delete_datareader(dds_subscriber, request_reader);
     }
-    ret = dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
-    if (ret != dds_RETCODE_OK) {
-      std::stringstream ss;
-      ss << "leaking subscriber while handling failure at " <<
-        __FILE__ << ":" << __LINE__ << '\n';
-      (std::cerr << ss.str()).flush();
-    }
+    dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
   }
 
   if (dds_publisher != nullptr) {
     if (response_writer != nullptr) {
-      ret = dds_Publisher_delete_datawriter(dds_publisher, response_writer);
-      if (ret != dds_RETCODE_OK) {
-        std::stringstream ss;
-        ss << "leaking datareader while handling failure at " <<
-          __FILE__ << ":" << __LINE__ << '\n';
-        (std::cerr << ss.str()).flush();
-      }
+      dds_Publisher_delete_datawriter(dds_publisher, response_writer);
     }
-    ret = dds_DomainParticipant_delete_publisher(participant, dds_publisher);
-    if (ret != dds_RETCODE_OK) {
-      std::stringstream ss;
-      ss << "leaking publisher while handling failure at " <<
-        __FILE__ << ":" << __LINE__ << '\n';
-      (std::cerr << ss.str()).flush();
-    }
+    dds_DomainParticipant_delete_publisher(participant, dds_publisher);
   }
 
   if (service_info != nullptr) {
@@ -478,6 +457,12 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
     delete service_info;
     service->data = nullptr;
     if (service->service_name != nullptr) {
+      RCUTILS_LOG_DEBUG_NAMED(
+        "rmw_gurumdds_static_cpp",
+        "Deleted server with service '%s' on node '%s%s%s'",
+        service->service_name, node->namespace_,
+        node->namespace_[strlen(node->namespace_) - 1] == '/' ? "" : "/", node->name);
+
       rmw_free(const_cast<char *>(service->service_name));
     }
   }

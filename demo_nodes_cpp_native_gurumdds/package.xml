@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>demo_nodes_cpp_native_gurumdds</name>
-  <version>0.7.6</version>
+  <version>1.0.0</version>
   <description>C++ nodes which access the native handles of the rmw implemenation.</description>
   <maintainer email="youngjin@gurum.cc">Youngjin Yun</maintainer>
   <license>Apache License 2.0</license>
@@ -19,6 +19,7 @@
   <test_depend>launch</test_depend>
   <test_depend>launch_testing</test_depend>
   <test_depend>launch_testing_ament_cmake</test_depend>
+  <test_depend>launch_testing_ros</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

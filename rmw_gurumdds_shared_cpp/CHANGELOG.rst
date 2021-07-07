@@ -1,54 +1,106 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package rmw_gurumdds_shared_cpp
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.7.12 (2021-05-07)
--------------------
-* fix typo: check namespace\_ allocate
+3.0.1 (2021-07-07)
+------------------
+
+3.0.0 (2021-04-29)
+------------------
+* Revise for lint
 * Contributors: Youngjin Yun
 
-0.7.11 (2021-04-12)
--------------------
+2.1.4 (2021-04-22)
+------------------
+* Take and return new RMW_DURATION_INFINITE
+* Contributors: Youngjin Yun
+
+2.1.3 (2021-04-12)
+------------------
 * fix typo
 * Contributors: Youngjin Yun
 
-0.7.10 (2021-03-10)
--------------------
-* Change maintainer
-* fix typo
-* Use DataReader listener for taking data samples
-* Delete contained entities before deleting domain participant
-* Contributors: junho, youngjin
+2.1.2 (2021-03-22)
+------------------
+* Update code about build error on windows
+* Add RMW function to check QoS compatibility
+* Contributors: Youngjin Yun, youngjin
 
-0.7.9 (2020-11-19)
+2.1.1 (2021-03-12)
 ------------------
 * Update packages to use gurumdds-2.7
-* Contributors: junho
+* fix typo
+* Contributors: youngjin
 
-0.7.8 (2020-07-29)
+2.1.0 (2021-02-23)
+------------------
+* Change maintainer
+* Set actual domain id into context
+* Use DataReader listener for taking data samples
+* Contributors: junho, youngjin
+
+2.0.1 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-0.7.7 (2020-07-06)
+2.0.0 (2020-07-09)
 ------------------
+* Removed parameters domain_id and localhost_only from rmw_create_node()
+* Contributors: junho
+
+1.1.0 (2020-07-09)
+------------------
+* Handle RMW_DEFAULT_DOMAIN_ID
+* Added support for sample_lost event
 * Set resource_limit explicitly
 * Fixed compile warnings
 * Contributors: junho
 
-0.7.6 (2020-06-04)
+1.0.0 (2020-06-04)
 ------------------
+* MANUAL_BY_NODE liveliness is deprecated
 * Updated packages to use gurumdds-2.6
-* Contributors: junho
-
-0.7.5 (2020-04-16)
-------------------
-
-0.7.4 (2020-04-01)
-------------------
+* security_context is renamed to enclave
+* Added incompatible qos support
+* Apply one participant per context API changes
 * Fixed some errors
   * added missing qos finalization
   * fixed issue that topic endpoint info was not handled correctly
   * added null check to builtin datareader callbacks
 * Fixed missing string array finalization
+* Added event init functions
+* Follow changes made to rmw_topic_endpoint_info_array
+* Minor refactoring
+* Fixed some errors
+* Implemented rmw_get_publishers/subscriptions_info_by_topic()
+* Contributors: junho
+
+0.8.2 (2019-12-19)
+------------------
+* updated packages to use gurumdds-2.5
+* Contributors: hyeonwoo
+
+0.8.1 (2019-11-15)
+------------------
+* CoreDDS is renamed to GurumDDS
+* Contributors: junho
+
+0.8.0 (2019-11-06)
+------------------
+* added gurumdds dependency to package.xml
+* refactored error handling code
+* wait for announcements after creating entities
+* fixed wrong return value
+* implemented localhost_only feature
+* added localhost_only parameter to rmw_create_node()
+* adjusted sleep time before discovery functions and fixed typos
+* now rmw_wait() can handle events properly
+* rewrote rmw_node_info_and_types
+* fixed indents
+* Implemented rmw_get_client_names_and_types_by_node()
+* fixed code style divergence
+* fixed typos
+* updated cmake to fit new library paths
+* migration from gitlab
 * Contributors: junho
