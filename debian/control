@@ -1,0 +1,12 @@
+Source: ros-galactic-rmw-gurumdds-shared-cpp
+Section: misc
+Priority: optional
+Maintainer: Youngjin Yun <youngjin@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-2.7, ros-galactic-ament-cmake, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-gurumdds-cmake-module, ros-galactic-rcutils, ros-galactic-rmw, ros-galactic-rmw-dds-common, ros-galactic-rosidl-cmake, ros-galactic-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-galactic-rmw-gurumdds-shared-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gurumdds-2.7, ros-galactic-ament-cmake, ros-galactic-gurumdds-cmake-module, ros-galactic-rmw-dds-common, ros-galactic-ros-workspace
+Description: Code shared on static and dynamic type support of rmw_gurumdds_cpp.
