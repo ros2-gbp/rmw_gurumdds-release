@@ -189,6 +189,10 @@ shared__rmw_wait(
           RMW_SET_ERROR_MSG("failed to detach condition from wait set");
         }
       }
+
+      while(dds_ConditionSeq_length(attached_conditions) > 0) {
+        dds_ConditionSeq_remove(attached_conditions, 0);
+      }
     }
     rmw_wait_set_t * wait_set = nullptr;
     const char * implementation_identifier = nullptr;
@@ -233,14 +237,14 @@ shared__rmw_wait(
         return RMW_RET_ERROR;
       }
 
-      dds_GuardCondition * queue_guard_condition = subscriber_info->queue_guard_condition;
-      if (queue_guard_condition == nullptr) {
+      dds_ReadCondition * read_condition = subscriber_info->read_condition;
+      if (read_condition == nullptr) {
         RMW_SET_ERROR_MSG("read condition handle is null");
         return RMW_RET_ERROR;
       }
 
       dds_ReturnCode_t ret = dds_WaitSet_attach_condition(
-        dds_wait_set, reinterpret_cast<dds_Condition *>(queue_guard_condition));
+        dds_wait_set, reinterpret_cast<dds_Condition *>(read_condition));
       CHECK_ATTACH(ret);
     }
   }
@@ -282,14 +286,14 @@ shared__rmw_wait(
         return RMW_RET_ERROR;
       }
 
-      dds_GuardCondition * queue_guard_condition = service_info->queue_guard_condition;
-      if (queue_guard_condition == nullptr) {
+      dds_ReadCondition * read_condition = service_info->read_condition;
+      if (read_condition == nullptr) {
         RMW_SET_ERROR_MSG("read condition handle is null");
         return RMW_RET_ERROR;
       }
 
       dds_ReturnCode_t ret = dds_WaitSet_attach_condition(
-        dds_wait_set, reinterpret_cast<dds_Condition *>(queue_guard_condition));
+        dds_wait_set, reinterpret_cast<dds_Condition *>(read_condition));
       CHECK_ATTACH(ret);
     }
   }
@@ -302,14 +306,14 @@ shared__rmw_wait(
         return RMW_RET_ERROR;
       }
 
-      dds_GuardCondition * queue_guard_condition = client_info->queue_guard_condition;
-      if (queue_guard_condition == nullptr) {
+      dds_ReadCondition * read_condition = client_info->read_condition;
+      if (read_condition == nullptr) {
         RMW_SET_ERROR_MSG("read condition handle is null");
         return RMW_RET_ERROR;
       }
 
       dds_ReturnCode_t ret = dds_WaitSet_attach_condition(
-        dds_wait_set, reinterpret_cast<dds_Condition *>(queue_guard_condition));
+        dds_wait_set, reinterpret_cast<dds_Condition *>(read_condition));
       CHECK_ATTACH(ret);
     }
   }
@@ -410,8 +414,8 @@ shared__rmw_wait(
         return RMW_RET_ERROR;
       }
 
-      dds_GuardCondition * queue_guard_condition = subscriber_info->queue_guard_condition;
-      if (!queue_guard_condition) {
+      dds_ReadCondition * read_condition = subscriber_info->read_condition;
+      if (!read_condition) {
         RMW_SET_ERROR_MSG("read condition handle is null");
         return RMW_RET_ERROR;
       }
@@ -420,7 +424,7 @@ shared__rmw_wait(
       for (; j < dds_ConditionSeq_length(active_conditions); ++j) {
         if (
           dds_ConditionSeq_get(active_conditions, j) ==
-          reinterpret_cast<dds_Condition *>(queue_guard_condition))
+          reinterpret_cast<dds_Condition *>(read_condition))
         {
           break;
         }
@@ -431,7 +435,7 @@ shared__rmw_wait(
       }
 
       rmw_ret_t rmw_ret_code = __detach_condition(
-        dds_wait_set, reinterpret_cast<dds_Condition *>(queue_guard_condition));
+        dds_wait_set, reinterpret_cast<dds_Condition *>(read_condition));
       if (rmw_ret_code != RMW_RET_OK) {
         return rmw_ret_code;
       }
@@ -479,8 +483,8 @@ shared__rmw_wait(
         return RMW_RET_ERROR;
       }
 
-      dds_GuardCondition * queue_guard_condition = service_info->queue_guard_condition;
-      if (queue_guard_condition == nullptr) {
+      dds_ReadCondition * read_condition = service_info->read_condition;
+      if (read_condition == nullptr) {
         RMW_SET_ERROR_MSG("read condition handle is null");
         return RMW_RET_ERROR;
       }
@@ -489,7 +493,7 @@ shared__rmw_wait(
       for (; j < dds_ConditionSeq_length(active_conditions); ++j) {
         if (
           dds_ConditionSeq_get(active_conditions, j) ==
-          reinterpret_cast<dds_Condition *>(queue_guard_condition))
+          reinterpret_cast<dds_Condition *>(read_condition))
         {
           break;
         }
@@ -500,7 +504,7 @@ shared__rmw_wait(
       }
 
       rmw_ret_t rmw_ret_code = __detach_condition(
-        dds_wait_set, reinterpret_cast<dds_Condition *>(queue_guard_condition));
+        dds_wait_set, reinterpret_cast<dds_Condition *>(read_condition));
       if (rmw_ret_code != RMW_RET_OK) {
         return rmw_ret_code;
       }
@@ -515,8 +519,8 @@ shared__rmw_wait(
         return RMW_RET_ERROR;
       }
 
-      dds_GuardCondition * queue_guard_condition = client_info->queue_guard_condition;
-      if (queue_guard_condition == nullptr) {
+      dds_ReadCondition * read_condition = client_info->read_condition;
+      if (read_condition == nullptr) {
         RMW_SET_ERROR_MSG("read condition handle is null");
         return RMW_RET_ERROR;
       }
@@ -525,7 +529,7 @@ shared__rmw_wait(
       for (; j < dds_ConditionSeq_length(active_conditions); ++j) {
         if (
           dds_ConditionSeq_get(active_conditions, j) ==
-          reinterpret_cast<dds_Condition *>(queue_guard_condition))
+          reinterpret_cast<dds_Condition *>(read_condition))
         {
           break;
         }
@@ -536,7 +540,7 @@ shared__rmw_wait(
       }
 
       rmw_ret_t rmw_ret_code = __detach_condition(
-        dds_wait_set, reinterpret_cast<dds_Condition *>(queue_guard_condition));
+        dds_wait_set, reinterpret_cast<dds_Condition *>(read_condition));
       if (rmw_ret_code != RMW_RET_OK) {
         return rmw_ret_code;
       }
