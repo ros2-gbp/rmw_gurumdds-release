@@ -2,22 +2,27 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.3 (2021-08-19)
+2.1.1 (2021-03-12)
+------------------
+* Update packages to use gurumdds-2.7
+* Contributors: youngjin
+
+2.1.8 (2021-08-19)
 ------------------
 * Remove datareader listener patch
 * Remove unnecessary operation
 * Contributors: Youngjin Yun
 
-3.0.2 (2021-07-14)
+2.1.7 (2021-07-14)
 ------------------
 
-3.0.1 (2021-07-07)
+2.1.6 (2021-07-08)
 ------------------
 * Use variable attempt to take the number of times equal to count
 * Check if the queue is empty before using it
 * Contributors: Youngjin Yun
 
-3.0.0 (2021-04-29)
+2.1.5 (2021-04-28)
 ------------------
 * Revise for lint
 * Contributors: Youngjin Yun
@@ -36,12 +41,9 @@ Changelog for package rmw_gurumdds_cpp
 ------------------
 * Update code about build error on windows
 * Add RMW function to check QoS compatibility
-* Contributors: Youngjin Yun, youngjin
-
-2.1.1 (2021-03-12)
-------------------
+* 2.1.1
 * Update packages to use gurumdds-2.7
-* Contributors: youngjin
+* Contributors: Youngjin Yun, youngjin
 
 2.1.0 (2021-02-23)
 ------------------
