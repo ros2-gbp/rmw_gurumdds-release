@@ -1,0 +1,150 @@
+ros-rolling-rmw-gurumdds-shared-cpp (3.0.3-1focal) focal; urgency=high
+
+  * Wait for state change of topic cache
+  * Remove datareader listener patch
+  * Remove attached waitset conditions on destructor
+  * Remove unnecessary operation
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 18 Aug 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (3.0.2-1focal) focal; urgency=high
+
+  * Move handle sequence delete into right place
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 13 Jul 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (3.0.1-1focal) focal; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 06 Jul 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (3.0.0-1focal) focal; urgency=high
+
+  * Revise for lint
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 28 Apr 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.1.4-1focal) focal; urgency=high
+
+  * Take and return new RMW_DURATION_INFINITE
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 21 Apr 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.1.3-1focal) focal; urgency=high
+
+  * fix typo
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 11 Apr 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.1.2-1focal) focal; urgency=high
+
+  * Update code about build error on windows
+  * Add RMW function to check QoS compatibility
+  * Contributors: Youngjin Yun, youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 21 Mar 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.1.1-1focal) focal; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * fix typo
+  * Contributors: youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 11 Mar 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.1.0-1focal) focal; urgency=high
+
+  * Change maintainer
+  * Set actual domain id into context
+  * Use DataReader listener for taking data samples
+  * Contributors: junho, youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 22 Feb 2021 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.0.1-1focal) focal; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Junho Lee <junho@gurum.cc>  Tue, 28 Jul 2020 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (2.0.0-1focal) focal; urgency=high
+
+  * Removed parameters domain_id and localhost_only from rmw_create_node()
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Wed, 08 Jul 2020 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (1.1.0-1focal) focal; urgency=high
+
+  * Handle RMW_DEFAULT_DOMAIN_ID
+  * Added support for sample_lost event
+  * Set resource_limit explicitly
+  * Fixed compile warnings
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Wed, 08 Jul 2020 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (1.0.0-1focal) focal; urgency=high
+
+  * MANUAL_BY_NODE liveliness is deprecated
+  * Updated packages to use gurumdds-2.6
+  * security_context is renamed to enclave
+  * Added incompatible qos support
+  * Apply one participant per context API changes
+  * Fixed some errors
+    * added missing qos finalization
+    * fixed issue that topic endpoint info was not handled correctly
+    * added null check to builtin datareader callbacks
+  * Fixed missing string array finalization
+  * Added event init functions
+  * Follow changes made to rmw_topic_endpoint_info_array
+  * Minor refactoring
+  * Fixed some errors
+  * Implemented rmw_get_publishers/subscriptions_info_by_topic()
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Wed, 03 Jun 2020 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (0.8.2-1focal) focal; urgency=high
+
+  * updated packages to use gurumdds-2.5
+  * Contributors: hyeonwoo
+
+ -- junhui <junhui@gurum.cc>  Wed, 18 Dec 2019 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (0.8.1-1focal) focal; urgency=high
+
+  * CoreDDS is renamed to GurumDDS
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Thu, 14 Nov 2019 15:00:00 -0000
+
+ros-rolling-rmw-gurumdds-shared-cpp (0.8.0-1focal) focal; urgency=high
+
+  * added gurumdds dependency to package.xml
+  * refactored error handling code
+  * wait for announcements after creating entities
+  * fixed wrong return value
+  * implemented localhost_only feature
+  * added localhost_only parameter to rmw_create_node()
+  * adjusted sleep time before discovery functions and fixed typos
+  * now rmw_wait() can handle events properly
+  * rewrote rmw_node_info_and_types
+  * fixed indents
+  * Implemented rmw_get_client_names_and_types_by_node()
+  * fixed code style divergence
+  * fixed typos
+  * updated cmake to fit new library paths
+  * migration from gitlab
+  * Contributors: junho
+
+ -- junhui <junhui@gurum.cc>  Tue, 05 Nov 2019 15:00:00 -0000
+
+
