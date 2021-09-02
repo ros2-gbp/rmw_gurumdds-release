@@ -41,7 +41,9 @@ shared__rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_)
+  const char * namespace_,
+  size_t domain_id,
+  bool localhost_only)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, NULL);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -102,8 +104,7 @@ shared__rmw_create_node(
 
   // TODO(clemjh): Implement security features
 
-  dds_DomainId_t domain_id = static_cast<dds_DomainId_t>(context->actual_domain_id);
-  if (context->options.localhost_only == RMW_LOCALHOST_ONLY_ENABLED) {
+  if (localhost_only) {
     dds_StringProperty props[] = {
       {const_cast<char *>("rtps.interface.ip"),
         const_cast<void *>(static_cast<const void *>("127.0.0.1"))},

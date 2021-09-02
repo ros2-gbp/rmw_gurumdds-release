@@ -107,10 +107,8 @@ rmw_create_subscription(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_C);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_message_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_CPP);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -235,7 +233,7 @@ rmw_create_subscription(
   subscription->data = subscriber_info;
   subscription->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (subscription->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
   memcpy(const_cast<char *>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
