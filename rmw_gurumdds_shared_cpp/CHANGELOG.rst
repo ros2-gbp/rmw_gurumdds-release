@@ -2,13 +2,10 @@
 Changelog for package rmw_gurumdds_shared_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.1.1 (2021-03-12)
+3.0.4 (2021-09-02)
 ------------------
-* Update packages to use gurumdds-2.7
-* fix typo
-* Contributors: youngjin
 
-2.1.8 (2021-08-19)
+3.0.3 (2021-08-19)
 ------------------
 * Wait for state change of topic cache
 * Remove datareader listener patch
@@ -16,15 +13,15 @@ Changelog for package rmw_gurumdds_shared_cpp
 * Remove unnecessary operation
 * Contributors: Youngjin Yun
 
-2.1.7 (2021-07-14)
+3.0.2 (2021-07-14)
 ------------------
 * Move handle sequence delete into right place
 * Contributors: Youngjin Yun
 
-2.1.6 (2021-07-08)
+3.0.1 (2021-07-07)
 ------------------
 
-2.1.5 (2021-04-28)
+3.0.0 (2021-04-29)
 ------------------
 * Revise for lint
 * Contributors: Youngjin Yun
@@ -43,10 +40,13 @@ Changelog for package rmw_gurumdds_shared_cpp
 ------------------
 * Update code about build error on windows
 * Add RMW function to check QoS compatibility
-* 2.1.1
+* Contributors: Youngjin Yun, youngjin
+
+2.1.1 (2021-03-12)
+------------------
 * Update packages to use gurumdds-2.7
 * fix typo
-* Contributors: Youngjin Yun, youngjin
+* Contributors: youngjin
 
 2.1.0 (2021-02-23)
 ------------------
