@@ -59,6 +59,7 @@ add_library(rmw_gurumdds_cpp
   src/rmw_count.cpp
   src/rmw_event.cpp
   src/rmw_get_implementation_identifier.cpp
+  src/rmw_get_network_flow_endpoints.cpp
   src/rmw_get_serialization_format.cpp
   src/rmw_get_topic_endpoint_info.cpp
   src/rmw_guard_condition.cpp
@@ -67,6 +68,7 @@ add_library(rmw_gurumdds_cpp
   src/rmw_node.cpp
   src/rmw_node_info_and_types.cpp
   src/rmw_publisher.cpp
+  src/rmw_qos.cpp
   src/rmw_request.cpp
   src/rmw_response.cpp
   src/rmw_serialize.cpp
