@@ -41,7 +41,9 @@ shared__rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_)
+  const char * namespace_,
+  size_t domain_id,
+  bool localhost_only)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, NULL);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -101,19 +103,28 @@ shared__rmw_create_node(
   dds_DomainParticipant * participant = nullptr;
 
   // TODO(clemjh): Implement security features
+  std::string static_discovery_id;
+  static_discovery_id += namespace_;
+  static_discovery_id += name;
 
-  dds_DomainId_t domain_id = static_cast<dds_DomainId_t>(context->actual_domain_id);
-  if (context->options.localhost_only == RMW_LOCALHOST_ONLY_ENABLED) {
+  if (localhost_only) {
     dds_StringProperty props[] = {
       {const_cast<char *>("rtps.interface.ip"),
         const_cast<void *>(static_cast<const void *>("127.0.0.1"))},
+      {const_cast<char *>("gurumdds.static_discovery.id"),
+        const_cast<void *>(static_cast<const void *>(static_discovery_id.c_str()))},
       {nullptr, nullptr},
     };
     participant = dds_DomainParticipantFactory_create_participant_w_props(
       factory, domain_id, &participant_qos, nullptr, 0, props);
   } else {
-    participant = dds_DomainParticipantFactory_create_participant(
-      factory, domain_id, &participant_qos, nullptr, 0);
+    dds_StringProperty props[] = {
+      {const_cast<char *>("gurumdds.static_discovery.id"),
+        const_cast<void *>(static_cast<const void *>(static_discovery_id.c_str()))},
+      {nullptr, nullptr},
+    };
+    participant = dds_DomainParticipantFactory_create_participant_w_props(
+      factory, domain_id, &participant_qos, nullptr, 0, props);
   }
   graph_guard_condition = shared__rmw_create_guard_condition(implementation_identifier);
   if (graph_guard_condition == nullptr) {
@@ -320,7 +331,7 @@ shared__rmw_destroy_node(const char * implementation_identifier, rmw_node_t * no
       return RMW_RET_ERROR;
     }
 
-    if (dds_InstanceHandleSeq_length(dw_seq) > 1) {
+    if (dds_InstanceHandleSeq_length(dw_seq) == 0) {
       dds_InstanceHandleSeq_delete(dw_seq);
       continue;
     }
