@@ -2,67 +2,98 @@
 Changelog for package rmw_gurumdds_shared_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.0.12 (2021-10-14)
--------------------
-* Fix bug: condition of dw/dr seq delete
+3.0.9 (2021-10-14)
+------------------
+* Add missing return
 * Contributors: Youngjin Yun
 
-1.0.11 (2021-10-13)
--------------------
-* Fix bug: condition of dw_seq delete
+3.0.8 (2021-10-14)
+------------------
+* Fix bug: condition of dw/dr seq delete
 * Support static discovery
 * Contributors: Youngjin Yun
 
-1.0.10 (2021-09-02)
--------------------
-
-1.0.9 (2021-07-23)
+3.0.7 (2021-09-27)
 ------------------
-* Revise for lint
+* Remove sleep before fill tnat
 * Contributors: Youngjin Yun
 
-1.0.8 (2021-07-22)
+3.0.6 (2021-09-23)
 ------------------
+
+3.0.5 (2021-09-23)
+------------------
+* Stop double-defining structs
+* Add rmw_publisher_wait_for_all_acked
+* Contributors: Youngjin Yun
+
+3.0.4 (2021-09-02)
+------------------
+
+3.0.3 (2021-08-19)
+------------------
+* Wait for state change of topic cache
 * Remove datareader listener patch
 * Remove attached waitset conditions on destructor
 * Remove unnecessary operation
-* Contributors: Kumazuma, Youngjin Yun
+* Contributors: Youngjin Yun
 
-1.0.7 (2021-07-14)
+3.0.2 (2021-07-14)
 ------------------
 * Move handle sequence delete into right place
 * Contributors: Youngjin Yun
 
-1.0.6 (2021-05-07)
+3.0.1 (2021-07-07)
 ------------------
-* fix typo: check namespace\_ allocate
-* Update code about build error on windows
+
+3.0.0 (2021-04-29)
+------------------
+* Revise for lint
 * Contributors: Youngjin Yun
 
-1.0.5 (2021-04-12)
+2.1.4 (2021-04-22)
+------------------
+* Take and return new RMW_DURATION_INFINITE
+* Contributors: Youngjin Yun
+
+2.1.3 (2021-04-12)
 ------------------
 * fix typo
 * Contributors: Youngjin Yun
 
-1.0.4 (2021-03-10)
+2.1.2 (2021-03-22)
+------------------
+* Update code about build error on windows
+* Add RMW function to check QoS compatibility
+* Contributors: Youngjin Yun, youngjin
+
+2.1.1 (2021-03-12)
+------------------
+* Update packages to use gurumdds-2.7
+* fix typo
+* Contributors: youngjin
+
+2.1.0 (2021-02-23)
 ------------------
 * Change maintainer
-* fix typo
+* Set actual domain id into context
 * Use DataReader listener for taking data samples
 * Contributors: junho, youngjin
 
-1.0.3 (2020-11-19)
-------------------
-* Update packages to use gurumdds-2.7
-* Contributors: junho
-
-1.0.2 (2020-07-29)
+2.0.1 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-1.0.1 (2020-07-06)
+2.0.0 (2020-07-09)
 ------------------
+* Removed parameters domain_id and localhost_only from rmw_create_node()
+* Contributors: junho
+
+1.1.0 (2020-07-09)
+------------------
+* Handle RMW_DEFAULT_DOMAIN_ID
+* Added support for sample_lost event
 * Set resource_limit explicitly
 * Fixed compile warnings
 * Contributors: junho
