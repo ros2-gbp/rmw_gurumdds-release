@@ -72,8 +72,7 @@ public:
     const GUID_t & entity_guid,
     std::string && topic_name,
     std::string && type_name,
-    rmw_qos_profile_t & qos
-  )
+    rmw_qos_profile_t & qos)
   {
     initialize_participant_map(participant_to_entity_guids_, participant_guid);
     if (rcutils_logging_logger_is_enabled_for(

@@ -32,6 +32,7 @@
 #include "rmw_gurumdds_cpp/types.hpp"
 
 #include "rcutils/types.h"
+#include "rcutils/error_handling.h"
 
 #include "./type_support_common.hpp"
 
@@ -92,6 +93,14 @@ rmw_create_publisher(
     return nullptr;
   }
 
+  if (publisher_options->require_unique_network_flow_endpoints ==
+    RMW_UNIQUE_NETWORK_FLOW_ENDPOINTS_STRICTLY_REQUIRED)
+  {
+    RMW_SET_ERROR_MSG(
+      "Strict requirement on unique network flow endpoints for publishers not supported");
+    return nullptr;
+  }
+
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
     RMW_SET_ERROR_MSG("node info is null");
@@ -107,9 +116,11 @@ rmw_create_publisher(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -263,7 +274,7 @@ rmw_create_publisher(
   rmw_publisher->data = publisher_info;
   rmw_publisher->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (rmw_publisher->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
     goto fail;
   }
   memcpy(const_cast<char *>(rmw_publisher->topic_name), topic_name, strlen(topic_name) + 1);
@@ -377,6 +388,34 @@ rmw_publisher_assert_liveliness(const rmw_publisher_t * publisher)
   }
 
   return RMW_RET_OK;
+}
+
+rmw_ret_t
+rmw_publisher_wait_for_all_acked(const rmw_publisher_t * publisher, rmw_time_t wait_timeout)
+{
+  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    publisher,
+    publisher->implementation_identifier, gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+
+  GurumddsPublisherInfo * publisher_info = static_cast<GurumddsPublisherInfo *>(publisher->data);
+  if (publisher_info == nullptr) {
+    RMW_SET_ERROR_MSG("publisher internal data is invalid");
+    return RMW_RET_ERROR;
+  }
+
+  dds_Duration_t timeout = rmw_time_to_dds(wait_timeout);
+  dds_ReturnCode_t ret = dds_DataWriter_wait_for_acknowledgments(
+    publisher_info->topic_writer, &timeout);
+
+  if (ret == dds_RETCODE_OK) {
+    return RMW_RET_OK;
+  } else if (ret == dds_RETCODE_TIMEOUT) {
+    return RMW_RET_TIMEOUT;
+  } else {
+    return RMW_RET_ERROR;
+  }
 }
 
 rmw_ret_t

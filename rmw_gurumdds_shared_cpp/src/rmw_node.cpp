@@ -41,9 +41,7 @@ shared__rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_,
-  size_t domain_id,
-  bool localhost_only)
+  const char * namespace_)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, NULL);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -107,7 +105,8 @@ shared__rmw_create_node(
   static_discovery_id += namespace_;
   static_discovery_id += name;
 
-  if (localhost_only) {
+  dds_DomainId_t domain_id = static_cast<dds_DomainId_t>(context->actual_domain_id);
+  if (context->options.localhost_only == RMW_LOCALHOST_ONLY_ENABLED) {
     dds_StringProperty props[] = {
       {const_cast<char *>("rtps.interface.ip"),
         const_cast<void *>(static_cast<const void *>("127.0.0.1"))},
@@ -331,19 +330,16 @@ shared__rmw_destroy_node(const char * implementation_identifier, rmw_node_t * no
       return RMW_RET_ERROR;
     }
 
-    if (dds_InstanceHandleSeq_length(dw_seq) == 0) {
-      dds_InstanceHandleSeq_delete(dw_seq);
-      continue;
-    }
-
-    dds_DataWriter * dw = reinterpret_cast<dds_DataWriter *>(dds_InstanceHandleSeq_get(dw_seq, 0));
-    ret = dds_Publisher_delete_datawriter(pub, dw);
-    if (ret != dds_RETCODE_OK) {
-      RMW_SET_ERROR_MSG("failed to delete datawriter");
-      dds_InstanceHandleSeq_delete(dw_seq);
-      dds_InstanceHandleSeq_delete(pub_seq);
-      dds_InstanceHandleSeq_delete(sub_seq);
-      return RMW_RET_ERROR;
+    for (uint32_t j = 0; j < dds_InstanceHandleSeq_length(dw_seq); j++) {
+      dds_DataWriter * dw =
+        reinterpret_cast<dds_DataWriter *>(dds_InstanceHandleSeq_get(dw_seq, j));
+      ret = dds_Publisher_delete_datawriter(pub, dw);
+      if (ret != dds_RETCODE_OK) {
+        RMW_SET_ERROR_MSG("failed to delete datawriter");
+        dds_InstanceHandleSeq_delete(dw_seq);
+        dds_InstanceHandleSeq_delete(pub_seq);
+        dds_InstanceHandleSeq_delete(sub_seq);
+      }
     }
 
     ret = dds_DomainParticipant_delete_publisher(participant, pub);
@@ -378,18 +374,16 @@ shared__rmw_destroy_node(const char * implementation_identifier, rmw_node_t * no
       return RMW_RET_ERROR;
     }
 
-    if (dds_InstanceHandleSeq_length(dr_seq) > 1) {
-      dds_InstanceHandleSeq_delete(dr_seq);
-      continue;
-    }
-
-    dds_DataReader * dr = reinterpret_cast<dds_DataReader *>(dds_InstanceHandleSeq_get(dr_seq, 0));
-    ret = dds_Subscriber_delete_datareader(sub, dr);
-    if (ret != dds_RETCODE_OK) {
-      RMW_SET_ERROR_MSG("failed to delete datareader");
-      dds_InstanceHandleSeq_delete(dr_seq);
-      dds_InstanceHandleSeq_delete(sub_seq);
-      return RMW_RET_ERROR;
+    for (uint32_t j = 0; j < dds_InstanceHandleSeq_length(dr_seq); j++) {
+      dds_DataReader * dr =
+        reinterpret_cast<dds_DataReader *>(dds_InstanceHandleSeq_get(dr_seq, j));
+      ret = dds_Subscriber_delete_datareader(sub, dr);
+      if (ret != dds_RETCODE_OK) {
+        RMW_SET_ERROR_MSG("failed to delete datareader");
+        dds_InstanceHandleSeq_delete(dr_seq);
+        dds_InstanceHandleSeq_delete(sub_seq);
+        return RMW_RET_ERROR;
+      }
     }
 
     ret = dds_DomainParticipant_delete_subscriber(participant, sub);
