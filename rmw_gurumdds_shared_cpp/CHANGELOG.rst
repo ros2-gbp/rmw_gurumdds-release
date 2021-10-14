@@ -2,35 +2,27 @@
 Changelog for package rmw_gurumdds_shared_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.9 (2021-10-14)
+2.1.1 (2021-03-12)
 ------------------
-* Add missing return
-* Contributors: Youngjin Yun
+* Update packages to use gurumdds-2.7
+* fix typo
+* Contributors: youngjin
 
-3.0.8 (2021-10-14)
-------------------
+2.1.11 (2021-10-14)
+-------------------
 * Fix bug: condition of dw/dr seq delete
 * Support static discovery
 * Contributors: Youngjin Yun
 
-3.0.7 (2021-09-27)
-------------------
+2.1.10 (2021-09-27)
+-------------------
 * Remove sleep before fill tnat
 * Contributors: Youngjin Yun
 
-3.0.6 (2021-09-23)
+2.1.9 (2021-09-02)
 ------------------
 
-3.0.5 (2021-09-23)
-------------------
-* Stop double-defining structs
-* Add rmw_publisher_wait_for_all_acked
-* Contributors: Youngjin Yun
-
-3.0.4 (2021-09-02)
-------------------
-
-3.0.3 (2021-08-19)
+2.1.8 (2021-08-19)
 ------------------
 * Wait for state change of topic cache
 * Remove datareader listener patch
@@ -38,15 +30,15 @@ Changelog for package rmw_gurumdds_shared_cpp
 * Remove unnecessary operation
 * Contributors: Youngjin Yun
 
-3.0.2 (2021-07-14)
+2.1.7 (2021-07-14)
 ------------------
 * Move handle sequence delete into right place
 * Contributors: Youngjin Yun
 
-3.0.1 (2021-07-07)
+2.1.6 (2021-07-08)
 ------------------
 
-3.0.0 (2021-04-29)
+2.1.5 (2021-04-28)
 ------------------
 * Revise for lint
 * Contributors: Youngjin Yun
@@ -65,13 +57,10 @@ Changelog for package rmw_gurumdds_shared_cpp
 ------------------
 * Update code about build error on windows
 * Add RMW function to check QoS compatibility
-* Contributors: Youngjin Yun, youngjin
-
-2.1.1 (2021-03-12)
-------------------
+* 2.1.1
 * Update packages to use gurumdds-2.7
 * fix typo
-* Contributors: youngjin
+* Contributors: Youngjin Yun, youngjin
 
 2.1.0 (2021-02-23)
 ------------------
