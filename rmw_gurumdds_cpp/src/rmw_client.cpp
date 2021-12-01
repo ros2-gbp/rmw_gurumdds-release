@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
-#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
 #include "rmw/rmw.h"
@@ -80,11 +79,9 @@ rmw_create_client(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -214,6 +211,7 @@ rmw_create_client(
       participant, request_topic_name.c_str(), request_type_name.c_str(), &topic_qos, nullptr, 0);
     if (request_topic == nullptr) {
       RMW_SET_ERROR_MSG("failed to create topic");
+      dds_TopicQos_finalize(&topic_qos);
       goto fail;
     }
 
@@ -249,6 +247,7 @@ rmw_create_client(
       participant, response_topic_name.c_str(), response_type_name.c_str(), &topic_qos, nullptr, 0);
     if (response_topic == nullptr) {
       RMW_SET_ERROR_MSG("failed to create topic");
+      dds_TopicQos_finalize(&topic_qos);
       goto fail;
     }
 
@@ -299,6 +298,7 @@ rmw_create_client(
     dds_publisher, request_topic, &datawriter_qos, nullptr, 0);
   if (request_writer == nullptr) {
     RMW_SET_ERROR_MSG("failed to create datawriter");
+    dds_DataWriterQos_finalize(&datawriter_qos);
     goto fail;
   }
   client_info->request_writer = request_writer;
@@ -340,6 +340,7 @@ rmw_create_client(
     dds_subscriber, response_topic, &datareader_qos, nullptr, 0);
   if (response_reader == nullptr) {
     RMW_SET_ERROR_MSG("failed to create datareader");
+    dds_DataReaderQos_finalize(&datareader_qos);
     goto fail;
   }
   client_info->response_reader = response_reader;
@@ -423,6 +424,22 @@ fail:
     dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
   }
 
+  if (request_topic != nullptr) {
+    dds_DomainParticipant_delete_topic(participant, request_topic);
+  }
+
+  if (response_topic != nullptr) {
+    dds_DomainParticipant_delete_topic(participant, response_topic);
+  }
+
+  if (request_typesupport != nullptr) {
+    dds_TypeSupport_delete(request_typesupport);
+  }
+
+  if (response_typesupport != nullptr) {
+    dds_TypeSupport_delete(response_typesupport);
+  }
+
   if (client_info != nullptr) {
     delete client_info;
   }
@@ -432,24 +449,26 @@ fail:
 rmw_ret_t
 rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 {
-  if (node == nullptr) {
-    RMW_SET_ERROR_MSG("node handle is null");
-    return RMW_RET_ERROR;
-  }
+  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    node handle,
+    node->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
-  if (client == nullptr) {
-    RMW_SET_ERROR_MSG("client handle is null");
-    return RMW_RET_ERROR;
-  }
-
+  RMW_CHECK_ARGUMENT_FOR_NULL(client, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     client handle,
-    client->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    client->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);
+  if (node_info == nullptr) {
+    RMW_SET_ERROR_MSG("node info handle is null");
+    return RMW_RET_ERROR;
+  }
 
-  rmw_ret_t rmw_ret = RMW_RET_OK;
   dds_ReturnCode_t ret = dds_RETCODE_OK;
   GurumddsClientInfo * client_info = static_cast<GurumddsClientInfo *>(client->data);
 
@@ -461,18 +480,18 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
             client_info->dds_publisher, client_info->request_writer);
           if (ret != dds_RETCODE_OK) {
             RMW_SET_ERROR_MSG("failed to delete datawriter");
-            rmw_ret = RMW_RET_ERROR;
+            return RMW_RET_ERROR;
           }
         }
         ret = dds_DomainParticipant_delete_publisher(
           client_info->participant, client_info->dds_publisher);
         if (ret != dds_RETCODE_OK) {
           RMW_SET_ERROR_MSG("failed to delete publisher");
-          rmw_ret = RMW_RET_ERROR;
+          return RMW_RET_ERROR;
         }
       } else if (client_info->request_writer != nullptr) {
         RMW_SET_ERROR_MSG("cannot delete datawriter because the publisher is null");
-        rmw_ret = RMW_RET_ERROR;
+        return RMW_RET_ERROR;
       }
 
       if (client_info->dds_subscriber != nullptr) {
@@ -482,34 +501,34 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
               client_info->response_reader, client_info->read_condition);
             if (ret != dds_RETCODE_OK) {
               RMW_SET_ERROR_MSG("failed to delete readcondition");
-              rmw_ret = RMW_RET_ERROR;
+              return RMW_RET_ERROR;
             }
           }
           ret = dds_Subscriber_delete_datareader(
             client_info->dds_subscriber, client_info->response_reader);
           if (ret != dds_RETCODE_OK) {
             RMW_SET_ERROR_MSG("failed to delete datareader");
-            rmw_ret = RMW_RET_ERROR;
+            return RMW_RET_ERROR;
           }
         } else if (client_info->read_condition != nullptr) {
           RMW_SET_ERROR_MSG("cannot delete readcondition because the datareader is null");
-          rmw_ret = RMW_RET_ERROR;
+          return RMW_RET_ERROR;
         }
         ret = dds_DomainParticipant_delete_subscriber(
           client_info->participant, client_info->dds_subscriber);
         if (ret != dds_RETCODE_OK) {
           RMW_SET_ERROR_MSG("failed to delete subscriber");
-          rmw_ret = RMW_RET_ERROR;
+          return RMW_RET_ERROR;
         }
       } else if (client_info->response_reader != nullptr) {
         RMW_SET_ERROR_MSG("cannot delete datareader because the subscriber is null");
-        rmw_ret = RMW_RET_ERROR;
+        return RMW_RET_ERROR;
       }
 
     } else if (client_info->dds_publisher != nullptr || client_info->dds_subscriber != nullptr) {
       RMW_SET_ERROR_MSG(
         "cannot delete publisher and subscriber because the domain participant is null");
-      rmw_ret = RMW_RET_ERROR;
+      return RMW_RET_ERROR;
     }
 
     delete client_info;
@@ -527,7 +546,7 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 
   rmw_client_free(client);
 
-  rmw_ret = rmw_trigger_guard_condition(node_info->graph_guard_condition);
+  rmw_ret_t rmw_ret = rmw_trigger_guard_condition(node_info->graph_guard_condition);
 
   return rmw_ret;
 }
@@ -546,7 +565,7 @@ rmw_service_server_is_available(
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     node handle,
     node->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   if (client == nullptr) {
     RMW_SET_ERROR_MSG("client handle is null");
@@ -556,7 +575,7 @@ rmw_service_server_is_available(
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     client handle,
     client->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   if (is_available == nullptr) {
     RMW_SET_ERROR_MSG("is_available is null");

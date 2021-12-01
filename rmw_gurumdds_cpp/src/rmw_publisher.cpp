@@ -32,7 +32,6 @@
 #include "rmw_gurumdds_cpp/types.hpp"
 
 #include "rcutils/types.h"
-#include "rcutils/error_handling.h"
 
 #include "./type_support_common.hpp"
 
@@ -93,14 +92,6 @@ rmw_create_publisher(
     return nullptr;
   }
 
-  if (publisher_options->require_unique_network_flow_endpoints ==
-    RMW_UNIQUE_NETWORK_FLOW_ENDPOINTS_STRICTLY_REQUIRED)
-  {
-    RMW_SET_ERROR_MSG(
-      "Strict requirement on unique network flow endpoints for publishers not supported");
-    return nullptr;
-  }
-
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
     RMW_SET_ERROR_MSG("node info is null");
@@ -116,11 +107,9 @@ rmw_create_publisher(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -205,6 +194,7 @@ rmw_create_publisher(
       participant, processed_topic_name.c_str(), type_name.c_str(), &topic_qos, nullptr, 0);
     if (topic == nullptr) {
       RMW_SET_ERROR_MSG("failed to create topic");
+      dds_TopicQos_finalize(&topic_qos);
       goto fail;
     }
 
@@ -232,6 +222,7 @@ rmw_create_publisher(
   topic_writer = dds_Publisher_create_datawriter(dds_publisher, topic, &datawriter_qos, nullptr, 0);
   if (topic_writer == nullptr) {
     RMW_SET_ERROR_MSG("failed to create datawriter");
+    dds_DataWriterQos_finalize(&datawriter_qos);
     goto fail;
   }
 
@@ -244,13 +235,12 @@ rmw_create_publisher(
   publisher_info = new(std::nothrow) GurumddsPublisherInfo();
   if (publisher_info == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate GurumddsPublisherInfo");
-    return nullptr;
+    goto fail;
   }
 
   publisher_info->implementation_identifier = gurum_gurumdds_identifier;
   publisher_info->publisher = dds_publisher;
   publisher_info->topic_writer = topic_writer;
-  publisher_info->dds_typesupport = dds_typesupport;
   publisher_info->rosidl_message_typesupport = type_support;
   publisher_info->publisher_gid.implementation_identifier = gurum_gurumdds_identifier;
 
@@ -274,7 +264,7 @@ rmw_create_publisher(
   rmw_publisher->data = publisher_info;
   rmw_publisher->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (rmw_publisher->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
   memcpy(const_cast<char *>(rmw_publisher->topic_name), topic_name, strlen(topic_name) + 1);
@@ -286,6 +276,9 @@ rmw_create_publisher(
     // Error message already set
     goto fail;
   }
+
+  dds_TypeSupport_delete(dds_typesupport);
+  dds_typesupport = nullptr;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
@@ -300,6 +293,10 @@ rmw_create_publisher(
 fail:
   if (rmw_publisher != nullptr) {
     rmw_publisher_free(rmw_publisher);
+  }
+
+  if (topic != nullptr) {
+    dds_DomainParticipant_delete_topic(participant, topic);
   }
 
   if (dds_publisher != nullptr) {
@@ -393,23 +390,17 @@ rmw_publisher_assert_liveliness(const rmw_publisher_t * publisher)
 rmw_ret_t
 rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
 {
-  if (node == nullptr) {
-    RMW_SET_ERROR_MSG("node handle is null");
-    return RMW_RET_ERROR;
-  }
+  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     node handle,
     node->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
-  if (publisher == nullptr) {
-    RMW_SET_ERROR_MSG("publisher handle is null");
-    return RMW_RET_ERROR;
-  }
+  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     publisher handle,
     publisher->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   auto node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
@@ -448,11 +439,6 @@ rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
       return RMW_RET_ERROR;
     }
 
-    if (publisher_info->dds_typesupport != nullptr) {
-      dds_TypeSupport_delete(publisher_info->dds_typesupport);
-      publisher_info->dds_typesupport = nullptr;
-    }
-
     delete publisher_info;
     publisher->data = nullptr;
     if (publisher->topic_name != nullptr) {
@@ -476,21 +462,13 @@ rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
 rmw_ret_t
 rmw_get_gid_for_publisher(const rmw_publisher_t * publisher, rmw_gid_t * gid)
 {
-  if (publisher == nullptr) {
-    RMW_SET_ERROR_MSG("publisher is null");
-    return RMW_RET_ERROR;
-  }
-
+  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_ARGUMENT_FOR_NULL(gid, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     publisher handle,
     publisher->implementation_identifier,
     gurum_gurumdds_identifier,
-    return RMW_RET_ERROR);
-
-  if (gid == nullptr) {
-    RMW_SET_ERROR_MSG("gid is null");
-    return RMW_RET_ERROR;
-  }
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   const GurumddsPublisherInfo * info =
     static_cast<const GurumddsPublisherInfo *>(publisher->data);
@@ -622,8 +600,17 @@ rmw_publish(
   rmw_publisher_allocation_t * allocation)
 {
   (void)allocation;
-  RCUTILS_CHECK_FOR_NULL_WITH_MSG(publisher, "publisher pointer is null", return RMW_RET_ERROR);
-  RCUTILS_CHECK_FOR_NULL_WITH_MSG(ros_message, "ros_message pointer is null", return RMW_RET_ERROR);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    publisher, "publisher pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    ros_message, "ros_message pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    publisher,
+    publisher->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   auto info = static_cast<GurumddsPublisherInfo *>(publisher->data);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "publisher info pointer is null", return RMW_RET_ERROR);
@@ -659,6 +646,7 @@ rmw_publish(
   );
   if (!result) {
     RMW_SET_ERROR_MSG("failed to serialize message");
+    free(dds_message);
     return RMW_RET_ERROR;
   }
 
@@ -696,9 +684,17 @@ rmw_publish_serialized_message(
   rmw_publisher_allocation_t * allocation)
 {
   (void)allocation;
-  RCUTILS_CHECK_FOR_NULL_WITH_MSG(publisher, "publisher pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    serialized_message, "serialized_message pointer is null", return RMW_RET_ERROR);
+    publisher, "publisher pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    serialized_message, "serialized_message pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    publisher,
+    publisher->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   auto info = static_cast<GurumddsPublisherInfo *>(publisher->data);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "publisher info pointer is null", return RMW_RET_ERROR);
