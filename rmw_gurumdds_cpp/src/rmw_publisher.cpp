@@ -205,6 +205,7 @@ rmw_create_publisher(
       participant, processed_topic_name.c_str(), type_name.c_str(), &topic_qos, nullptr, 0);
     if (topic == nullptr) {
       RMW_SET_ERROR_MSG("failed to create topic");
+      dds_TopicQos_finalize(&topic_qos);
       goto fail;
     }
 
@@ -232,6 +233,7 @@ rmw_create_publisher(
   topic_writer = dds_Publisher_create_datawriter(dds_publisher, topic, &datawriter_qos, nullptr, 0);
   if (topic_writer == nullptr) {
     RMW_SET_ERROR_MSG("failed to create datawriter");
+    dds_DataWriterQos_finalize(&datawriter_qos);
     goto fail;
   }
 
@@ -244,13 +246,12 @@ rmw_create_publisher(
   publisher_info = new(std::nothrow) GurumddsPublisherInfo();
   if (publisher_info == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate GurumddsPublisherInfo");
-    return nullptr;
+    goto fail;
   }
 
   publisher_info->implementation_identifier = gurum_gurumdds_identifier;
   publisher_info->publisher = dds_publisher;
   publisher_info->topic_writer = topic_writer;
-  publisher_info->dds_typesupport = dds_typesupport;
   publisher_info->rosidl_message_typesupport = type_support;
   publisher_info->publisher_gid.implementation_identifier = gurum_gurumdds_identifier;
 
@@ -287,6 +288,9 @@ rmw_create_publisher(
     goto fail;
   }
 
+  dds_TypeSupport_delete(dds_typesupport);
+  dds_typesupport = nullptr;
+
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
   RCUTILS_LOG_DEBUG_NAMED(
@@ -300,6 +304,10 @@ rmw_create_publisher(
 fail:
   if (rmw_publisher != nullptr) {
     rmw_publisher_free(rmw_publisher);
+  }
+
+  if (topic != nullptr) {
+    dds_DomainParticipant_delete_topic(participant, topic);
   }
 
   if (dds_publisher != nullptr) {
@@ -421,23 +429,17 @@ rmw_publisher_wait_for_all_acked(const rmw_publisher_t * publisher, rmw_time_t w
 rmw_ret_t
 rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
 {
-  if (node == nullptr) {
-    RMW_SET_ERROR_MSG("node handle is null");
-    return RMW_RET_ERROR;
-  }
+  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     node handle,
     node->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
-  if (publisher == nullptr) {
-    RMW_SET_ERROR_MSG("publisher handle is null");
-    return RMW_RET_ERROR;
-  }
+  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     publisher handle,
     publisher->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   auto node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
@@ -476,11 +478,6 @@ rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
       return RMW_RET_ERROR;
     }
 
-    if (publisher_info->dds_typesupport != nullptr) {
-      dds_TypeSupport_delete(publisher_info->dds_typesupport);
-      publisher_info->dds_typesupport = nullptr;
-    }
-
     delete publisher_info;
     publisher->data = nullptr;
     if (publisher->topic_name != nullptr) {
@@ -504,21 +501,13 @@ rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
 rmw_ret_t
 rmw_get_gid_for_publisher(const rmw_publisher_t * publisher, rmw_gid_t * gid)
 {
-  if (publisher == nullptr) {
-    RMW_SET_ERROR_MSG("publisher is null");
-    return RMW_RET_ERROR;
-  }
-
+  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_ARGUMENT_FOR_NULL(gid, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     publisher handle,
     publisher->implementation_identifier,
     gurum_gurumdds_identifier,
-    return RMW_RET_ERROR);
-
-  if (gid == nullptr) {
-    RMW_SET_ERROR_MSG("gid is null");
-    return RMW_RET_ERROR;
-  }
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   const GurumddsPublisherInfo * info =
     static_cast<const GurumddsPublisherInfo *>(publisher->data);
@@ -558,81 +547,14 @@ rmw_publisher_get_actual_qos(
     return RMW_RET_ERROR;
   }
 
-  switch (dds_qos.history.kind) {
-    case dds_KEEP_LAST_HISTORY_QOS:
-      qos->history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
-      break;
-    case dds_KEEP_ALL_HISTORY_QOS:
-      qos->history = RMW_QOS_POLICY_HISTORY_KEEP_ALL;
-      break;
-    default:
-      qos->history = RMW_QOS_POLICY_HISTORY_UNKNOWN;
-      break;
-  }
-
-  switch (dds_qos.durability.kind) {
-    case dds_TRANSIENT_LOCAL_DURABILITY_QOS:
-      qos->durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
-      break;
-    case dds_VOLATILE_DURABILITY_QOS:
-      qos->durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
-      break;
-    default:
-      qos->durability = RMW_QOS_POLICY_DURABILITY_UNKNOWN;
-      break;
-  }
-
-  switch (dds_qos.reliability.kind) {
-    case dds_BEST_EFFORT_RELIABILITY_QOS:
-      qos->reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
-      break;
-    case dds_RELIABLE_RELIABILITY_QOS:
-      qos->reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
-      break;
-    default:
-      qos->reliability = RMW_QOS_POLICY_RELIABILITY_UNKNOWN;
-      break;
-  }
-
+  qos->reliability = convert_reliability(dds_qos.reliability);
+  qos->durability = convert_durability(dds_qos.durability);
+  qos->deadline = convert_deadline(dds_qos.deadline);
+  qos->lifespan = convert_lifespan(dds_qos.lifespan);
+  qos->liveliness = convert_liveliness(dds_qos.liveliness);
+  qos->liveliness_lease_duration = convert_liveliness_lease_duration(dds_qos.liveliness);
+  qos->history = convert_history(dds_qos.history);
   qos->depth = static_cast<size_t>(dds_qos.history.depth);
-
-  if (dds_qos.deadline.period.sec == dds_DURATION_INFINITE_SEC) {
-    qos->deadline.sec = std::numeric_limits<uint64_t>::max();
-    qos->deadline.nsec = std::numeric_limits<uint64_t>::max();
-  } else {
-    qos->deadline.sec = static_cast<uint64_t>(dds_qos.deadline.period.sec);
-    qos->deadline.nsec = static_cast<uint64_t>(dds_qos.deadline.period.nanosec);
-  }
-
-  if (dds_qos.lifespan.duration.sec == dds_DURATION_INFINITE_SEC) {
-    qos->lifespan.sec = std::numeric_limits<uint64_t>::max();
-    qos->lifespan.nsec = std::numeric_limits<uint64_t>::max();
-  } else {
-    qos->lifespan.sec = dds_qos.lifespan.duration.sec;
-    qos->lifespan.nsec = dds_qos.lifespan.duration.nanosec;
-  }
-
-  switch (dds_qos.liveliness.kind) {
-    case dds_AUTOMATIC_LIVELINESS_QOS:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
-      break;
-    case dds_MANUAL_BY_TOPIC_LIVELINESS_QOS:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;
-      break;
-    default:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_UNKNOWN;
-      break;
-  }
-
-  if (dds_qos.liveliness.lease_duration.sec == dds_DURATION_INFINITE_SEC) {
-    qos->liveliness_lease_duration.sec = std::numeric_limits<uint64_t>::max();
-    qos->liveliness_lease_duration.nsec = std::numeric_limits<uint64_t>::max();
-  } else {
-    qos->liveliness_lease_duration.sec =
-      static_cast<uint64_t>(dds_qos.liveliness.lease_duration.sec);
-    qos->liveliness_lease_duration.nsec =
-      static_cast<uint64_t>(dds_qos.liveliness.lease_duration.nanosec);
-  }
 
   ret = dds_DataWriterQos_finalize(&dds_qos);
   if (ret != dds_RETCODE_OK) {
@@ -650,8 +572,17 @@ rmw_publish(
   rmw_publisher_allocation_t * allocation)
 {
   (void)allocation;
-  RCUTILS_CHECK_FOR_NULL_WITH_MSG(publisher, "publisher pointer is null", return RMW_RET_ERROR);
-  RCUTILS_CHECK_FOR_NULL_WITH_MSG(ros_message, "ros_message pointer is null", return RMW_RET_ERROR);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    publisher, "publisher pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    ros_message, "ros_message pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    publisher,
+    publisher->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   auto info = static_cast<GurumddsPublisherInfo *>(publisher->data);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "publisher info pointer is null", return RMW_RET_ERROR);
@@ -687,6 +618,7 @@ rmw_publish(
   );
   if (!result) {
     RMW_SET_ERROR_MSG("failed to serialize message");
+    free(dds_message);
     return RMW_RET_ERROR;
   }
 
@@ -724,9 +656,17 @@ rmw_publish_serialized_message(
   rmw_publisher_allocation_t * allocation)
 {
   (void)allocation;
-  RCUTILS_CHECK_FOR_NULL_WITH_MSG(publisher, "publisher pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    serialized_message, "serialized_message pointer is null", return RMW_RET_ERROR);
+    publisher, "publisher pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_FOR_NULL_WITH_MSG(
+    serialized_message, "serialized_message pointer is null",
+    return RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    publisher,
+    publisher->implementation_identifier,
+    gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   auto info = static_cast<GurumddsPublisherInfo *>(publisher->data);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "publisher info pointer is null", return RMW_RET_ERROR);

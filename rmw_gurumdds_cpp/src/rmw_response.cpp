@@ -34,25 +34,14 @@ rmw_take_response(
   void * ros_response,
   bool * taken)
 {
-  if (client == nullptr) {
-    RMW_SET_ERROR_MSG("client handle is null");
-    return RMW_RET_ERROR;
-  }
-
+  RMW_CHECK_ARGUMENT_FOR_NULL(client, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     client handle,
     client->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
-
-  if (ros_response == nullptr) {
-    RMW_SET_ERROR_MSG("ros response handle is null");
-    return RMW_RET_ERROR;
-  }
-
-  if (taken == nullptr) {
-    RMW_SET_ERROR_MSG("boolean flag for taken is null");
-    return RMW_RET_ERROR;
-  }
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  RMW_CHECK_ARGUMENT_FOR_NULL(request_header, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_ARGUMENT_FOR_NULL(ros_response, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_ARGUMENT_FOR_NULL(taken, RMW_RET_INVALID_ARGUMENT);
 
   *taken = false;
 
@@ -119,6 +108,13 @@ rmw_take_response(
   dds_SampleInfo * sample_info = dds_SampleInfoSeq_get(sample_infos, 0);
   if (sample_info->valid_data) {
     void * sample = dds_DataSeq_get(data_values, 0);
+    if (sample == nullptr) {
+      dds_DataReader_raw_return_loan(response_reader, data_values, sample_infos, sample_sizes);
+      dds_DataSeq_delete(data_values);
+      dds_SampleInfoSeq_delete(sample_infos);
+      dds_UnsignedLongSeq_delete(sample_sizes);
+      return RMW_RET_ERROR;
+    }
     uint32_t size = dds_UnsignedLongSeq_get(sample_sizes, 0);
     int64_t sequence_number = 0;
     int8_t client_guid[16] = {0};
@@ -168,20 +164,13 @@ rmw_send_response(
   rmw_request_id_t * request_header,
   void * ros_response)
 {
-  if (service == nullptr) {
-    RMW_SET_ERROR_MSG("service handle is null");
-    return RMW_RET_ERROR;
-  }
-
+  RMW_CHECK_ARGUMENT_FOR_NULL(service, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     service handle,
     service->implementation_identifier, gurum_gurumdds_identifier,
-    return RMW_RET_ERROR)
-
-  if (ros_response == nullptr) {
-    RMW_SET_ERROR_MSG("ros response handle is null");
-    return RMW_RET_ERROR;
-  }
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  RMW_CHECK_ARGUMENT_FOR_NULL(request_header, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_ARGUMENT_FOR_NULL(ros_response, RMW_RET_INVALID_ARGUMENT);
 
   GurumddsServiceInfo * service_info = static_cast<GurumddsServiceInfo *>(service->data);
   if (service_info == nullptr) {
