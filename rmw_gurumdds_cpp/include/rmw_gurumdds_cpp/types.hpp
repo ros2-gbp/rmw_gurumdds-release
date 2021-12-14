@@ -23,6 +23,7 @@ typedef struct _GurumddsPublisherInfo : GurumddsEventInfo
   dds_Publisher * publisher;
   rmw_gid_t publisher_gid;
   dds_DataWriter * topic_writer;
+  dds_TypeSupport * dds_typesupport;
   const rosidl_message_type_support_t * rosidl_message_typesupport;
   const char * implementation_identifier;
 
@@ -41,6 +42,7 @@ typedef struct _GurumddsSubscriberInfo : GurumddsEventInfo
   dds_Subscriber * subscriber;
   dds_DataReader * topic_reader;
   dds_ReadCondition * read_condition;
+  dds_TypeSupport * dds_typesupport;
   const rosidl_message_type_support_t * rosidl_message_typesupport;
   const char * implementation_identifier;
 

@@ -201,10 +201,13 @@ shared__rmw_wait(
   atexit.wait_set = wait_set;
   atexit.implementation_identifier = implementation_identifier;
 
-  RMW_CHECK_ARGUMENT_FOR_NULL(wait_set, RMW_RET_INVALID_ARGUMENT);
+  if (wait_set == nullptr) {
+    RMW_SET_ERROR_MSG("wait set handle is null");
+    return RMW_RET_ERROR;
+  }
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     wait set handle, wait_set->implementation_identifier,
-    implementation_identifier, return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    implementation_identifier, return RMW_RET_ERROR);
 
   GurumddsWaitSetInfo * wait_set_info = static_cast<GurumddsWaitSetInfo *>(wait_set->data);
   if (wait_set_info == nullptr) {

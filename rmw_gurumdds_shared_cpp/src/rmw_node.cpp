@@ -41,9 +41,7 @@ shared__rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_,
-  size_t domain_id,
-  bool localhost_only)
+  const char * namespace_)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, NULL);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -107,7 +105,8 @@ shared__rmw_create_node(
   static_discovery_id += namespace_;
   static_discovery_id += name;
 
-  if (localhost_only) {
+  dds_DomainId_t domain_id = static_cast<dds_DomainId_t>(context->actual_domain_id);
+  if (context->options.localhost_only == RMW_LOCALHOST_ONLY_ENABLED) {
     dds_StringProperty props[] = {
       {const_cast<char *>("rtps.interface.ip"),
         const_cast<void *>(static_cast<const void *>("127.0.0.1"))},
@@ -152,6 +151,8 @@ shared__rmw_create_node(
     goto fail;
   }
 
+  node_handle->implementation_identifier = implementation_identifier;
+  node_handle->data = participant;
   node_handle->name = reinterpret_cast<const char *>(rmw_allocate(sizeof(char) * strlen(name) + 1));
   if (node_handle->name == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate memory for node name");
@@ -260,11 +261,14 @@ fail:
 rmw_ret_t
 shared__rmw_destroy_node(const char * implementation_identifier, rmw_node_t * node)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
+  if (node == nullptr) {
+    RMW_SET_ERROR_MSG("node handle is null");
+    return RMW_RET_ERROR;
+  }
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     node_handle,
     node->implementation_identifier, implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    return RMW_RET_ERROR);
 
   dds_DomainParticipantFactory * factory = dds_DomainParticipantFactory_get_instance();
   if (factory == nullptr) {
@@ -457,23 +461,28 @@ _get_node_names(
   rcutils_string_array_t * node_namespaces,
   rcutils_string_array_t * enclaves)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    node_handle,
-    node->implementation_identifier, implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  if (node == nullptr) {
+    RMW_SET_ERROR_MSG("node handle is null");
+    return RMW_RET_ERROR;
+  }
+
   if (rmw_check_zero_rmw_string_array(node_names) != RMW_RET_OK) {
-    return RMW_RET_INVALID_ARGUMENT;
+    return RMW_RET_ERROR;
   }
 
   if (rmw_check_zero_rmw_string_array(node_namespaces) != RMW_RET_OK) {
-    return RMW_RET_INVALID_ARGUMENT;
+    return RMW_RET_ERROR;
   }
 
   if (enclaves != nullptr &&
     rmw_check_zero_rmw_string_array(enclaves) != RMW_RET_OK)
   {
-    return RMW_RET_INVALID_ARGUMENT;
+    return RMW_RET_ERROR;
+  }
+
+  if (node->implementation_identifier != implementation_identifier) {
+    RMW_SET_ERROR_MSG("node handle not from this implementation");
+    return RMW_RET_ERROR;
   }
 
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);

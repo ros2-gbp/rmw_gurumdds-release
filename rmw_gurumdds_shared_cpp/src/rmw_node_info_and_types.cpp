@@ -159,14 +159,15 @@ shared__rmw_get_subscriber_names_and_types_by_node(
   bool no_demangle,
   rmw_names_and_types_t * topic_names_and_types)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    node,
-    node->implementation_identifier,
-    implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-  RCUTILS_CHECK_ALLOCATOR_WITH_MSG(
-    allocator, "allocator argument is invalid", return RMW_RET_INVALID_ARGUMENT);
+  if (node == nullptr) {
+    RMW_SET_ERROR_MSG("node handle is null");
+    return RMW_RET_INVALID_ARGUMENT;
+  }
+
+  if (node->implementation_identifier != implementation_identifier) {
+    RMW_SET_ERROR_MSG("node handle is not from this rmw implementation");
+    return RMW_RET_ERROR;
+  }
 
   rmw_ret_t ret = rmw_names_and_types_check_zero(topic_names_and_types);
   if (ret != RMW_RET_OK) {
@@ -208,14 +209,15 @@ shared__rmw_get_publisher_names_and_types_by_node(
   bool no_demangle,
   rmw_names_and_types_t * topic_names_and_types)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    node,
-    node->implementation_identifier,
-    implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-  RCUTILS_CHECK_ALLOCATOR_WITH_MSG(
-    allocator, "allocator argument is invalid", return RMW_RET_INVALID_ARGUMENT);
+  if (node == nullptr) {
+    RMW_SET_ERROR_MSG("node handle is null");
+    return RMW_RET_INVALID_ARGUMENT;
+  }
+
+  if (node->implementation_identifier != implementation_identifier) {
+    RMW_SET_ERROR_MSG("node handle is not from this rmw implementation");
+    return RMW_RET_ERROR;
+  }
 
   rmw_ret_t ret = rmw_names_and_types_check_zero(topic_names_and_types);
   if (ret != RMW_RET_OK) {
@@ -257,14 +259,15 @@ __get_service_names_and_types_by_node(
   rmw_names_and_types_t * service_names_and_types,
   bool is_service)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    node,
-    node->implementation_identifier,
-    implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-  RCUTILS_CHECK_ALLOCATOR_WITH_MSG(
-    allocator, "allocator argument is invalid", return RMW_RET_INVALID_ARGUMENT);
+  if (node == nullptr) {
+    RMW_SET_ERROR_MSG("node handle is null");
+    return RMW_RET_INVALID_ARGUMENT;
+  }
+
+  if (node->implementation_identifier != implementation_identifier) {
+    RMW_SET_ERROR_MSG("node handle is not from this rmw implementation");
+    return RMW_RET_ERROR;
+  }
 
   rmw_ret_t ret = rmw_names_and_types_check_zero(service_names_and_types);
   if (ret != RMW_RET_OK) {

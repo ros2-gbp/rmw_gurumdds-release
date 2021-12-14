@@ -52,11 +52,14 @@ shared__rmw_destroy_guard_condition(
   const char * implementation_identifier,
   rmw_guard_condition_t * guard_condition)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(guard_condition, RMW_RET_INVALID_ARGUMENT);
+  if (guard_condition == nullptr) {
+    RMW_SET_ERROR_MSG("guard condition handle is null");
+    return RMW_RET_ERROR;
+  }
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     guard condition handle,
     guard_condition->implementation_identifier,
-    implementation_identifier, return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    implementation_identifier, return RMW_RET_ERROR)
 
   dds_GuardCondition * dds_guard_condition =
     static_cast<dds_GuardCondition *>(guard_condition->data);
@@ -71,12 +74,16 @@ shared__rmw_trigger_guard_condition(
   const char * implementation_identifier,
   const rmw_guard_condition_t * guard_condition)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(guard_condition, RMW_RET_INVALID_ARGUMENT);
+  if (guard_condition == nullptr) {
+    RMW_SET_ERROR_MSG("guard condition handle is null");
+    return RMW_RET_ERROR;
+  }
+
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     guard condition handle,
     guard_condition->implementation_identifier,
     implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    return RMW_RET_ERROR);
 
   dds_GuardCondition * dds_guard_condition =
     static_cast<dds_GuardCondition *>(guard_condition->data);

@@ -60,7 +60,7 @@ shared__rmw_take_event(
     event handle,
     event_handle->implementation_identifier,
     implementation_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    return RMW_RET_ERROR);
 
   rmw_ret_t ret_code = RMW_RET_UNSUPPORTED;
 

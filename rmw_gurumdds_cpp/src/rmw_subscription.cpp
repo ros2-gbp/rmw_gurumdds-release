@@ -23,6 +23,8 @@
 #include "rmw/serialized_message.h"
 #include "rmw/rmw.h"
 
+#include "rcutils/error_handling.h"
+
 #include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
 #include "rmw_gurumdds_shared_cpp/types.hpp"
 #include "rmw_gurumdds_shared_cpp/dds_include.hpp"
@@ -92,6 +94,14 @@ rmw_create_subscription(
     return nullptr;
   }
 
+  if (subscription_options->require_unique_network_flow_endpoints ==
+    RMW_UNIQUE_NETWORK_FLOW_ENDPOINTS_STRICTLY_REQUIRED)
+  {
+    RMW_SET_ERROR_MSG(
+      "Strict requirement on unique network flow endpoints for subscriptions not supported");
+    return nullptr;
+  }
+
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
     RMW_SET_ERROR_MSG("node info is null");
@@ -107,9 +117,11 @@ rmw_create_subscription(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -196,7 +208,6 @@ rmw_create_subscription(
       participant, processed_topic_name.c_str(), type_name.c_str(), &topic_qos, nullptr, 0);
     if (topic == nullptr) {
       RMW_SET_ERROR_MSG("failed to create topic");
-      dds_TopicQos_finalize(&topic_qos);
       goto fail;
     }
 
@@ -225,7 +236,6 @@ rmw_create_subscription(
     dds_Subscriber_create_datareader(dds_subscriber, topic, &datareader_qos, nullptr, 0);
   if (topic_reader == nullptr) {
     RMW_SET_ERROR_MSG("failed to create datareader");
-    dds_DataReaderQos_finalize(&datareader_qos);
     goto fail;
   }
 
@@ -252,6 +262,7 @@ rmw_create_subscription(
   subscriber_info->subscriber = dds_subscriber;
   subscriber_info->topic_reader = topic_reader;
   subscriber_info->read_condition = read_condition;
+  subscriber_info->dds_typesupport = dds_typesupport;
   subscriber_info->rosidl_message_typesupport = type_support;
 
   subscription = rmw_subscription_allocate();
@@ -264,7 +275,7 @@ rmw_create_subscription(
   subscription->data = subscriber_info;
   subscription->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (subscription->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
     goto fail;
   }
   memcpy(const_cast<char *>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
@@ -276,9 +287,6 @@ rmw_create_subscription(
     // Error message already set
     goto fail;
   }
-
-  dds_TypeSupport_delete(dds_typesupport);
-  dds_typesupport = nullptr;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
@@ -296,10 +304,6 @@ fail:
       rmw_free(const_cast<char *>(subscription->topic_name));
     }
     rmw_subscription_free(subscription);
-  }
-
-  if (topic != nullptr) {
-    dds_DomainParticipant_delete_topic(participant, topic);
   }
 
   if (dds_subscriber != nullptr) {
@@ -472,20 +476,24 @@ rmw_subscription_get_actual_qos(
 rmw_ret_t
 rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
+  if (node == nullptr) {
+    RMW_SET_ERROR_MSG("node handle is null");
+    return RMW_RET_ERROR;
+  }
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     node handle,
     node->implementation_identifier,
     gurum_gurumdds_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION
-  );
+    return RMW_RET_ERROR
+  )
 
-  RMW_CHECK_ARGUMENT_FOR_NULL(subscription, RMW_RET_INVALID_ARGUMENT);
+  if (subscription == nullptr) {
+    RMW_SET_ERROR_MSG("subscription handle is null");
+    return RMW_RET_ERROR;
+  }
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    subscription handle,
-    subscription->implementation_identifier,
-    gurum_gurumdds_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    subscription handle, subscription->implementation_identifier,
+    gurum_gurumdds_identifier, return RMW_RET_ERROR)
 
   auto node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
@@ -498,6 +506,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
     return RMW_RET_ERROR;
   }
 
+  rmw_ret_t rmw_ret = RMW_RET_OK;
   dds_ReturnCode_t ret = dds_RETCODE_OK;
   GurumddsSubscriberInfo * subscriber_info =
     static_cast<GurumddsSubscriberInfo *>(subscription->data);
@@ -511,7 +520,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
           ret = dds_DataReader_delete_readcondition(topic_reader, read_condition);
           if (ret != dds_RETCODE_OK) {
             RMW_SET_ERROR_MSG("failed to delete readcondition");
-            return RMW_RET_ERROR;
+            rmw_ret = RMW_RET_ERROR;
           }
           subscriber_info->read_condition = nullptr;
         }
@@ -519,25 +528,28 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
         ret = dds_Subscriber_delete_datareader(dds_subscriber, topic_reader);
         if (ret != dds_RETCODE_OK) {
           RMW_SET_ERROR_MSG("failed to delete datareader");
-          return RMW_RET_ERROR;
+          rmw_ret = RMW_RET_ERROR;
         }
         subscriber_info->topic_reader = nullptr;
       } else if (subscriber_info->read_condition != nullptr) {
         RMW_SET_ERROR_MSG("cannot delete readcondition because the datareader is null");
-        return RMW_RET_ERROR;
+        rmw_ret = RMW_RET_ERROR;
       }
 
       ret = dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
       if (ret != dds_RETCODE_OK) {
         RMW_SET_ERROR_MSG("failed to delete subscriber");
-        return RMW_RET_ERROR;
+        rmw_ret = RMW_RET_ERROR;
       }
-      subscriber_info->subscriber = nullptr;
     } else if (subscriber_info->topic_reader != nullptr) {
       RMW_SET_ERROR_MSG("cannot delte datareader because the subscriber is null");
-      return RMW_RET_ERROR;
+      rmw_ret = RMW_RET_ERROR;
     }
 
+    if (subscriber_info->dds_typesupport != nullptr) {
+      dds_TypeSupport_delete(subscriber_info->dds_typesupport);
+      subscriber_info->dds_typesupport = nullptr;
+    }
 
     delete subscriber_info;
     subscription->data = nullptr;
@@ -554,7 +566,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 
   rmw_subscription_free(subscription);
 
-  rmw_ret_t rmw_ret = rmw_trigger_guard_condition(node_info->graph_guard_condition);
+  rmw_ret = rmw_trigger_guard_condition(node_info->graph_guard_condition);
 
   return rmw_ret;
 }
@@ -571,10 +583,10 @@ _take(
   (void)allocation;
   *taken = false;
 
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    subscription handle,
-    subscription->implementation_identifier, identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  if (subscription->implementation_identifier != identifier) {
+    RMW_SET_ERROR_MSG("subscription handle not from this implementation");
+    return RMW_RET_ERROR;
+  }
 
   GurumddsSubscriberInfo * info = static_cast<GurumddsSubscriberInfo *>(subscription->data);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "custom subscriber info is null", return RMW_RET_ERROR);
@@ -596,7 +608,7 @@ _take(
   }
 
   dds_UnsignedLongSeq * sample_sizes = dds_UnsignedLongSeq_create(1);
-  if (sample_sizes == nullptr) {
+  if (sample_infos == nullptr) {
     RMW_SET_ERROR_MSG("failed to create sample size sequence");
     dds_DataSeq_delete(data_values);
     dds_SampleInfoSeq_delete(sample_infos);
@@ -607,10 +619,9 @@ _take(
     topic_reader, dds_HANDLE_NIL, data_values, sample_infos, sample_sizes, 1,
     dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
 
-  const char * topic_name =
-    dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
-
   if (ret == dds_RETCODE_NO_DATA) {
+    const char * topic_name =
+      dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
     RCUTILS_LOG_DEBUG_NAMED(
       "rmw_gurumdds_cpp", "No data on topic %s", topic_name);
     dds_DataReader_raw_return_loan(topic_reader, data_values, sample_infos, sample_sizes);
@@ -619,6 +630,10 @@ _take(
     dds_UnsignedLongSeq_delete(sample_sizes);
     return RMW_RET_OK;
   }
+  const char * topic_name =
+    dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
+  RCUTILS_LOG_DEBUG_NAMED(
+    "rmw_gurumdds_cpp", "Received data on topic %s", topic_name);
 
   if (ret != dds_RETCODE_OK) {
     RMW_SET_ERROR_MSG("failed to take data");
@@ -629,12 +644,15 @@ _take(
     return RMW_RET_ERROR;
   }
 
-  RCUTILS_LOG_DEBUG_NAMED(
-    "rmw_gurumdds_cpp", "Received data on topic %s", topic_name);
-
   dds_SampleInfo * sample_info = dds_SampleInfoSeq_get(sample_infos, 0);
 
-  if (sample_info->valid_data) {
+  bool ignore_sample = false;
+
+  if (!sample_info->valid_data) {
+    ignore_sample = true;
+  }
+
+  if (!ignore_sample) {
     void * sample = dds_DataSeq_get(data_values, 0);
     if (sample == nullptr) {
       RMW_SET_ERROR_MSG("failed to get message");
@@ -700,11 +718,11 @@ rmw_take(
   rmw_subscription_allocation_t * allocation)
 {
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    subscription, "subscription pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    subscription, "subscription pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    ros_message, "ros_message pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    ros_message, "ros_message pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    taken, "boolean flag for taken is null", return RMW_RET_INVALID_ARGUMENT);
+    taken, "boolean flag for taken is null", return RMW_RET_ERROR);
 
   return _take(
     gurum_gurumdds_identifier, subscription, ros_message, taken, nullptr, allocation);
@@ -719,13 +737,13 @@ rmw_take_with_info(
   rmw_subscription_allocation_t * allocation)
 {
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    subscription, "subscription pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    subscription, "subscription pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    ros_message, "ros_message pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    ros_message, "ros_message pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    taken, "boolean flag for taken is null", return RMW_RET_INVALID_ARGUMENT);
+    taken, "boolean flag for taken is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    message_info, "message info pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    message_info, "message info pointer is null", return RMW_RET_ERROR);
 
   return _take(
     gurum_gurumdds_identifier, subscription, ros_message, taken, message_info, allocation);
@@ -754,7 +772,7 @@ rmw_take_sequence(
     subscription handle,
     subscription->implementation_identifier,
     gurum_gurumdds_identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION)
 
   if (0u == count) {
     RMW_SET_ERROR_MSG("count cannot be 0");
@@ -791,7 +809,7 @@ rmw_take_sequence(
   }
 
   dds_UnsignedLongSeq * sample_sizes = dds_UnsignedLongSeq_create(count);
-  if (sample_sizes == nullptr) {
+  if (sample_infos == nullptr) {
     RMW_SET_ERROR_MSG("failed to create sample size sequence");
     dds_DataSeq_delete(data_values);
     dds_SampleInfoSeq_delete(sample_infos);
@@ -804,10 +822,9 @@ rmw_take_sequence(
     topic_reader, dds_HANDLE_NIL, data_values, sample_infos, sample_sizes, count,
     dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
 
-  const char * topic_name =
-    dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
-
   if (ret == dds_RETCODE_NO_DATA) {
+    const char * topic_name =
+      dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
     RCUTILS_LOG_DEBUG_NAMED(
       "rmw_gurumdds_cpp", "No data on topic %s", topic_name);
     dds_DataReader_raw_return_loan(topic_reader, data_values, sample_infos, sample_sizes);
@@ -826,13 +843,21 @@ rmw_take_sequence(
     return RMW_RET_ERROR;
   }
 
+  const char * topic_name =
+    dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
   RCUTILS_LOG_DEBUG_NAMED(
     "rmw_gurumdds_cpp", "Received data on topic %s", topic_name);
 
   for (uint32_t i = 0; i < dds_SampleInfoSeq_length(sample_infos); i++) {
     dds_SampleInfo * sample_info = dds_SampleInfoSeq_get(sample_infos, i);
 
-    if (sample_info->valid_data) {
+    bool ignore_sample = false;
+
+    if (!sample_info->valid_data) {
+      ignore_sample = true;
+    }
+
+    if (!ignore_sample) {
       void * sample = dds_DataSeq_get(data_values, i);
       if (sample == nullptr) {
         RMW_SET_ERROR_MSG("failed to get message");
@@ -906,11 +931,10 @@ _take_serialized(
   (void)allocation;
   *taken = false;
 
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    subscription handle,
-    subscription->implementation_identifier,
-    identifier,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  if (subscription->implementation_identifier != identifier) {
+    RMW_SET_ERROR_MSG("subscription handle not from this implementation");
+    return RMW_RET_ERROR;
+  }
 
   GurumddsSubscriberInfo * info = static_cast<GurumddsSubscriberInfo *>(subscription->data);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(info, "custom subscriber info is null", return RMW_RET_ERROR);
@@ -932,7 +956,7 @@ _take_serialized(
   }
 
   dds_UnsignedLongSeq * sample_sizes = dds_UnsignedLongSeq_create(1);
-  if (sample_sizes == nullptr) {
+  if (sample_infos == nullptr) {
     RMW_SET_ERROR_MSG("failed to create sample size sequence");
     dds_DataSeq_delete(data_values);
     dds_SampleInfoSeq_delete(sample_infos);
@@ -943,10 +967,9 @@ _take_serialized(
     topic_reader, dds_HANDLE_NIL, data_values, sample_infos, sample_sizes, 1,
     dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
 
-  const char * topic_name =
-    dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
-
   if (ret == dds_RETCODE_NO_DATA) {
+    const char * topic_name =
+      dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
     RCUTILS_LOG_DEBUG_NAMED(
       "rmw_gurumdds_cpp", "No data on topic %s", topic_name);
     dds_DataReader_raw_return_loan(topic_reader, data_values, sample_infos, sample_sizes);
@@ -955,6 +978,10 @@ _take_serialized(
     dds_UnsignedLongSeq_delete(sample_sizes);
     return RMW_RET_OK;
   }
+  const char * topic_name =
+    dds_TopicDescription_get_name(dds_DataReader_get_topicdescription(topic_reader));
+  RCUTILS_LOG_DEBUG_NAMED(
+    "rmw_gurumdds_cpp", "Received data on topic %s", topic_name);
 
   if (ret != dds_RETCODE_OK) {
     RMW_SET_ERROR_MSG("failed to take data");
@@ -965,12 +992,15 @@ _take_serialized(
     return RMW_RET_ERROR;
   }
 
-  RCUTILS_LOG_DEBUG_NAMED(
-    "rmw_gurumdds_cpp", "Received data on topic %s", topic_name);
-
   dds_SampleInfo * sample_info = dds_SampleInfoSeq_get(sample_infos, 0);
 
-  if (sample_info->valid_data) {
+  bool ignore_sample = false;
+
+  if (!sample_info->valid_data) {
+    ignore_sample = true;
+  }
+
+  if (!ignore_sample) {
     void * sample = dds_DataSeq_get(data_values, 0);
     if (sample == nullptr) {
       RMW_SET_ERROR_MSG("failed to take data");
@@ -1036,11 +1066,11 @@ rmw_take_serialized_message(
   rmw_subscription_allocation_t * allocation)
 {
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    subscription, "subscription pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    subscription, "subscription pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    serialized_message, "serialized_message pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    serialized_message, "serialized_message pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    taken, "boolean flag for taken is null", return RMW_RET_INVALID_ARGUMENT);
+    taken, "boolean flag for taken is null", return RMW_RET_ERROR);
 
   return _take_serialized(
     gurum_gurumdds_identifier, subscription,
@@ -1056,13 +1086,13 @@ rmw_take_serialized_message_with_info(
   rmw_subscription_allocation_t * allocation)
 {
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    subscription, "subscription pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    subscription, "subscription pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    serialized_message, "serialized_message pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    serialized_message, "serialized_message pointer is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    taken, "boolean flag for taken is null", return RMW_RET_INVALID_ARGUMENT);
+    taken, "boolean flag for taken is null", return RMW_RET_ERROR);
   RCUTILS_CHECK_FOR_NULL_WITH_MSG(
-    message_info, "message info pointer is null", return RMW_RET_INVALID_ARGUMENT);
+    message_info, "message info pointer is null", return RMW_RET_ERROR);
 
   return _take_serialized(
     gurum_gurumdds_identifier, subscription,
