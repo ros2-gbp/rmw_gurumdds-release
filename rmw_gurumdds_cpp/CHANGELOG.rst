@@ -2,20 +2,14 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.1.2 (2022-01-03)
+2.1.1 (2021-03-12)
+------------------
+* Update packages to use gurumdds-2.7
+* Contributors: youngjin
+
+2.2.0 (2022-01-04)
 ------------------
 * Update packages to use gurumdds-2.8 & Update README
-* Contributors: Youngjin Yun
-
-3.1.1 (2021-12-21)
-------------------
-* Add public to qos convert api& fix for uncrustify
-* Contributors: Youngjin Yun
-
-3.1.0 (2021-11-25)
-------------------
-* Use convert api for publisher/subscription Qos getters
-* Add client/service Qos getters
 * Remove dds_typesupport from Publisher/Subscriber Info
 * Change the return time when destroying entities
 * Add ommited memory manage code
@@ -24,47 +18,33 @@ Changelog for package rmw_gurumdds_cpp
 * Update return value
 * Contributors: Youngjin Yun
 
-3.0.9 (2021-10-14)
-------------------
+2.1.11 (2021-10-14)
+-------------------
 
-3.0.8 (2021-10-14)
-------------------
+2.1.10 (2021-09-27)
+-------------------
 
-3.0.7 (2021-09-27)
-------------------
-
-3.0.6 (2021-09-23)
-------------------
-* Revise for lint
-* Contributors: Youngjin Yun
-
-3.0.5 (2021-09-23)
-------------------
-* Update rmw_context_impl_t definition
-* Add rmw_publisher_wait_for_all_acked
-* Contributors: Youngjin Yun
-
-3.0.4 (2021-09-02)
+2.1.9 (2021-09-02)
 ------------------
 * Fix unbounded sequence size
 * Contributors: Youngjin Yun
 
-3.0.3 (2021-08-19)
+2.1.8 (2021-08-19)
 ------------------
 * Remove datareader listener patch
 * Remove unnecessary operation
 * Contributors: Youngjin Yun
 
-3.0.2 (2021-07-14)
+2.1.7 (2021-07-14)
 ------------------
 
-3.0.1 (2021-07-07)
+2.1.6 (2021-07-08)
 ------------------
 * Use variable attempt to take the number of times equal to count
 * Check if the queue is empty before using it
 * Contributors: Youngjin Yun
 
-3.0.0 (2021-04-29)
+2.1.5 (2021-04-28)
 ------------------
 * Revise for lint
 * Contributors: Youngjin Yun
@@ -83,12 +63,9 @@ Changelog for package rmw_gurumdds_cpp
 ------------------
 * Update code about build error on windows
 * Add RMW function to check QoS compatibility
-* Contributors: Youngjin Yun, youngjin
-
-2.1.1 (2021-03-12)
-------------------
+* 2.1.1
 * Update packages to use gurumdds-2.7
-* Contributors: youngjin
+* Contributors: Youngjin Yun, youngjin
 
 2.1.0 (2021-02-23)
 ------------------
