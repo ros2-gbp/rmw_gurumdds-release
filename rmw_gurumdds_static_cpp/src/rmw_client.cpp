@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
-#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
 #include "rmw/rmw.h"
@@ -80,10 +79,8 @@ rmw_create_client(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_C);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_service_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_CPP);
     if (type_support == nullptr) {
-      recutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -162,13 +159,14 @@ rmw_create_client(
   // Create topic and type name strings
   request_type_name = _create_type_name(request_callbacks);
   response_type_name = _create_type_name(response_callbacks);
+  request_topic_name.reserve(256);
+  response_topic_name.reserve(256);
   if (!qos_policies->avoid_ros_namespace_conventions) {
-    request_topic_name = std::string(ros_service_requester_prefix) + service_name;
-    response_topic_name = std::string(ros_service_response_prefix) + service_name;
-  } else {
-    request_topic_name = service_name;
-    response_topic_name = service_name;
+    request_topic_name += ros_service_requester_prefix;
+    response_topic_name += ros_service_response_prefix;
   }
+  request_topic_name += service_name;
+  response_topic_name += service_name;
   request_topic_name += "Request";
   response_topic_name += "Reply";
 

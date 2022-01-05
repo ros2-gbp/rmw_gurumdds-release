@@ -15,32 +15,23 @@
 #include <limits>
 #include "rmw_gurumdds_shared_cpp/qos.hpp"
 
-static inline bool is_time_unspecified(const rmw_time_t & time)
+static inline bool is_time_default(const rmw_time_t & time)
 {
-  return rmw_time_equal(time, RMW_DURATION_UNSPECIFIED);
+  return time.sec == 0 && time.nsec == 0;
 }
 
-dds_Duration_t
+static dds_Duration_t
 rmw_time_to_dds(const rmw_time_t & time)
 {
-  if (rmw_time_equal(time, RMW_DURATION_INFINITE)) {
-    dds_Duration_t duration;
-    duration.sec = dds_DURATION_INFINITE_SEC;
-    duration.nanosec = dds_DURATION_INFINITE_NSEC;
-    return duration;
-  }
   dds_Duration_t duration;
   duration.sec = static_cast<int32_t>(time.sec);
   duration.nanosec = static_cast<uint32_t>(time.nsec);
   return duration;
 }
 
-rmw_time_t
+static rmw_time_t
 dds_duration_to_rmw(const dds_Duration_t & duration)
 {
-  if (duration.sec == dds_DURATION_INFINITE_SEC && duration.nanosec == dds_DURATION_INFINITE_NSEC) {
-    return RMW_DURATION_INFINITE;
-  }
   rmw_time_t time;
   time.sec = static_cast<uint64_t>(duration.sec);
   time.nsec = static_cast<uint64_t>(duration.nanosec);
@@ -108,7 +99,7 @@ set_entity_qos_from_profile_generic(
     entity_qos->resource_limits.max_samples_per_instance = 4096;
   }
 
-  if (!is_time_unspecified(qos_profile->deadline)) {
+  if (!is_time_default(qos_profile->deadline)) {
     entity_qos->deadline.period = rmw_time_to_dds(qos_profile->deadline);
   }
 
@@ -126,7 +117,7 @@ set_entity_qos_from_profile_generic(
       return false;
   }
 
-  if (!is_time_unspecified(qos_profile->liveliness_lease_duration)) {
+  if (!is_time_default(qos_profile->liveliness_lease_duration)) {
     entity_qos->liveliness.lease_duration = rmw_time_to_dds(qos_profile->liveliness_lease_duration);
   }
 
@@ -145,7 +136,7 @@ get_datawriter_qos(
     return false;
   }
 
-  if (!is_time_unspecified(qos_profile->lifespan)) {
+  if (!is_time_default(qos_profile->lifespan)) {
     datawriter_qos->lifespan.duration = rmw_time_to_dds(qos_profile->lifespan);
   }
 
@@ -170,21 +161,7 @@ bool get_datareader_qos(
   return true;
 }
 
-rmw_qos_history_policy_t
-convert_history(
-  dds_HistoryQosPolicy policy)
-{
-  switch (policy.kind) {
-    case dds_KEEP_LAST_HISTORY_QOS:
-      return RMW_QOS_POLICY_HISTORY_KEEP_LAST;
-    case dds_KEEP_ALL_HISTORY_QOS:
-      return RMW_QOS_POLICY_HISTORY_KEEP_ALL;
-    default:
-      return RMW_QOS_POLICY_HISTORY_UNKNOWN;
-  }
-}
-
-rmw_qos_reliability_policy_t
+enum rmw_qos_reliability_policy_t
 convert_reliability(
   dds_ReliabilityQosPolicy policy)
 {
@@ -198,7 +175,7 @@ convert_reliability(
   }
 }
 
-rmw_qos_durability_policy_t
+enum rmw_qos_durability_policy_t
 convert_durability(
   dds_DurabilityQosPolicy policy)
 {
@@ -212,21 +189,21 @@ convert_durability(
   }
 }
 
-rmw_time_t
+struct rmw_time_t
 convert_deadline(
   dds_DeadlineQosPolicy policy)
 {
   return dds_duration_to_rmw(policy.period);
 }
 
-rmw_time_t
+struct rmw_time_t
 convert_lifespan(
   dds_LifespanQosPolicy policy)
 {
   return dds_duration_to_rmw(policy.duration);
 }
 
-rmw_qos_liveliness_policy_t
+enum rmw_qos_liveliness_policy_t
 convert_liveliness(
   dds_LivelinessQosPolicy policy)
 {
@@ -240,7 +217,7 @@ convert_liveliness(
   }
 }
 
-rmw_time_t
+struct rmw_time_t
 convert_liveliness_lease_duration(
   dds_LivelinessQosPolicy policy)
 {
