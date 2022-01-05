@@ -1,4 +1,4 @@
-From 955714cd17aa03d1a39ae198b5c193252dfeb211 Mon Sep 17 00:00:00 2001
+From 7f1c799b99bfd388040f1bbe2e3fc81caeadf222 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Thu, 11 Feb 2021 18:39:10 -0800
 Subject: [PATCH] Drop membership in rmw_implementation_packages group
@@ -14,7 +14,7 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/package.xml b/package.xml
-index ef456ea..0b4cee1 100644
+index af32181..c373a89 100644
 --- a/package.xml
 +++ b/package.xml
 @@ -36,8 +36,6 @@
