@@ -386,7 +386,7 @@ rmw_subscription_get_actual_qos(
 
   dds_DataReader * data_reader = info->topic_reader;
   if (data_reader == nullptr) {
-    RMW_SET_ERROR_MSG("subscription internal data writer is invalid");
+    RMW_SET_ERROR_MSG("subscription internal data reader is invalid");
     return RMW_RET_ERROR;
   }
 
@@ -465,6 +465,11 @@ rmw_subscription_get_actual_qos(
       static_cast<uint64_t>(dds_qos.liveliness.lease_duration.nanosec);
   }
 
+  ret = dds_DataReaderQos_finalize(&dds_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("failed to finalize datareader qos");
+    return RMW_RET_ERROR;
+  }
 
   return RMW_RET_OK;
 }
