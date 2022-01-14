@@ -92,14 +92,17 @@ shared__rmw_create_node(
   rmw_node_t * node_handle = nullptr;
   GurumddsNodeInfo * node_info = nullptr;
   rmw_guard_condition_t * graph_guard_condition = nullptr;
+  GurumddsParticipantListener * participant_listener = nullptr;
   GurumddsPublisherListener * publisher_listener = nullptr;
   GurumddsSubscriberListener * subscriber_listener = nullptr;
   dds_Subscriber * builtin_subscriber = nullptr;
   dds_DataReader * builtin_participant_datareader = nullptr;
   dds_DataReader * builtin_publication_datareader = nullptr;
   dds_DataReader * builtin_subscription_datareader = nullptr;
+  TopicCache<GuidPrefix_t> * topic_cache = nullptr;
   dds_DomainParticipant * participant = nullptr;
 
+  topic_cache = new(std::nothrow) TopicCache<GuidPrefix_t>();
   // TODO(clemjh): Implement security features
   std::string static_discovery_id;
   static_discovery_id += namespace_;
@@ -131,12 +134,21 @@ shared__rmw_create_node(
     goto fail;
   }
 
+  participant_listener =
+    new(std::nothrow) GurumddsParticipantListener(implementation_identifier, graph_guard_condition);
+  if (participant_listener == nullptr) {
+    RMW_SET_ERROR_MSG("failed to allocate GurumddsParticipantListener");
+    return nullptr;
+  }
+  participant_listener->context.graph_cache = topic_cache;
+
   publisher_listener =
     new(std::nothrow) GurumddsPublisherListener(implementation_identifier, graph_guard_condition);
   if (publisher_listener == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate GurumddsPublisherListener");
     return nullptr;
   }
+  publisher_listener->context.graph_cache = topic_cache;
 
   subscriber_listener =
     new(std::nothrow) GurumddsSubscriberListener(implementation_identifier, graph_guard_condition);
@@ -144,6 +156,7 @@ shared__rmw_create_node(
     RMW_SET_ERROR_MSG("failed to allocate GurumddsSubscriberListener");
     return nullptr;
   }
+  subscriber_listener->context.graph_cache = topic_cache;
 
   node_handle = rmw_node_allocate();
   if (node_handle == nullptr) {
@@ -174,6 +187,7 @@ shared__rmw_create_node(
 
   node_info->participant = participant;
   node_info->graph_guard_condition = graph_guard_condition;
+  node_info->part_listener = participant_listener;
   node_info->pub_listener = publisher_listener;
   node_info->sub_listener = subscriber_listener;
 
@@ -201,6 +215,13 @@ shared__rmw_create_node(
     RMW_SET_ERROR_MSG("builtin subscription datareader handle is null");
     goto fail;
   }
+
+  node_info->part_listener->dds_reader = builtin_participant_datareader;
+  dds_DataReader_set_listener(
+    builtin_participant_datareader,
+    &node_info->part_listener->dds_listener, dds_DATA_AVAILABLE_STATUS);
+  dds_DataReader_set_listener_context(
+    builtin_participant_datareader, &node_info->part_listener->context);
 
   node_info->pub_listener->dds_reader = builtin_publication_datareader;
   dds_DataReader_set_listener(
@@ -254,6 +275,10 @@ fail:
 
   if (subscriber_listener != nullptr) {
     delete subscriber_listener;
+  }
+
+  if (participant_listener != nullptr) {
+    delete participant_listener;
   }
 
   if (node_info != nullptr) {
@@ -415,6 +440,11 @@ shared__rmw_destroy_node(const char * implementation_identifier, rmw_node_t * no
   if (node_info->sub_listener != nullptr) {
     delete node_info->sub_listener;
     node_info->sub_listener = nullptr;
+  }
+
+  if (node_info->part_listener != nullptr) {
+    delete node_info->part_listener;
+    node_info->part_listener = nullptr;
   }
 
   if (node_info->graph_guard_condition != nullptr) {

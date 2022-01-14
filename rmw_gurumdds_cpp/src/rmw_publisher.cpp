@@ -399,6 +399,34 @@ rmw_publisher_assert_liveliness(const rmw_publisher_t * publisher)
 }
 
 rmw_ret_t
+rmw_publisher_wait_for_all_acked(const rmw_publisher_t * publisher, rmw_time_t wait_timeout)
+{
+  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    publisher,
+    publisher->implementation_identifier, gurum_gurumdds_identifier,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+
+  GurumddsPublisherInfo * publisher_info = static_cast<GurumddsPublisherInfo *>(publisher->data);
+  if (publisher_info == nullptr) {
+    RMW_SET_ERROR_MSG("publisher internal data is invalid");
+    return RMW_RET_ERROR;
+  }
+
+  dds_Duration_t timeout = rmw_time_to_dds(wait_timeout);
+  dds_ReturnCode_t ret = dds_DataWriter_wait_for_acknowledgments(
+    publisher_info->topic_writer, &timeout);
+
+  if (ret == dds_RETCODE_OK) {
+    return RMW_RET_OK;
+  } else if (ret == dds_RETCODE_TIMEOUT) {
+    return RMW_RET_TIMEOUT;
+  } else {
+    return RMW_RET_ERROR;
+  }
+}
+
+rmw_ret_t
 rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
 {
   RMW_CHECK_ARGUMENT_FOR_NULL(node, RMW_RET_INVALID_ARGUMENT);
@@ -519,81 +547,14 @@ rmw_publisher_get_actual_qos(
     return RMW_RET_ERROR;
   }
 
-  switch (dds_qos.history.kind) {
-    case dds_KEEP_LAST_HISTORY_QOS:
-      qos->history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
-      break;
-    case dds_KEEP_ALL_HISTORY_QOS:
-      qos->history = RMW_QOS_POLICY_HISTORY_KEEP_ALL;
-      break;
-    default:
-      qos->history = RMW_QOS_POLICY_HISTORY_UNKNOWN;
-      break;
-  }
-
-  switch (dds_qos.durability.kind) {
-    case dds_TRANSIENT_LOCAL_DURABILITY_QOS:
-      qos->durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
-      break;
-    case dds_VOLATILE_DURABILITY_QOS:
-      qos->durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
-      break;
-    default:
-      qos->durability = RMW_QOS_POLICY_DURABILITY_UNKNOWN;
-      break;
-  }
-
-  switch (dds_qos.reliability.kind) {
-    case dds_BEST_EFFORT_RELIABILITY_QOS:
-      qos->reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
-      break;
-    case dds_RELIABLE_RELIABILITY_QOS:
-      qos->reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
-      break;
-    default:
-      qos->reliability = RMW_QOS_POLICY_RELIABILITY_UNKNOWN;
-      break;
-  }
-
+  qos->reliability = convert_reliability(dds_qos.reliability);
+  qos->durability = convert_durability(dds_qos.durability);
+  qos->deadline = convert_deadline(dds_qos.deadline);
+  qos->lifespan = convert_lifespan(dds_qos.lifespan);
+  qos->liveliness = convert_liveliness(dds_qos.liveliness);
+  qos->liveliness_lease_duration = convert_liveliness_lease_duration(dds_qos.liveliness);
+  qos->history = convert_history(dds_qos.history);
   qos->depth = static_cast<size_t>(dds_qos.history.depth);
-
-  if (dds_qos.deadline.period.sec == dds_DURATION_INFINITE_SEC) {
-    qos->deadline.sec = std::numeric_limits<uint64_t>::max();
-    qos->deadline.nsec = std::numeric_limits<uint64_t>::max();
-  } else {
-    qos->deadline.sec = static_cast<uint64_t>(dds_qos.deadline.period.sec);
-    qos->deadline.nsec = static_cast<uint64_t>(dds_qos.deadline.period.nanosec);
-  }
-
-  if (dds_qos.lifespan.duration.sec == dds_DURATION_INFINITE_SEC) {
-    qos->lifespan.sec = std::numeric_limits<uint64_t>::max();
-    qos->lifespan.nsec = std::numeric_limits<uint64_t>::max();
-  } else {
-    qos->lifespan.sec = dds_qos.lifespan.duration.sec;
-    qos->lifespan.nsec = dds_qos.lifespan.duration.nanosec;
-  }
-
-  switch (dds_qos.liveliness.kind) {
-    case dds_AUTOMATIC_LIVELINESS_QOS:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
-      break;
-    case dds_MANUAL_BY_TOPIC_LIVELINESS_QOS:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;
-      break;
-    default:
-      qos->liveliness = RMW_QOS_POLICY_LIVELINESS_UNKNOWN;
-      break;
-  }
-
-  if (dds_qos.liveliness.lease_duration.sec == dds_DURATION_INFINITE_SEC) {
-    qos->liveliness_lease_duration.sec = std::numeric_limits<uint64_t>::max();
-    qos->liveliness_lease_duration.nsec = std::numeric_limits<uint64_t>::max();
-  } else {
-    qos->liveliness_lease_duration.sec =
-      static_cast<uint64_t>(dds_qos.liveliness.lease_duration.sec);
-    qos->liveliness_lease_duration.nsec =
-      static_cast<uint64_t>(dds_qos.liveliness.lease_duration.nanosec);
-  }
 
   ret = dds_DataWriterQos_finalize(&dds_qos);
   if (ret != dds_RETCODE_OK) {
