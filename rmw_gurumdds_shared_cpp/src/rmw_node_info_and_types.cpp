@@ -85,7 +85,6 @@ __get_key(
     RMW_SET_ERROR_MSG("Can't get domainparticipant qos policies");
     return RMW_RET_ERROR;
   }
-
   dds_InstanceHandleSeq * handle_seq = dds_InstanceHandleSeq_create(4);
   if (handle_seq == nullptr) {
     RMW_SET_ERROR_MSG("failed to create instance handle sequence");

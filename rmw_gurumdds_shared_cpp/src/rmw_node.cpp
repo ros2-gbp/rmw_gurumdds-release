@@ -42,9 +42,7 @@ shared__rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_,
-  size_t domain_id,
-  bool localhost_only)
+  const char * namespace_)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, NULL);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
@@ -100,9 +98,9 @@ shared__rmw_create_node(
   std::list<dds_Publisher *> publisher_list;
   std::list<dds_Subscriber *> subscription_list;
   dds_Subscriber * builtin_subscriber = nullptr;
+  dds_DataReader * builtin_participant_datareader = nullptr;
   dds_DataReader * builtin_publication_datareader = nullptr;
   dds_DataReader * builtin_subscription_datareader = nullptr;
-
   dds_DomainParticipant * participant = nullptr;
 
   // TODO(clemjh): Implement security features
@@ -110,7 +108,8 @@ shared__rmw_create_node(
   static_discovery_id += namespace_;
   static_discovery_id += name;
 
-  if (localhost_only) {
+  dds_DomainId_t domain_id = static_cast<dds_DomainId_t>(context->actual_domain_id);
+  if (context->options.localhost_only == RMW_LOCALHOST_ONLY_ENABLED) {
     dds_StringProperty props[] = {
       {const_cast<char *>("rtps.interface.ip"),
         const_cast<void *>(static_cast<const void *>("127.0.0.1"))},
@@ -189,6 +188,12 @@ shared__rmw_create_node(
 
   // set listeners
   builtin_subscriber = dds_DomainParticipant_get_builtin_subscriber(participant);
+  builtin_participant_datareader =
+    dds_Subscriber_lookup_datareader(builtin_subscriber, "BuiltinParticipant");
+  if (builtin_participant_datareader == nullptr) {
+    RMW_SET_ERROR_MSG("builtin participant datareader handle is null");
+    goto fail;
+  }
   builtin_publication_datareader =
     dds_Subscriber_lookup_datareader(builtin_subscriber, "BuiltinPublications");
   if (builtin_publication_datareader == nullptr) {
@@ -208,6 +213,7 @@ shared__rmw_create_node(
     &node_info->pub_listener->dds_listener, dds_DATA_AVAILABLE_STATUS);
   dds_DataReader_set_listener_context(
     builtin_publication_datareader, &node_info->pub_listener->context);
+
   node_info->sub_listener->dds_reader = builtin_subscription_datareader;
   dds_DataReader_set_listener(
     builtin_subscription_datareader,
@@ -285,6 +291,19 @@ shared__rmw_destroy_node(const char * implementation_identifier, rmw_node_t * no
   dds_DomainParticipant * participant = node_info->participant;
   if (participant == nullptr) {
     RMW_SET_ERROR_MSG("participant handle is null");
+    return RMW_RET_ERROR;
+  }
+
+  dds_InstanceHandleSeq * pub_seq = dds_InstanceHandleSeq_create(4);
+  if (pub_seq == nullptr) {
+    RMW_SET_ERROR_MSG("failed to create instance handle sequence");
+    return RMW_RET_ERROR;
+  }
+
+  dds_InstanceHandleSeq * sub_seq = dds_InstanceHandleSeq_create(4);
+  if (sub_seq == nullptr) {
+    RMW_SET_ERROR_MSG("failed to create instance handle sequence");
+    dds_InstanceHandleSeq_delete(pub_seq);
     return RMW_RET_ERROR;
   }
 

@@ -32,6 +32,7 @@
 #include "rmw_gurumdds_static_cpp/types.hpp"
 
 #include "rcutils/types.h"
+#include "rcutils/error_handling.h"
 
 #include "./type_support_common.hpp"
 
@@ -107,8 +108,10 @@ rmw_create_publisher(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_C);
   if (type_support == nullptr) {
+    rcutils_reset_error();
     type_support = get_message_typesupport_handle(type_supports, RMW_GURUMDDS_STATIC_CPP_TYPESUPPORT_CPP);
     if (type_support == nullptr) {
+      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -234,7 +237,7 @@ rmw_create_publisher(
   rmw_publisher->data = publisher_info;
   rmw_publisher->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (rmw_publisher->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
     goto fail;
   }
   memcpy(const_cast<char *>(rmw_publisher->topic_name), topic_name, strlen(topic_name) + 1);
