@@ -8,6 +8,29 @@ Changelog for package rmw_gurumdds_shared_cpp
 * fix typo
 * Contributors: youngjin
 
+2.3.0 (2022-04-26)
+------------------
+
+2.2.4 (2022-04-26)
+------------------
+* Remove minimum dds version as raw typesupport removed
+* Contributors: Youngjin Yun
+
+2.2.3 (2022-03-17)
+------------------
+* Remove dead store
+* Adjust minimum dds version
+* Contributors: Youngjin Yun
+
+2.2.2 (2022-02-16)
+------------------
+
+2.2.1 (2022-02-16)
+------------------
+* Wrap up unordered_map with shared_ptr
+* Change to delete only the entities created by the user
+* Contributors: Youngjin Yun
+
 2.2.0 (2022-01-04)
 ------------------
 * Update packages to use gurumdds-2.8 & Update README
