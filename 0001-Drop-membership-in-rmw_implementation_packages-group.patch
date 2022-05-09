@@ -1,4 +1,4 @@
-From 45ecc03fe453a866201bb7ff2004243179f51798 Mon Sep 17 00:00:00 2001
+From 6c7f4d5b287cb8aefb73d06a744f6b198e8cec85 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Thu, 11 Feb 2021 18:39:10 -0800
 Subject: [PATCH] Drop membership in rmw_implementation_packages group
