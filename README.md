@@ -1,3 +1,28 @@
+## rmw_gurumdds (galactic) - 2.3.0-1
+
+The packages in the `rmw_gurumdds` repository were released into the `galactic` distro by running `/usr/bin/bloom-release --rosdistro galactic --track galactic rmw_gurumdds` on `Mon, 09 May 2022 08:19:30 -0000`
+
+These packages were released:
+- `rmw_gurumdds_cpp`
+- `rmw_gurumdds_shared_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `2.2.0-2`
+- old version: `2.2.0-2`
+- new version: `2.3.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.1`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (foxy) - 1.2.0-1
 
 The packages in the `rmw_gurumdds` repository were released into the `foxy` distro by running `/usr/bin/bloom-release --rosdistro foxy --track foxy rmw_gurumdds` on `Mon, 09 May 2022 08:10:38 -0000`
