@@ -110,9 +110,9 @@ rmw_create_client(
   dds_Topic * request_topic = nullptr;
   dds_Topic * response_topic = nullptr;
 
-  uint64_t guid_temp = 0;
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
-  rmw_ret_t rmw_ret = RMW_RET_OK;
+  uint8_t client_guid[16] = {0};
+  dds_ReturnCode_t ret;
+  rmw_ret_t rmw_ret;
 
   std::pair<std::string, std::string> service_type_name;
   std::pair<std::string, std::string> service_metastring;
@@ -122,13 +122,6 @@ rmw_create_client(
   std::string response_type_name;
   std::string request_metastring;
   std::string response_metastring;
-
-  // Random values are required for GUID
-  std::random_device rd;
-  std::default_random_engine dre(rd());
-  std::uniform_int_distribution<uint64_t> uniform_dist(
-    (std::numeric_limits<uint64_t>::min)(),
-    (std::numeric_limits<uint64_t>::max)());
 
   // Create topic and type name strings
   service_type_name =
@@ -363,10 +356,8 @@ rmw_create_client(
   client_info->read_condition = read_condition;
 
   // Set GUID
-  guid_temp = uniform_dist(dre);
-  memcpy(client_info->writer_guid, &guid_temp, sizeof(guid_temp));
-  guid_temp = uniform_dist(dre);
-  memcpy(client_info->writer_guid + sizeof(guid_temp), &guid_temp, sizeof(guid_temp));
+  dds_DataWriter_get_guid(request_writer, client_guid);
+  memcpy(client_info->writer_guid, client_guid, sizeof(client_guid));
 
   rmw_client = rmw_client_allocate();
   if (rmw_client == nullptr) {
@@ -472,7 +463,7 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
     return RMW_RET_ERROR;
   }
 
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
+  dds_ReturnCode_t ret;
   GurumddsClientInfo * client_info = static_cast<GurumddsClientInfo *>(client->data);
 
   if (client_info != nullptr) {
