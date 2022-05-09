@@ -23,8 +23,6 @@
 #include "rmw/serialized_message.h"
 #include "rmw/rmw.h"
 
-#include "rcutils/error_handling.h"
-
 #include "rmw_gurumdds_shared_cpp/rmw_common.hpp"
 #include "rmw_gurumdds_shared_cpp/types.hpp"
 #include "rmw_gurumdds_shared_cpp/dds_include.hpp"
@@ -94,14 +92,6 @@ rmw_create_subscription(
     return nullptr;
   }
 
-  if (subscription_options->require_unique_network_flow_endpoints ==
-    RMW_UNIQUE_NETWORK_FLOW_ENDPOINTS_STRICTLY_REQUIRED)
-  {
-    RMW_SET_ERROR_MSG(
-      "Strict requirement on unique network flow endpoints for subscriptions not supported");
-    return nullptr;
-  }
-
   GurumddsNodeInfo * node_info = static_cast<GurumddsNodeInfo *>(node->data);
   if (node_info == nullptr) {
     RMW_SET_ERROR_MSG("node info is null");
@@ -117,11 +107,9 @@ rmw_create_subscription(
   const rosidl_message_type_support_t * type_support =
     get_message_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_message_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -137,8 +125,8 @@ rmw_create_subscription(
   dds_TopicDescription * topic_desc = nullptr;
   dds_ReadCondition * read_condition = nullptr;
   dds_TypeSupport * dds_typesupport = nullptr;
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
-  rmw_ret_t rmw_ret = RMW_RET_OK;
+  dds_ReturnCode_t ret;
+  rmw_ret_t rmw_ret;
 
   std::string type_name =
     create_type_name(type_support->data, type_support->typesupport_identifier);
@@ -254,6 +242,8 @@ rmw_create_subscription(
     goto fail;
   }
 
+  node_info->sub_list.push_back(dds_subscriber);
+
   subscriber_info = new(std::nothrow) GurumddsSubscriberInfo();
   if (subscriber_info == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate subscriber info handle");
@@ -276,7 +266,7 @@ rmw_create_subscription(
   subscription->data = subscriber_info;
   subscription->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (subscription->topic_name == nullptr) {
-    RMW_SET_ERROR_MSG("failed to allocate memory for topic name");
+    RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
   memcpy(const_cast<char *>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
@@ -321,6 +311,7 @@ fail:
       }
       dds_Subscriber_delete_datareader(dds_subscriber, topic_reader);
     }
+    node_info->sub_list.remove(dds_subscriber);
     dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
   }
 
@@ -477,12 +468,12 @@ rmw_subscription_get_actual_qos(
       static_cast<uint64_t>(dds_qos.liveliness.lease_duration.nanosec);
   }
 
-
   ret = dds_DataReaderQos_finalize(&dds_qos);
   if (ret != dds_RETCODE_OK) {
     RMW_SET_ERROR_MSG("failed to finalize datareader qos");
     return RMW_RET_ERROR;
   }
+
   return RMW_RET_OK;
 }
 
@@ -515,7 +506,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
     return RMW_RET_ERROR;
   }
 
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
+  dds_ReturnCode_t ret;
   GurumddsSubscriberInfo * subscriber_info =
     static_cast<GurumddsSubscriberInfo *>(subscription->data);
   if (subscriber_info != nullptr) {
@@ -544,15 +535,18 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
         return RMW_RET_ERROR;
       }
 
+      node_info->sub_list.remove(dds_subscriber);
       ret = dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
       if (ret != dds_RETCODE_OK) {
         RMW_SET_ERROR_MSG("failed to delete subscriber");
         return RMW_RET_ERROR;
       }
+      subscriber_info->subscriber = nullptr;
     } else if (subscriber_info->topic_reader != nullptr) {
       RMW_SET_ERROR_MSG("cannot delte datareader because the subscriber is null");
       return RMW_RET_ERROR;
     }
+
 
     delete subscriber_info;
     subscription->data = nullptr;

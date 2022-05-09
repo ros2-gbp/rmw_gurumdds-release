@@ -15,7 +15,7 @@
 #ifndef RMW_GURUMDDS_SHARED_CPP__TYPES_HPP_
 #define RMW_GURUMDDS_SHARED_CPP__TYPES_HPP_
 
-#include <atomic>
+#include <utility>
 #include <cassert>
 #include <exception>
 #include <iostream>
@@ -27,7 +27,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <utility>
+#include <atomic>
 
 #include "rmw/rmw.h"
 #include "rmw/ret_types.h"
@@ -113,9 +113,7 @@ static void pub_on_data_available(const dds_DataReader * a_reader)
         convert_liveliness_lease_duration(pbtd->liveliness),
         false,
       };
-      context->topic_cache->add_topic(
-        participant_guid, guid, std::move(topic_name),
-        std::move(type_name), qos);
+      context->topic_cache->add_topic(participant_guid, guid, topic_name, type_name, qos);
     } else {
       context->topic_cache->remove_topic(guid);
     }
@@ -326,6 +324,8 @@ typedef struct _GurumddsNodeInfo
   rmw_guard_condition_t * graph_guard_condition;
   GurumddsPublisherListener * pub_listener;
   GurumddsSubscriberListener * sub_listener;
+  std::list<dds_Publisher *> pub_list;
+  std::list<dds_Subscriber *> sub_list;
 } GurumddsNodeInfo;
 
 typedef struct _GurumddsWaitSetInfo

@@ -18,7 +18,6 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
-#include "rcutils/error_handling.h"
 
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/names_and_types.h"
@@ -77,11 +76,9 @@ rmw_create_service(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -107,8 +104,8 @@ rmw_create_service(
   dds_Topic * request_topic = nullptr;
   dds_Topic * response_topic = nullptr;
 
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
-  rmw_ret_t rmw_ret = RMW_RET_OK;
+  dds_ReturnCode_t ret;
+  rmw_ret_t rmw_ret;
 
   std::pair<std::string, std::string> service_type_name;
   std::pair<std::string, std::string> service_metastring;
@@ -456,7 +453,7 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
     return RMW_RET_ERROR;
   }
 
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
+  dds_ReturnCode_t ret;
   GurumddsServiceInfo * service_info = static_cast<GurumddsServiceInfo *>(service->data);
 
   if (service_info != nullptr) {

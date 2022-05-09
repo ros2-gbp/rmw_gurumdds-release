@@ -165,7 +165,6 @@ _get_endpoint_info_by_topic(
           }
         }
 
-
         ret = rmw_topic_endpoint_info_set_node_name(&ep_info, node_name.c_str(), allocator);
         check_ok();
 
@@ -194,7 +193,6 @@ _get_endpoint_info_by_topic(
 #undef check_ok
       }
     }
-
     dds_InstanceHandleSeq_delete(handle_seq);
 
     ret = rmw_topic_endpoint_info_array_init_with_size(endpoints_info, info_vec.size(), allocator);
