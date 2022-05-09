@@ -1,3 +1,28 @@
+## rmw_gurumdds (rolling) - 4.0.0-1
+
+The packages in the `rmw_gurumdds` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling rmw_gurumdds` on `Mon, 09 May 2022 08:58:25 -0000`
+
+These packages were released:
+- `rmw_gurumdds_cpp`
+- `rmw_gurumdds_shared_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `null`
+- old version: `3.1.2-2`
+- new version: `4.0.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.1`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (humble) - 3.2.0-1
 
 The packages in the `rmw_gurumdds` repository were released into the `humble` distro by running `/usr/bin/bloom-release --rosdistro humble --track humble rmw_gurumdds` on `Mon, 09 May 2022 08:35:41 -0000`
