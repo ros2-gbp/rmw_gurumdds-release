@@ -1,0 +1,12 @@
+Source: ros-humble-rmw-gurumdds-shared-cpp
+Section: misc
+Priority: optional
+Maintainer: Youngjin Yun <youngjin@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-2.8, ros-humble-ament-cmake, ros-humble-ament-lint-auto <!nocheck>, ros-humble-ament-lint-common <!nocheck>, ros-humble-gurumdds-cmake-module, ros-humble-rcutils, ros-humble-rmw, ros-humble-rmw-dds-common, ros-humble-rosidl-cmake, ros-humble-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-humble-rmw-gurumdds-shared-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gurumdds-2.8, ros-humble-ament-cmake, ros-humble-gurumdds-cmake-module, ros-humble-rmw-dds-common, ros-humble-ros-workspace
+Description: Code shared on static and dynamic type support of rmw_gurumdds_cpp.
