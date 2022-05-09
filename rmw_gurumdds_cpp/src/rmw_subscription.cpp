@@ -125,8 +125,8 @@ rmw_create_subscription(
   dds_TopicDescription * topic_desc = nullptr;
   dds_ReadCondition * read_condition = nullptr;
   dds_TypeSupport * dds_typesupport = nullptr;
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
-  rmw_ret_t rmw_ret = RMW_RET_OK;
+  dds_ReturnCode_t ret;
+  rmw_ret_t rmw_ret;
 
   std::string type_name =
     create_type_name(type_support->data, type_support->typesupport_identifier);
@@ -242,6 +242,8 @@ rmw_create_subscription(
     goto fail;
   }
 
+  node_info->sub_list.push_back(dds_subscriber);
+
   subscriber_info = new(std::nothrow) GurumddsSubscriberInfo();
   if (subscriber_info == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate subscriber info handle");
@@ -309,6 +311,7 @@ fail:
       }
       dds_Subscriber_delete_datareader(dds_subscriber, topic_reader);
     }
+    node_info->sub_list.remove(dds_subscriber);
     dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
   }
 
@@ -503,7 +506,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
     return RMW_RET_ERROR;
   }
 
-  dds_ReturnCode_t ret = dds_RETCODE_OK;
+  dds_ReturnCode_t ret;
   GurumddsSubscriberInfo * subscriber_info =
     static_cast<GurumddsSubscriberInfo *>(subscription->data);
   if (subscriber_info != nullptr) {
@@ -532,6 +535,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
         return RMW_RET_ERROR;
       }
 
+      node_info->sub_list.remove(dds_subscriber);
       ret = dds_DomainParticipant_delete_subscriber(participant, dds_subscriber);
       if (ret != dds_RETCODE_OK) {
         RMW_SET_ERROR_MSG("failed to delete subscriber");
