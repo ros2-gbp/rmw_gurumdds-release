@@ -1,0 +1,103 @@
+ros-foxy-gurumdds-cmake-module (1.3.0-1focal) focal; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 04 Oct 2022 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.2.3-1focal) focal; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 04 Jul 2022 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.2.2-1focal) focal; urgency=high
+
+  * Reorganise package
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 26 May 2022 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.2.1-1focal) focal; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 26 May 2022 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.1.1-1focal) focal; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 08 May 2022 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.1.0-1focal) focal; urgency=high
+
+  * Update packages to use gurumdds-2.8 & Update README
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 02 Jan 2022 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.0.4-1focal) focal; urgency=high
+
+  * Modify cmake according to library path format
+  * Change maintainer
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 07 Jul 2021 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.0.3-1focal) focal; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 18 Nov 2020 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.0.2-1focal) focal; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 28 Jul 2020 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.0.1-1focal) focal; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 27 Jul 2020 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (1.0.0-1focal) focal; urgency=high
+
+  * Updated packages to use gurumdds-2.6
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 03 Jun 2020 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (0.8.2-1focal) focal; urgency=high
+
+  * updated packages to use gurumdds-2.5
+  * Contributors: hyeonwoo
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 18 Dec 2019 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (0.8.1-1focal) focal; urgency=high
+
+  * CoreDDS is renamed to GurumDDS
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 14 Nov 2019 15:00:00 -0000
+
+ros-foxy-gurumdds-cmake-module (0.8.0-1focal) focal; urgency=high
+
+  * added changelog
+  * added gurumdds dependency to package.xml
+  * rewrote build scripts
+  * fixed 'command not found' error
+  * Implemented Wstring support
+  * fixed typos
+  * fixed code style divergence
+  * updated cmake to fit new library paths
+  * migration from gitlab
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 05 Nov 2019 15:00:00 -0000
+
+
