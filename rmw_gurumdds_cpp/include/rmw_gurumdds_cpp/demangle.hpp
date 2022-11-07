@@ -42,6 +42,7 @@ _demangle_service_type_only(const std::string & dds_type_name);
 std::string
 _identity_demangle(const std::string & name);
 
+
 using DemangleFunction = std::string (*)(const std::string &);
 using MangleFunction = DemangleFunction;
 

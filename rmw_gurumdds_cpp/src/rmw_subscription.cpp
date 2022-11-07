@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <chrono>
-#include <limits>
-#include <string>
-#include <thread>
 #include <utility>
+#include <string>
+#include <limits>
+#include <thread>
+#include <chrono>
 
 #include "rcutils/error_handling.h"
 
@@ -25,6 +25,7 @@
 #include "rmw/allocators.h"
 #include "rmw/error_handling.h"
 #include "rmw/serialized_message.h"
+#include "rmw/subscription_content_filter_options.h"
 #include "rmw/validate_full_topic_name.h"
 
 #include "rmw_gurumdds_cpp/gid.hpp"
@@ -208,6 +209,7 @@ __rmw_create_subscription(
     strlen(topic_name) + 1);
   rmw_subscription->options = *subscription_options;
   rmw_subscription->can_loan_messages = false;
+  rmw_subscription->is_cft_enabled = false;
 
   if (!internal) {
     if (graph_on_subscriber_created(ctx, node, subscriber_info) != RMW_RET_OK) {
@@ -293,12 +295,14 @@ _take(
     RMW_SET_ERROR_MSG("failed to create data sequence");
     return RMW_RET_ERROR;
   }
+
   dds_SampleInfoSeq * sample_infos = dds_SampleInfoSeq_create(1);
   if (sample_infos == nullptr) {
     RMW_SET_ERROR_MSG("failed to create sample info sequence");
     dds_DataSeq_delete(data_values);
     return RMW_RET_ERROR;
   }
+
   dds_UnsignedLongSeq * sample_sizes = dds_UnsignedLongSeq_create(1);
   if (sample_sizes == nullptr) {
     RMW_SET_ERROR_MSG("failed to create sample size sequence");
@@ -307,7 +311,7 @@ _take(
     return RMW_RET_ERROR;
   }
 
-  dds_ReturnCode_t ret = dds_DataReader_raw_take(
+  dds_ReturnCode_t ret = dds_DataReader_raw_take_w_sampleinfoex(
     topic_reader, dds_HANDLE_NIL, data_values, sample_infos, sample_sizes, 1,
     dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
 
@@ -365,11 +369,16 @@ _take(
     *taken = true;
 
     if (message_info != nullptr) {
+      int64_t sequence_number = 0;
+      dds_SampleInfoEx * sampleinfo_ex = reinterpret_cast<dds_SampleInfoEx *>(sample_info);
+      dds_sn_to_ros_sn(sampleinfo_ex->seq, &sequence_number);
       message_info->source_timestamp =
         sample_info->source_timestamp.sec * static_cast<int64_t>(1000000000) +
         sample_info->source_timestamp.nanosec;
       // TODO(clemjh): SampleInfo doesn't contain received_timestamp
       message_info->received_timestamp = 0;
+      message_info->publication_sequence_number = sequence_number;
+      message_info->reception_sequence_number = RMW_MESSAGE_INFO_SEQUENCE_NUMBER_UNSUPPORTED;
       rmw_gid_t * sender_gid = &message_info->publisher_gid;
       sender_gid->implementation_identifier = identifier;
       memset(sender_gid->data, 0, RMW_GID_STORAGE_SIZE);
@@ -437,7 +446,7 @@ _take_serialized(
     return RMW_RET_ERROR;
   }
 
-  dds_ReturnCode_t ret = dds_DataReader_raw_take(
+  dds_ReturnCode_t ret = dds_DataReader_raw_take_w_sampleinfoex(
     topic_reader, dds_HANDLE_NIL, data_values, sample_infos, sample_sizes, 1,
     dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
 
@@ -495,11 +504,16 @@ _take_serialized(
     *taken = true;
 
     if (message_info != nullptr) {
+      int64_t sequence_number = 0;
+      dds_SampleInfoEx * sampleinfo_ex = reinterpret_cast<dds_SampleInfoEx *>(sample_info);
+      dds_sn_to_ros_sn(sampleinfo_ex->seq, &sequence_number);
       message_info->source_timestamp =
         sample_info->source_timestamp.sec * static_cast<int64_t>(1000000000) +
         sample_info->source_timestamp.nanosec;
       // TODO(clemjh): SampleInfo doesn't contain received_timestamp
       message_info->received_timestamp = 0;
+      message_info->publication_sequence_number = sequence_number;
+      message_info->reception_sequence_number = RMW_MESSAGE_INFO_SEQUENCE_NUMBER_UNSUPPORTED;
       rmw_gid_t * sender_gid = &message_info->publisher_gid;
       sender_gid->implementation_identifier = identifier;
       memset(sender_gid->data, 0, RMW_GID_STORAGE_SIZE);
@@ -582,6 +596,13 @@ rmw_create_subscription(
         "topic name is invalid: %s", reason);
       return nullptr;
     }
+  }
+
+  if (subscription_options->require_unique_network_flow_endpoints ==
+    RMW_UNIQUE_NETWORK_FLOW_ENDPOINTS_STRICTLY_REQUIRED)
+  {
+    RMW_SET_ERROR_MSG("Unique network flow endpoints not supported on subscriptions");
+    return nullptr;
   }
 
   rmw_context_impl_t * ctx = node->context->impl;
@@ -696,7 +717,6 @@ rmw_subscription_get_actual_qos(
     RMW_SET_ERROR_MSG("failed to finalize datareader qos");
     return RMW_RET_ERROR;
   }
-
   return RMW_RET_OK;
 }
 
@@ -851,7 +871,8 @@ rmw_take_sequence(
   }
 
   *taken = 0;
-  dds_ReturnCode_t ret = dds_DataReader_raw_take(
+
+  dds_ReturnCode_t ret = dds_DataReader_raw_take_w_sampleinfoex(
     topic_reader, dds_HANDLE_NIL, data_values, sample_infos, sample_sizes, count,
     dds_ANY_SAMPLE_STATE, dds_ANY_VIEW_STATE, dds_ANY_INSTANCE_STATE);
 
@@ -907,6 +928,10 @@ rmw_take_sequence(
         return RMW_RET_ERROR;
       }
 
+      int64_t sequence_number = 0;
+      dds_SampleInfoEx * sampleinfo_ex = reinterpret_cast<dds_SampleInfoEx *>(sample_info);
+      dds_sn_to_ros_sn(sampleinfo_ex->seq, &sequence_number);
+
       auto message_info = &(message_info_sequence->data[*taken]);
 
       message_info->source_timestamp =
@@ -914,10 +939,11 @@ rmw_take_sequence(
         sample_info->source_timestamp.nanosec;
       // TODO(clemjh): SampleInfo doesn't contain received_timestamp
       message_info->received_timestamp = 0;
+      message_info->publication_sequence_number = sequence_number;
+      message_info->reception_sequence_number = RMW_MESSAGE_INFO_SEQUENCE_NUMBER_UNSUPPORTED;
       rmw_gid_t * sender_gid = &message_info->publisher_gid;
       sender_gid->implementation_identifier = RMW_GURUMDDS_ID;
       memset(sender_gid->data, 0, RMW_GID_STORAGE_SIZE);
-
       dds_ReturnCode_t ret = dds_DataReader_get_guid_from_publication_handle(
         topic_reader, sample_info->publication_handle, sender_gid->data);
       if (ret != dds_RETCODE_OK) {
@@ -1026,6 +1052,46 @@ rmw_return_loaned_message_from_subscription(
   (void)loaned_message;
 
   RMW_SET_ERROR_MSG("rmw_return_loaned_message_from_subscription is not supported");
+  return RMW_RET_UNSUPPORTED;
+}
+
+rmw_ret_t
+rmw_subscription_set_on_new_message_callback(
+  rmw_subscription_t * subscription,
+  rmw_event_callback_t callback,
+  const void * user_data)
+{
+  (void)subscription;
+  (void)callback;
+  (void)user_data;
+
+  RMW_SET_ERROR_MSG("rmw_subscription_set_on_new_message_callback not implemented");
+  return RMW_RET_UNSUPPORTED;
+}
+
+rmw_ret_t
+rmw_subscription_set_content_filter(
+  rmw_subscription_t * subscription,
+  const rmw_subscription_content_filter_options_t * options)
+{
+  (void)subscription;
+  (void)options;
+
+  RMW_SET_ERROR_MSG("rmw_subscription_set_content_filter is not supported");
+  return RMW_RET_UNSUPPORTED;
+}
+
+rmw_ret_t
+rmw_subscription_get_content_filter(
+  const rmw_subscription_t * subscription,
+  rcutils_allocator_t * allocator,
+  rmw_subscription_content_filter_options_t * options)
+{
+  (void)subscription;
+  (void)allocator;
+  (void)options;
+
+  RMW_SET_ERROR_MSG("rmw_subscription_get_content_filter is not supported");
   return RMW_RET_UNSUPPORTED;
 }
 }  // extern "C"

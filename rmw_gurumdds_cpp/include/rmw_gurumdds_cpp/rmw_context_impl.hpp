@@ -42,7 +42,7 @@
 
 #include "rcutils/strdup.h"
 
-struct rmw_context_impl_t
+struct rmw_context_impl_s
 {
   rmw_dds_common::Context common_ctx;
   rmw_context_t * base;
@@ -68,10 +68,10 @@ struct rmw_context_impl_t
 
   std::mutex endpoint_mutex;
 
-  explicit rmw_context_impl_t(rmw_context_t * const base)
+  explicit rmw_context_impl_s(rmw_context_t * const base)
   : common_ctx(),
     base(base),
-    domain_id(0u),
+    domain_id(base->actual_domain_id),
     participant(nullptr),
     publisher(nullptr),
     subscriber(nullptr),
@@ -84,7 +84,7 @@ struct rmw_context_impl_t
     common_ctx.sub = nullptr;
   }
 
-  ~rmw_context_impl_t()
+  ~rmw_context_impl_s()
   {
     if (0u != this->node_count) {
       RCUTILS_LOG_ERROR_NAMED(RMW_GURUMDDS_ID, "not all nodes finalized: %lu", this->node_count);
