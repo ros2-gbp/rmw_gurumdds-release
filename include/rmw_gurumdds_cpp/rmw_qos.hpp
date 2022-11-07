@@ -1,4 +1,4 @@
-// Copyright 2019 GurumNetworks, Inc.
+// Copyright 2021 GurumNetworks, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rmw_gurumdds_cpp/identifier.hpp"
+#ifndef RMW_GURUMDDS_CPP__RMW_QOS_HPP_
+#define RMW_GURUMDDS_CPP__RMW_QOS_HPP_
 
-const char * const RMW_GURUMDDS_ID = "rmw_gurumdds_cpp";
+#include "rmw/qos_profiles.h"
+
+#include "rmw_gurumdds_cpp/visibility_control.h"
+
+RMW_GURUMDDS_CPP_PUBLIC
+rmw_ret_t
+qos_profile_check_compatible(
+  const rmw_qos_profile_t publisher_profile,
+  const rmw_qos_profile_t subscription_profile,
+  rmw_qos_compatibility_type_t * compatibility,
+  char * reason,
+  size_t reason_size);
+
+#endif  // RMW_GURUMDDS_CPP__RMW_QOS_HPP_
