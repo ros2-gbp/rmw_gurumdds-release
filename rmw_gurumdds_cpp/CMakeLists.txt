@@ -11,6 +11,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_ros REQUIRED)
+find_package(rcpputils REQUIRED)
 find_package(rcutils REQUIRED)
 find_package(gurumdds_cmake_module REQUIRED)
 
@@ -43,56 +44,62 @@ if(NOT rosidl_typesupport_introspection_cpp_FOUND)
 endif()
 
 find_package(rmw REQUIRED)
-find_package(rmw_gurumdds_shared_cpp REQUIRED)
+find_package(rmw_dds_common REQUIRED)
 find_package(rosidl_runtime_c REQUIRED)
 find_package(rosidl_runtime_cpp REQUIRED)
 
 include_directories(include)
+ament_export_include_directories(include ${GurumDDS_INCLUDE_DIR})
 
+include_directories(${GurumDDS_INCLUDE_DIR})
+link_directories(${GurumDDS_LIBRARY_DIRS})
 add_library(rmw_gurumdds_cpp
   SHARED
+  src/demangle.cpp
+  src/event_converter.cpp
+  src/get_entities.cpp
   src/identifier.cpp
   src/message_converter.cpp
-  src/serialization_format.cpp
+  src/names_and_types_helpers.cpp
+  src/namespace_prefix.cpp
+  src/qos.cpp
   src/rmw_client.cpp
   src/rmw_compare_gids_equal.cpp
   src/rmw_count.cpp
   src/rmw_event.cpp
   src/rmw_get_implementation_identifier.cpp
-  src/rmw_get_network_flow_endpoints.cpp
   src/rmw_get_serialization_format.cpp
   src/rmw_get_topic_endpoint_info.cpp
   src/rmw_guard_condition.cpp
   src/rmw_init.cpp
   src/rmw_logging.cpp
-  src/rmw_node.cpp
   src/rmw_node_info_and_types.cpp
+  src/rmw_node.cpp
   src/rmw_publisher.cpp
-  src/rmw_qos.cpp
-  src/rmw_request.cpp
-  src/rmw_response.cpp
   src/rmw_serialize.cpp
-  src/rmw_service.cpp
   src/rmw_service_names_and_types.cpp
+  src/rmw_service.cpp
   src/rmw_subscription.cpp
   src/rmw_topic_names_and_types.cpp
   src/rmw_wait.cpp
-  src/type_support_common.hpp
+  src/rmw_context_impl.cpp
+  src/context_listener_thread.cpp
+  src/graph_cache.cpp
+  src/serialization_format.cpp
   src/types.cpp
-  src/get_entities.cpp
 )
 
 ament_target_dependencies(rmw_gurumdds_cpp
+  "rcpputils"
   "rcutils"
   "rosidl_typesupport_introspection_c"
   "rosidl_typesupport_introspection_cpp"
-  "rmw_gurumdds_shared_cpp"
   "rmw"
+  "rmw_dds_common"
   "rosidl_runtime_c"
   "rosidl_runtime_cpp"
   "GurumDDS")
 
-ament_export_include_directories(include)
 ament_export_libraries(rmw_gurumdds_cpp)
 
 ament_export_dependencies(
@@ -100,8 +107,9 @@ ament_export_dependencies(
   rosidl_typesupport_introspection_c
   rosidl_runtime_c
   rosidl_runtime_cpp
+  rcpputils
   rcutils
-  rmw_gurumdds_shared_cpp
+  rmw_dds_common
   rmw
 )
 
@@ -118,6 +126,9 @@ target_compile_definitions(rmw_gurumdds_cpp PRIVATE "RMW_GURUMDDS_CPP_BUILDING_L
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  # pass extra include dirs to cppcheck explicitly
+  list(APPEND AMENT_LINT_AUTO_EXCLUDE ament_cmake_cppcheck)
+  ament_cppcheck(INCLUDE_DIRS ${rcutils_INCLUDE_DIRS})
 endif()
 
 ament_package(
