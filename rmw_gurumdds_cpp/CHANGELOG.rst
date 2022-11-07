@@ -2,6 +2,32 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.0 (2022-10-05)
+------------------
+* Apply graph cache
+* Apply on_remote_changed callback
+* Avoid string generation on func call
+* Change the behavior of take response to a loop
+* Fix typo
+* Redefine rmw gurumdds identifier
+* Pass extra include dirs to cppcheck explicitly
+* Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
+* Contributors: Youngjin Yun, donghee811
+
+1.2.3 (2022-07-05)
+------------------
+* Add missing guid comparison conditional statement
+* Contributors: Youngjin Yun
+
+1.2.2 (2022-05-27)
+------------------
+
+1.2.1 (2022-05-25)
+------------------
+* Handle null string
+* Fix rclcpp test(test_serialized_message) failure
+* Contributors: Youngjin Yun, donghee811
+
 1.2.0 (2022-04-26)
 ------------------
 * Enhanced rpc with sampleinfoex
