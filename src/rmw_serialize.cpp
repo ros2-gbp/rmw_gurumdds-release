@@ -16,7 +16,7 @@
 #include "rmw/serialized_message.h"
 #include "rmw/rmw.h"
 
-#include "./type_support_common.hpp"
+#include "type_support_common.hpp"
 
 extern "C"
 {
@@ -57,6 +57,7 @@ rmw_serialize(
       serialized_message->allocator.allocate(
         serialized_message->buffer_length,
         serialized_message->allocator.state));
+    serialized_message->buffer_capacity = size;
   }
 
   bool res = serialize_ros_to_cdr(
