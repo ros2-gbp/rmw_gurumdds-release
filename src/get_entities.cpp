@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rmw_gurumdds_shared_cpp/types.hpp"
 #include "rmw_gurumdds_cpp/get_entities.hpp"
 #include "rmw_gurumdds_cpp/identifier.hpp"
+#include "rmw_gurumdds_cpp/rmw_context_impl.hpp"
 #include "rmw_gurumdds_cpp/types.hpp"
 
 namespace rmw_gurumdds_cpp
@@ -26,12 +26,11 @@ get_participant(rmw_node_t * node)
     return nullptr;
   }
 
-  if (node->implementation_identifier != gurum_gurumdds_identifier) {
+  if (node->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
-  GurumddsNodeInfo * impl = static_cast<GurumddsNodeInfo *>(node->data);
-  return impl->participant;
+  return node->context->impl->participant;
 }
 
 dds_Publisher *
@@ -41,12 +40,12 @@ get_publisher(rmw_publisher_t * publisher)
     return nullptr;
   }
 
-  if (publisher->implementation_identifier != gurum_gurumdds_identifier) {
+  if (publisher->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
   GurumddsPublisherInfo * impl = static_cast<GurumddsPublisherInfo *>(publisher->data);
-  return impl->publisher;
+  return dds_DataWriter_get_publisher(impl->topic_writer);
 }
 
 dds_DataWriter *
@@ -56,7 +55,7 @@ get_data_writer(rmw_publisher_t * publisher)
     return nullptr;
   }
 
-  if (publisher->implementation_identifier != gurum_gurumdds_identifier) {
+  if (publisher->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
@@ -71,12 +70,12 @@ get_subscriber(rmw_subscription_t * subscription)
     return nullptr;
   }
 
-  if (subscription->implementation_identifier != gurum_gurumdds_identifier) {
+  if (subscription->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
   GurumddsSubscriberInfo * impl = static_cast<GurumddsSubscriberInfo *>(subscription->data);
-  return impl->subscriber;
+  return dds_DataReader_get_subscriber(impl->topic_reader);
 }
 
 dds_DataReader *
@@ -86,7 +85,7 @@ get_data_reader(rmw_subscription_t * subscription)
     return nullptr;
   }
 
-  if (subscription->implementation_identifier != gurum_gurumdds_identifier) {
+  if (subscription->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
@@ -101,7 +100,7 @@ get_request_data_writer(rmw_client_t * client)
     return nullptr;
   }
 
-  if (client->implementation_identifier != gurum_gurumdds_identifier) {
+  if (client->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
@@ -116,7 +115,7 @@ get_response_data_reader(rmw_client_t * client)
     return nullptr;
   }
 
-  if (client->implementation_identifier != gurum_gurumdds_identifier) {
+  if (client->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
@@ -131,7 +130,7 @@ get_request_data_reader(rmw_service_t * service)
     return nullptr;
   }
 
-  if (service->implementation_identifier != gurum_gurumdds_identifier) {
+  if (service->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
@@ -146,7 +145,7 @@ get_response_data_writer(rmw_service_t * service)
     return nullptr;
   }
 
-  if (service->implementation_identifier != gurum_gurumdds_identifier) {
+  if (service->implementation_identifier != RMW_GURUMDDS_ID) {
     return nullptr;
   }
 
