@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rmw/rmw.h"
-#include "rmw/error_handling.h"
-#include "rmw/types.h"
 #include "rmw/impl/cpp/macros.hpp"
+#include "rmw/error_handling.h"
+#include "rmw/rmw.h"
+#include "rmw/types.h"
 
 #include "rmw_gurumdds_cpp/identifier.hpp"
 #include "rmw_gurumdds_cpp/types.hpp"
@@ -29,13 +29,13 @@ rmw_compare_gids_equal(const rmw_gid_t * gid1, const rmw_gid_t * gid2, bool * re
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     gid1,
     gid1->implementation_identifier,
-    gurum_gurumdds_identifier,
+    RMW_GURUMDDS_ID,
     return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
   RMW_CHECK_ARGUMENT_FOR_NULL(gid2, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     gid2,
     gid2->implementation_identifier,
-    gurum_gurumdds_identifier,
+    RMW_GURUMDDS_ID,
     return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
   RMW_CHECK_ARGUMENT_FOR_NULL(result, RMW_RET_INVALID_ARGUMENT);
 
