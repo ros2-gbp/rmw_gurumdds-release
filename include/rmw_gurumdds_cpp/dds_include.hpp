@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rmw_gurumdds_cpp/identifier.hpp"
+#ifndef RMW_GURUMDDS_CPP__DDS_INCLUDE_HPP_
+#define RMW_GURUMDDS_CPP__DDS_INCLUDE_HPP_
 
-const char * const RMW_GURUMDDS_ID = "rmw_gurumdds_cpp";
+#include <gurumdds/dcps.h>
+
+#endif  // RMW_GURUMDDS_CPP__DDS_INCLUDE_HPP_
