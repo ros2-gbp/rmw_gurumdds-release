@@ -1,4 +1,4 @@
-// Copyright 2019 GurumNetworks, Inc.
+// Copyright 2022 GurumNetworks, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rmw_gurumdds_cpp/identifier.hpp"
+#ifndef RMW_GURUMDDS_CPP__CONTEXT_LISTENER_THREAD_HPP_
+#define RMW_GURUMDDS_CPP__CONTEXT_LISTENER_THREAD_HPP_
 
-const char * const RMW_GURUMDDS_ID = "rmw_gurumdds_cpp";
+rmw_ret_t
+run_listener_thread(rmw_context_t * ctx);
+
+rmw_ret_t
+stop_listener_thread(rmw_context_t * ctx);
+
+#endif  // RMW_GURUMDDS_CPP__CONTEXT_LISTENER_THREAD_HPP_
