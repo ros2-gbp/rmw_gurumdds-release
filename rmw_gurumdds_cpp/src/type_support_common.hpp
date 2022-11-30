@@ -20,24 +20,24 @@
 typedef SSIZE_T ssize_t;
 #endif
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "rmw/allocators.h"
 #include "rmw/error_handling.h"
 #include "rmw/impl/cpp/macros.hpp"
-
-#include "rosidl_typesupport_introspection_c/field_types.h"
-#include "rosidl_typesupport_introspection_c/identifier.h"
-#include "rosidl_typesupport_introspection_c/message_introspection.h"
-#include "rosidl_typesupport_introspection_c/service_introspection.h"
 
 #include "rosidl_typesupport_introspection_cpp/field_types.hpp"
 #include "rosidl_typesupport_introspection_cpp/identifier.hpp"
 #include "rosidl_typesupport_introspection_cpp/message_introspection.hpp"
 #include "rosidl_typesupport_introspection_cpp/service_introspection.hpp"
 
-#include "message_converter.hpp"
+#include "rosidl_typesupport_introspection_c/field_types.h"
+#include "rosidl_typesupport_introspection_c/identifier.h"
+#include "rosidl_typesupport_introspection_c/message_introspection.h"
+#include "rosidl_typesupport_introspection_c/service_introspection.h"
+
+#include "./message_converter.hpp"
 
 template<typename MessageMembersT>
 std::string
@@ -87,7 +87,7 @@ _parse_struct(const MessageMembersT * members, const char * field_name, bool is_
   std::ostringstream metastring;
   metastring <<
     "{(" <<
-    (field_name ? std::string("name=") + field_name + "_," : "") <<
+  (field_name ? std::string("name=") + field_name + "_," : "") <<
     "type=" <<
     _create_type_name<MessageMembersT>(members) <<
     ",member=" <<
@@ -178,7 +178,7 @@ _parse_struct(const MessageMembersT * members, const char * field_name, bool is_
 
       metastring <<
         "(" <<
-        (member->is_array_ ? "" : std::string("name=") + member->name_ + "_") <<
+      (member->is_array_ ? "" : std::string("name=") + member->name_ + "_") <<
         ")";
     }
   }

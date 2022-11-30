@@ -67,8 +67,7 @@ rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     guard condition,
     guard_condition->implementation_identifier,
-    RMW_GURUMDDS_ID,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+    RMW_GURUMDDS_ID, return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
 
   dds_GuardCondition * dds_guard_condition =
     static_cast<dds_GuardCondition *>(guard_condition->data);

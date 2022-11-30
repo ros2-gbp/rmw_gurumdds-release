@@ -32,8 +32,8 @@
 #include "rmw/error_handling.h"
 #include "rmw/get_node_info_and_types.h"
 #include "rmw/get_topic_names_and_types.h"
-#include "rmw/impl/cpp/macros.hpp"
 #include "rmw/impl/cpp/key_value.hpp"
+#include "rmw/impl/cpp/macros.hpp"
 #include "rmw/names_and_types.h"
 #include "rmw/rmw.h"
 
@@ -260,4 +260,4 @@ rmw_get_client_names_and_types_by_node(
     __get_reader_names_and_types_by_node,
     service_names_and_types);
 }
-}  // extern "C"
+}  // extern "C"t

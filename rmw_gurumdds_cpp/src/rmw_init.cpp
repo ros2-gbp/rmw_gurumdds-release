@@ -15,9 +15,7 @@
 #include "rcutils/logging_macros.h"
 #include "rcutils/strdup.h"
 
-#include "rmw/error_handling.h"
 #include "rmw/impl/cpp/macros.hpp"
-#include "rmw/ret_types.h"
 #include "rmw/rmw.h"
 
 #include "rmw_gurumdds_cpp/dds_include.hpp"
@@ -35,7 +33,6 @@ rmw_init_options_init(rmw_init_options_t * init_options, rcutils_allocator_t all
     RMW_SET_ERROR_MSG("expected zero-initialized init_options");
     return RMW_RET_INVALID_ARGUMENT;
   }
-
   init_options->instance_id = 0;
   init_options->implementation_identifier = RMW_GURUMDDS_ID;
   init_options->domain_id = RMW_DEFAULT_DOMAIN_ID;
@@ -95,7 +92,6 @@ rmw_init_options_fini(rmw_init_options_t * init_options)
     init_options->implementation_identifier,
     "init option is not initialized",
     return RMW_RET_INVALID_ARGUMENT);
-
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     init_options,
     init_options->implementation_identifier,
@@ -115,11 +111,11 @@ rmw_init_options_fini(rmw_init_options_t * init_options)
 rmw_ret_t
 rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 {
-  RMW_CHECK_ARGUMENT_FOR_NULL(options, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_ARGUMENT_FOR_NULL(context, RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_ARGUMENT_FOR_NULL(options, RMW_RET_INVALID_ARGUMENT);
+  RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_FOR_NULL_WITH_MSG(
     options->implementation_identifier,
-    "init option is not initialized",
+    "expected initialized init options",
     return RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_FOR_NULL_WITH_MSG(
     options->enclave,
@@ -153,8 +149,7 @@ rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 
   context->instance_id = options->instance_id;
   context->implementation_identifier = RMW_GURUMDDS_ID;
-  context->actual_domain_id = RMW_DEFAULT_DOMAIN_ID != options->domain_id ? options->domain_id : 0u;
-  context->impl = new (std::nothrow) rmw_context_impl_s(context);
+  context->impl = new (std::nothrow) rmw_context_impl_t(context);
   if (context->impl == nullptr) {
     RMW_SET_ERROR_MSG("failed to allocate rmw context impl");
     goto fail;

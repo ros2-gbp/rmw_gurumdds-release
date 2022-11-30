@@ -2,38 +2,41 @@
 Changelog for package gurumdds_cmake_module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.3.0 (2022-10-05)
+1.3.1 (2022-11-30)
 ------------------
 
-3.2.2 (2022-07-05)
+1.3.0 (2022-10-05)
 ------------------
 
-3.2.1 (2022-06-02)
+1.2.3 (2022-07-05)
 ------------------
-* Reorganize package
+
+1.2.2 (2022-05-27)
+------------------
+* Reorganise package
 * Contributors: Youngjin Yun
 
-3.2.0 (2022-06-02)
+1.2.1 (2022-05-27)
 ------------------
 
-3.1.1 (2022-05-09)
+1.1.1 (2022-05-09)
 ------------------
 
-3.1.0 (2022-01-03)
+1.1.0 (2022-01-03)
 ------------------
-* Update packages to use gurumdds-2.8
+* Update packages to use gurumdds-2.8 & Update README
 * Contributors: Youngjin Yun
 
-3.0.0 (2021-07-08)
+1.0.4 (2021-07-08)
 ------------------
 * Modify cmake according to library path format
-* Contributors: Youngjin Yun
-
-2.0.0 (2021-03-16)
-------------------
-* Update packages to use gurumdds-2.7
 * Change maintainer
 * Contributors: Youngjin Yun
+
+1.0.3 (2020-11-19)
+------------------
+* Update packages to use gurumdds-2.7
+* Contributors: junho
 
 1.0.2 (2020-07-29)
 ------------------

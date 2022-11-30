@@ -20,10 +20,6 @@
 #include <exception>
 #include <iostream>
 #include <limits>
-#include <list>
-#include <map>
-#include <mutex>
-#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -70,7 +66,6 @@ typedef struct _GurumddsPublisherInfo : GurumddsEventInfo
   dds_DataWriter * topic_writer;
   const rosidl_message_type_support_t * rosidl_message_typesupport;
   const char * implementation_identifier;
-  int64_t sequence_number;
   rmw_context_impl_t * ctx;
 
   rmw_ret_t get_status(dds_StatusMask mask, void * event) override;
