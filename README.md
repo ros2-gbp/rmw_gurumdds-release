@@ -6,8 +6,10 @@ Required version of GurumDDS depends on the version of this project.
 
 | rmw_gurumdds             | GurumDDS                    |
 |--------------------------|-----------------------------|
-| 4.1.0 or higher          | higher than 2.8.3165        |
-| 4.0.0 or higher          | 2.8.3140 or higher          |
+| 3.3.0  or higher         | higher than 2.8.3165        |
+| 3.2.0  or higher         | 2.8.3140 or higher          |
+| 3.1.2  or higher         | 2.8.x                       |
+| 3.1.1  or lower          | 2.7.x                       |
 
 ## Packages
 This project consists of three packages, `gurumdds_camke_module`, `rmw_gurumdds_cpp` and `demo_nodes_cpp_native_gurumdds`.
@@ -57,8 +59,8 @@ This package is disabled by default.
 
 ## Branches
 There are four active branches in this project: master, humble, galactic and foxy.
-New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the master branch, so this branch might be unstable.
-If you want to use this project with ROS2 Humble Hawksbill, Galactic Geochelone or Foxy Fitzroy, please use humble, galactic or foxy branch, respectively.
+New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the master branch.
+If you want to use this project with ROS2 Rolling Ridley, Galactic Geochelone or Foxy Fitzroy, please use master, galactic or foxy branch, respectively.
 
 ## Implementation Status
 Currently some features are not fully implemented.
