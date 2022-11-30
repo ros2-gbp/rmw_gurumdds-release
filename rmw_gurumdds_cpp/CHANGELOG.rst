@@ -2,78 +2,134 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.3.1 (2022-11-30)
+4.1.0 (2022-10-05)
 ------------------
-* Remove sleep from entity creation
+* Apply graph cache (`#17 <https://github.com/ros2/rmw_gurumdds/issues/17>`_)
+  * graph_cache 0718
+  * Add topic name creation
+  * graph_cache 0722
+  * Sync api
+  * add context::finalize()
+  * Wrap-up pub and sub
+  * fix gid
+  * Wrap-up client and service
+  * fix segfault
+  * Add set on callback empty stub
+  * Add content filter topic feature empty stub
+  * Change the behavior of take response to a loop
+  * Add missing dependency
+  * Fix bug and remove unnecessary struct
+  * Synk for log
+  * Amend log and scope exit for node
+  * Apply on_remote_changed callback & fix typo
+  * Cleanup log
+  * Reposition message handling timing of response
+  Co-authored-by: donghee811 <donghee@gurum.cc>
+* Redefine rmw gurumdds identifier
+* Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
 * Contributors: Youngjin Yun
 
-1.3.0 (2022-10-05)
-------------------
-* Apply graph cache
-* Apply on_remote_changed callback
-* Avoid string generation on func call
-* Change the behavior of take response to a loop
-* Fix typo
-* Redefine rmw gurumdds identifier
-* Pass extra include dirs to cppcheck explicitly
-* Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
-* Contributors: Youngjin Yun, donghee811
-
-1.2.3 (2022-07-05)
+4.0.2 (2022-07-05)
 ------------------
 * Add missing guid comparison conditional statement
-* Contributors: Youngjin Yun
-
-1.2.2 (2022-05-27)
-------------------
-
-1.2.1 (2022-05-25)
-------------------
+* Add sequence numbers to message info structure
 * Handle null string
 * Fix rclcpp test(test_serialized_message) failure
 * Contributors: Youngjin Yun, donghee811
 
-1.2.0 (2022-04-26)
+4.0.1 (2022-05-10)
+------------------
+* Fix cast style and relative paths for cpplint
+* Contributors: Youngjin Yun
+
+4.0.0 (2022-05-09)
+------------------
+
+4.1.2 (2022-11-30)
+------------------
+* Remove sleep from entity creation
+* Contributors: Youngjin Yun
+
+4.1.1 (2022-11-07)
+------------------
+* Add rmw_get_gid_for_client method
+* 4.1.0
+* Apply graph cache (`#17 <https://github.com/YoungJin-gurum/rmw_gurumdds/issues/17>`_)
+  * graph_cache 0718
+  * Add topic name creation
+  * graph_cache 0722
+  * Sync api
+  * add context::finalize()
+  * Wrap-up pub and sub
+  * fix gid
+  * Wrap-up client and service
+  * fix segfault
+  * Add set on callback empty stub
+  * Add content filter topic feature empty stub
+  * Change the behavior of take response to a loop
+  * Add missing dependency
+  * Fix bug and remove unnecessary struct
+  * Synk for log
+  * Amend log and scope exit for node
+  * Apply on_remote_changed callback & fix typo
+  * Cleanup log
+  * Reposition message handling timing of response
+  Co-authored-by: donghee811 <donghee@gurum.cc>
+* Redefine rmw gurumdds identifier
+* Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
+* 4.0.2
+* Add missing guid comparison conditional statement
+* Add sequence numbers to message info structure
+* Handle null string
+* Fix rclcpp test(test_serialized_message) failure
+* 4.0.1
+* Fix cast style and relative paths for cpplint
+* 4.0.0
+* Contributors: Youngjin Yun, donghee811
+
+3.2.0 (2022-04-26)
 ------------------
 * Enhanced rpc with sampleinfoex
 * Basic rpc
 * Contributors: Youngjin Yun
 
-1.1.6 (2022-04-26)
+3.1.6 (2022-04-26)
 ------------------
 * Remove minimum dds version as raw typesupport removed
-* Contributors: Youngjin Yun
-
-1.1.5 (2022-03-23)
-------------------
 * Revert raw typesupport patch
 * Contributors: Youngjin Yun
 
-1.1.4 (2022-03-17)
+3.1.5 (2022-03-17)
 ------------------
 * Remove dead store
 * Adjust minimum dds version
 * Contributors: Youngjin Yun
 
-1.1.3 (2022-02-11)
+3.1.4 (2022-02-16)
 ------------------
 * Use raw typesupport instead of typesupport
-  * To reduce memory usage
-* Contributors: hyeonwoo
+* Contributors: Youngjin Yun
 
-1.1.2 (2022-02-11)
+3.1.3 (2022-02-16)
 ------------------
 * Add omitted free
 * Change to delete only the entities created by the user
 * Contributors: Youngjin Yun
 
-1.1.1 (2022-01-03)
+3.1.2 (2022-01-03)
 ------------------
 * Update packages to use gurumdds-2.8 & Update README
 * Contributors: Youngjin Yun
 
-1.1.0 (2021-11-17)
+3.1.1 (2021-12-21)
 ------------------
+* Add public to qos convert api& fix for uncrustify
+* Contributors: Youngjin Yun
+
+3.1.0 (2021-11-25)
+------------------
+* Use convert api for publisher/subscription Qos getters
+* Add client/service Qos getters
 * Remove dds_typesupport from Publisher/Subscriber Info
 * Change the return time when destroying entities
 * Add ommited memory manage code
@@ -82,62 +138,96 @@ Changelog for package rmw_gurumdds_cpp
 * Update return value
 * Contributors: Youngjin Yun
 
-1.0.12 (2021-10-14)
--------------------
+3.0.9 (2021-10-14)
+------------------
 
-1.0.11 (2021-10-13)
--------------------
+3.0.8 (2021-10-14)
+------------------
 
-1.0.10 (2021-09-02)
--------------------
-* Fix unbounded sequence size
-* Contributors: Youngjin Yun
+3.0.7 (2021-09-27)
+------------------
 
-1.0.9 (2021-07-23)
+3.0.6 (2021-09-23)
 ------------------
 * Revise for lint
 * Contributors: Youngjin Yun
 
-1.0.8 (2021-07-22)
+3.0.5 (2021-09-23)
+------------------
+* Update rmw_context_impl_t definition
+* Add rmw_publisher_wait_for_all_acked
+* Contributors: Youngjin Yun
+
+3.0.4 (2021-09-02)
+------------------
+* Fix unbounded sequence size
+* Contributors: Youngjin Yun
+
+3.0.3 (2021-08-19)
 ------------------
 * Remove datareader listener patch
 * Remove unnecessary operation
-* Contributors: Kumazuma, Youngjin Yun
+* Contributors: Youngjin Yun
 
-1.0.7 (2021-07-14)
+3.0.2 (2021-07-14)
+------------------
+
+3.0.1 (2021-07-07)
 ------------------
 * Use variable attempt to take the number of times equal to count
 * Check if the queue is empty before using it
 * Contributors: Youngjin Yun
 
-1.0.6 (2021-05-07)
+3.0.0 (2021-04-29)
 ------------------
-* Update code about build error on windows
+* Revise for lint
 * Contributors: Youngjin Yun
 
-1.0.5 (2021-04-12)
+2.1.4 (2021-04-22)
+------------------
+* Indicate missing support for unique network flows
+* Contributors: Youngjin Yun
+
+2.1.3 (2021-04-12)
 ------------------
 * Use dds_free instead of free for dll library
 * Contributors: Youngjin Yun
 
-1.0.4 (2021-03-10)
+2.1.2 (2021-03-22)
+------------------
+* Update code about build error on windows
+* Add RMW function to check QoS compatibility
+* Contributors: Youngjin Yun, youngjin
+
+2.1.1 (2021-03-12)
+------------------
+* Update packages to use gurumdds-2.7
+* Contributors: youngjin
+
+2.1.0 (2021-02-23)
 ------------------
 * Change maintainer
+* Handle typesupport errors on retrieval
+* Set actual domain id into context
+* Fix wrong error messages
 * Use DataReader listener for taking data samples
 * Contributors: junho, youngjin
 
-1.0.3 (2020-11-19)
-------------------
-* Update packages to use gurumdds-2.7
-* Contributors: junho
-
-1.0.2 (2020-07-29)
+2.0.1 (2020-07-29)
 ------------------
 * Change maintainer
 * Contributors: junho
 
-1.0.1 (2020-07-06)
+2.0.0 (2020-07-09)
 ------------------
+* Removed parameters domain_id and localhost_only from rmw_create_node()
+* Updated init/shutdown/init option functions
+* Contributors: junho
+
+1.1.0 (2020-07-09)
+------------------
+* Finalize rmw context only if it's shutdown
+* Added support for sample_lost event
 * Renamed rmw_gurumdds_dynamic_cpp to rmw_gurumdds_cpp
 * Renamed rmw_gurumdds_cpp to rmw_gurumdds_static_cpp
 * Contributors: junho

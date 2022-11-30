@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
+#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
 #include "rmw/get_service_names_and_types.h"
@@ -256,7 +257,6 @@ rmw_create_service(
     }
   }
 
-  // Create datareader for request
   if (!get_datareader_qos(subscriber, qos_policies, &datareader_qos)) {
     // Error message already set
     goto fail;
@@ -285,7 +285,6 @@ rmw_create_service(
   }
   service_info->read_condition = read_condition;
 
-  // Create datawriter for response
   if (!get_datawriter_qos(publisher, qos_policies, &datawriter_qos)) {
     // Error message already set
     goto fail;
@@ -397,7 +396,6 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
     node->implementation_identifier,
     RMW_GURUMDDS_ID,
     return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-
   RMW_CHECK_ARGUMENT_FOR_NULL(service, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     service,
@@ -455,6 +453,105 @@ rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
     rmw_free(const_cast<char *>(service->service_name));
   }
   rmw_service_free(service);
+
+  return RMW_RET_OK;
+}
+
+rmw_ret_t
+rmw_service_response_publisher_get_actual_qos(
+  const rmw_service_t * service,
+  rmw_qos_profile_t * qos)
+{
+  RMW_CHECK_ARGUMENT_FOR_NULL(service, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    service,
+    service->implementation_identifier,
+    RMW_GURUMDDS_ID,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  RMW_CHECK_ARGUMENT_FOR_NULL(qos, RMW_RET_INVALID_ARGUMENT);
+
+  GurumddsServiceInfo * service_info = static_cast<GurumddsServiceInfo *>(service->data);
+  if (service_info == nullptr) {
+    RMW_SET_ERROR_MSG("service info is null");
+    return RMW_RET_ERROR;
+  }
+
+  dds_DataWriter * response_writer = service_info->response_writer;
+  if (response_writer == nullptr) {
+    RMW_SET_ERROR_MSG("response writer is null");
+    return RMW_RET_ERROR;
+  }
+
+  dds_DataWriterQos dds_qos;
+  dds_ReturnCode_t ret = dds_DataWriter_get_qos(response_writer, &dds_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("publisher can't get data writer qos policies");
+    return RMW_RET_ERROR;
+  }
+
+  qos->reliability = convert_reliability(&dds_qos.reliability);
+  qos->durability = convert_durability(&dds_qos.durability);
+  qos->deadline = convert_deadline(&dds_qos.deadline);
+  qos->lifespan = convert_lifespan(&dds_qos.lifespan);
+  qos->liveliness = convert_liveliness(&dds_qos.liveliness);
+  qos->liveliness_lease_duration = convert_liveliness_lease_duration(&dds_qos.liveliness);
+  qos->history = convert_history(&dds_qos.history);
+  qos->depth = static_cast<size_t>(dds_qos.history.depth);
+
+  ret = dds_DataWriterQos_finalize(&dds_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("failed to finalize datawriter qos");
+    return RMW_RET_ERROR;
+  }
+
+  return RMW_RET_OK;
+}
+
+rmw_ret_t
+rmw_service_request_subscription_get_actual_qos(
+  const rmw_service_t * service,
+  rmw_qos_profile_t * qos)
+{
+  RMW_CHECK_ARGUMENT_FOR_NULL(service, RMW_RET_INVALID_ARGUMENT);
+  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
+    service,
+    service->implementation_identifier,
+    RMW_GURUMDDS_ID,
+    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+  RMW_CHECK_ARGUMENT_FOR_NULL(qos, RMW_RET_INVALID_ARGUMENT);
+
+  GurumddsServiceInfo * service_info = static_cast<GurumddsServiceInfo *>(service->data);
+  if (service_info == nullptr) {
+    RMW_SET_ERROR_MSG("service info is null");
+    return RMW_RET_ERROR;
+  }
+
+  dds_DataReader * request_reader = service_info->request_reader;
+  if (request_reader == nullptr) {
+    RMW_SET_ERROR_MSG("request reader is null");
+    return RMW_RET_ERROR;
+  }
+
+  dds_DataReaderQos dds_qos;
+  dds_ReturnCode_t ret = dds_DataReader_get_qos(request_reader, &dds_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("subscription can't get data reader qos policies");
+    return RMW_RET_ERROR;
+  }
+
+  qos->reliability = convert_reliability(&dds_qos.reliability);
+  qos->durability = convert_durability(&dds_qos.durability);
+  qos->deadline = convert_deadline(&dds_qos.deadline);
+  qos->liveliness = convert_liveliness(&dds_qos.liveliness);
+  qos->liveliness_lease_duration = convert_liveliness_lease_duration(&dds_qos.liveliness);
+  qos->history = convert_history(&dds_qos.history);
+  qos->depth = static_cast<size_t>(dds_qos.history.depth);
+
+  ret = dds_DataReaderQos_finalize(&dds_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("failed to finalize datareader qos");
+    return RMW_RET_ERROR;
+  }
 
   return RMW_RET_OK;
 }
@@ -774,5 +871,19 @@ rmw_send_response(
   }
 
   return RMW_RET_OK;
+}
+
+rmw_ret_t
+rmw_service_set_on_new_request_callback(
+  rmw_service_t * rmw_service,
+  rmw_event_callback_t callback,
+  const void * user_data)
+{
+  (void)rmw_service;
+  (void)callback;
+  (void)user_data;
+
+  RMW_SET_ERROR_MSG("rmw_service_set_on_new_request_callback not implemented");
+  return RMW_RET_UNSUPPORTED;
 }
 }  // extern "C"

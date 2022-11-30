@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "rmw/rmw.h"
 #include "rmw/error_handling.h"
 #include "rmw/impl/cpp/macros.hpp"
-#include "rmw/rmw.h"
 
 #include "rmw_gurumdds_cpp/event_converter.hpp"
 #include "rmw_gurumdds_cpp/identifier.hpp"
@@ -104,5 +104,19 @@ rmw_take_event(
 
   *taken = (ret_code == RMW_RET_OK);
   return ret_code;
+}
+
+rmw_ret_t
+rmw_event_set_callback(
+  rmw_event_t * rmw_event,
+  rmw_event_callback_t callback,
+  const void * user_data)
+{
+  (void)rmw_event;
+  (void)callback;
+  (void)user_data;
+
+  RMW_SET_ERROR_MSG("rmw_event_set_callback not implemented");
+  return RMW_RET_UNSUPPORTED;
 }
 }  // extern "C"
