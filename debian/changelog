@@ -1,0 +1,109 @@
+ros-humble-gurumdds-cmake-module (3.3.1-1jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 29 Nov 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.3.0-1jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 04 Oct 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.2.2-1jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 04 Jul 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.2.1-1jammy) jammy; urgency=high
+
+  * Reorganize package
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 01 Jun 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.2.0-1jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 01 Jun 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.1.1-1jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 08 May 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.1.0-1jammy) jammy; urgency=high
+
+  * Update packages to use gurumdds-2.8
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Sun, 02 Jan 2022 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (3.0.0-1jammy) jammy; urgency=high
+
+  * Modify cmake according to library path format
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 07 Jul 2021 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (2.0.0-1jammy) jammy; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * Change maintainer
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 15 Mar 2021 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (1.0.2-1jammy) jammy; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 28 Jul 2020 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (1.0.1-1jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 27 Jul 2020 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (1.0.0-1jammy) jammy; urgency=high
+
+  * Updated packages to use gurumdds-2.6
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 03 Jun 2020 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (0.8.2-1jammy) jammy; urgency=high
+
+  * updated packages to use gurumdds-2.5
+  * Contributors: hyeonwoo
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 18 Dec 2019 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (0.8.1-1jammy) jammy; urgency=high
+
+  * CoreDDS is renamed to GurumDDS
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 14 Nov 2019 15:00:00 -0000
+
+ros-humble-gurumdds-cmake-module (0.8.0-1jammy) jammy; urgency=high
+
+  * added changelog
+  * added gurumdds dependency to package.xml
+  * rewrote build scripts
+  * fixed 'command not found' error
+  * Implemented Wstring support
+  * fixed typos
+  * fixed code style divergence
+  * updated cmake to fit new library paths
+  * migration from gitlab
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 05 Nov 2019 15:00:00 -0000
+
+
