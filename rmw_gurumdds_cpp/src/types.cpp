@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "rmw/impl/cpp/key_value.hpp"
 
 #include "rmw_gurumdds_cpp/event_converter.hpp"
@@ -126,18 +130,6 @@ rmw_ret_t GurumddsSubscriberInfo::get_status(
     rmw_status->total_count = status.total_count;
     rmw_status->total_count_change = status.total_count_change;
     rmw_status->last_policy_kind = convert_qos_policy(status.last_policy_id);
-  } else if (mask == dds_SAMPLE_LOST_STATUS) {
-    dds_SampleLostStatus status;
-    dds_ReturnCode_t dds_ret =
-      dds_DataReader_get_sample_lost_status(this->topic_reader, &status);
-    rmw_ret_t rmw_ret = check_dds_ret_code(dds_ret);
-    if (rmw_ret != RMW_RET_OK) {
-      return rmw_ret;
-    }
-
-    auto rmw_status = static_cast<rmw_message_lost_status_t *>(event);
-    rmw_status->total_count = status.total_count;
-    rmw_status->total_count_change = status.total_count_change;
   } else {
     return RMW_RET_UNSUPPORTED;
   }

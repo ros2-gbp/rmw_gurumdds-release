@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
+
 #include "rcpputils/scope_exit.hpp"
 
 #include "rmw/publisher_options.h"
@@ -950,7 +952,7 @@ graph_remove_entity(
   rmw_gid_t gid;
   guid_to_gid(*guid, gid);
 
-  if (memcmp(gid.data, ctx->common_ctx.gid.data, 12) == 0) {
+  if (memcmp(gid.data, ctx->common_ctx.gid.data, RMW_GID_STORAGE_SIZE) == 0) {
     /* Ignore own announcements */
     return RMW_RET_OK;
   }

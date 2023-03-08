@@ -17,19 +17,19 @@
 
 #include "rosidl_runtime_cpp/bounded_vector.hpp"
 
-#include "rosidl_runtime_c/primitives_sequence.h"
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/primitives_sequence.h"
 #include "rosidl_runtime_c/string_functions.h"
-#include "rosidl_runtime_c/u16string.h"
+#include "rosidl_runtime_c/string.h"
 #include "rosidl_runtime_c/u16string_functions.h"
+#include "rosidl_runtime_c/u16string.h"
 
 #include "rosidl_typesupport_introspection_cpp/field_types.hpp"
 #include "rosidl_typesupport_introspection_cpp/message_introspection.hpp"
 
 #include "rosidl_typesupport_introspection_c/message_introspection.h"
 
-#include "cdr_buffer.hpp"
+#include "./cdr_buffer.hpp"
 
 class MessageSerializer
 {

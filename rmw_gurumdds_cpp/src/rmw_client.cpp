@@ -20,12 +20,11 @@
 #include <utility>
 
 #include "rcutils/logging_macros.h"
-#include "rcutils/error_handling.h"
 
 #include "rmw/allocators.h"
-#include "rmw/rmw.h"
 #include "rmw/error_handling.h"
 #include "rmw/impl/cpp/macros.hpp"
+#include "rmw/rmw.h"
 #include "rmw/types.h"
 #include "rmw/validate_full_topic_name.h"
 
@@ -79,11 +78,9 @@ rmw_create_client(
   const rosidl_service_type_support_t * type_support =
     get_service_typesupport_handle(type_supports, rosidl_typesupport_introspection_c__identifier);
   if (type_support == nullptr) {
-    rcutils_reset_error();
     type_support = get_service_typesupport_handle(
       type_supports, rosidl_typesupport_introspection_cpp::typesupport_identifier);
     if (type_support == nullptr) {
-      rcutils_reset_error();
       RMW_SET_ERROR_MSG("type support not from this implementation");
       return nullptr;
     }
@@ -282,6 +279,7 @@ rmw_create_client(
     goto fail;
   }
 
+  // Create datareader for response
   if (!get_datareader_qos(subscriber, qos_policies, &datareader_qos)) {
     // error message already set
     goto fail;
@@ -393,6 +391,7 @@ fail:
   if (client_info != nullptr) {
     delete client_info;
   }
+
   return nullptr;
 }
 
@@ -405,6 +404,7 @@ rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
     node->implementation_identifier,
     RMW_GURUMDDS_ID,
     return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
+
   RMW_CHECK_ARGUMENT_FOR_NULL(client, RMW_RET_INVALID_ARGUMENT);
   RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
     client,
@@ -548,105 +548,6 @@ rmw_service_server_is_available(
   }
 
   *is_available = true;
-
-  return RMW_RET_OK;
-}
-
-rmw_ret_t
-rmw_client_request_publisher_get_actual_qos(
-  const rmw_client_t * client,
-  rmw_qos_profile_t * qos)
-{
-  RMW_CHECK_ARGUMENT_FOR_NULL(client, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    client,
-    client->implementation_identifier,
-    RMW_GURUMDDS_ID,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-  RMW_CHECK_ARGUMENT_FOR_NULL(qos, RMW_RET_INVALID_ARGUMENT);
-
-  GurumddsClientInfo * client_info = static_cast<GurumddsClientInfo *>(client->data);
-  if (client_info == nullptr) {
-    RMW_SET_ERROR_MSG("client info is null");
-    return RMW_RET_ERROR;
-  }
-
-  dds_DataWriter * request_writer = client_info->request_writer;
-  if (request_writer == nullptr) {
-    RMW_SET_ERROR_MSG("request writer is null");
-    return RMW_RET_ERROR;
-  }
-
-  dds_DataWriterQos dds_qos;
-  dds_ReturnCode_t ret = dds_DataWriter_get_qos(request_writer, &dds_qos);
-  if (ret != dds_RETCODE_OK) {
-    RMW_SET_ERROR_MSG("publisher can't get data writer qos policies");
-    return RMW_RET_ERROR;
-  }
-
-  qos->reliability = convert_reliability(&dds_qos.reliability);
-  qos->durability = convert_durability(&dds_qos.durability);
-  qos->deadline = convert_deadline(&dds_qos.deadline);
-  qos->lifespan = convert_lifespan(&dds_qos.lifespan);
-  qos->liveliness = convert_liveliness(&dds_qos.liveliness);
-  qos->liveliness_lease_duration = convert_liveliness_lease_duration(&dds_qos.liveliness);
-  qos->history = convert_history(&dds_qos.history);
-  qos->depth = static_cast<size_t>(dds_qos.history.depth);
-
-  ret = dds_DataWriterQos_finalize(&dds_qos);
-  if (ret != dds_RETCODE_OK) {
-    RMW_SET_ERROR_MSG("failed to finalize datawriter qos");
-    return RMW_RET_ERROR;
-  }
-
-  return RMW_RET_OK;
-}
-
-rmw_ret_t
-rmw_client_response_subscription_get_actual_qos(
-  const rmw_client_t * client,
-  rmw_qos_profile_t * qos)
-{
-  RMW_CHECK_ARGUMENT_FOR_NULL(client, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    client,
-    client->implementation_identifier,
-    RMW_GURUMDDS_ID,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-  RMW_CHECK_ARGUMENT_FOR_NULL(qos, RMW_RET_INVALID_ARGUMENT);
-
-  GurumddsClientInfo * client_info = static_cast<GurumddsClientInfo *>(client->data);
-  if (client_info == nullptr) {
-    RMW_SET_ERROR_MSG("client info is null");
-    return RMW_RET_ERROR;
-  }
-
-  dds_DataReader * response_reader = client_info->response_reader;
-  if (response_reader == nullptr) {
-    RMW_SET_ERROR_MSG("response reader is null");
-    return RMW_RET_ERROR;
-  }
-
-  dds_DataReaderQos dds_qos;
-  dds_ReturnCode_t ret = dds_DataReader_get_qos(response_reader, &dds_qos);
-  if (ret != dds_RETCODE_OK) {
-    RMW_SET_ERROR_MSG("subscription can't get data reader qos policies");
-    return RMW_RET_ERROR;
-  }
-
-  qos->reliability = convert_reliability(&dds_qos.reliability);
-  qos->durability = convert_durability(&dds_qos.durability);
-  qos->deadline = convert_deadline(&dds_qos.deadline);
-  qos->liveliness = convert_liveliness(&dds_qos.liveliness);
-  qos->liveliness_lease_duration = convert_liveliness_lease_duration(&dds_qos.liveliness);
-  qos->history = convert_history(&dds_qos.history);
-  qos->depth = static_cast<size_t>(dds_qos.history.depth);
-
-  ret = dds_DataReaderQos_finalize(&dds_qos);
-  if (ret != dds_RETCODE_OK) {
-    RMW_SET_ERROR_MSG("failed to finalize datareader qos");
-    return RMW_RET_ERROR;
-  }
 
   return RMW_RET_OK;
 }
@@ -982,19 +883,5 @@ rmw_take_response(
   dds_UnsignedLongSeq_delete(sample_sizes);
 
   return RMW_RET_OK;
-}
-
-rmw_ret_t
-rmw_client_set_on_new_response_callback(
-  rmw_client_t * rmw_client,
-  rmw_event_callback_t callback,
-  const void * user_data)
-{
-  (void)rmw_client;
-  (void)callback;
-  (void)user_data;
-
-  RMW_SET_ERROR_MSG("rmw_client_set_on_new_request_callback not implemented");
-  return RMW_RET_UNSUPPORTED;
 }
 }  // extern "C"

@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
-#include <sstream>
-#include <limits>
-#include <thread>
 #include <chrono>
-
-#include "rcutils/error_handling.h"
-#include "rcutils/types.h"
+#include <limits>
+#include <sstream>
+#include <string>
+#include <thread>
 
 #include "rcpputils/scope_exit.hpp"
 
@@ -91,7 +88,6 @@ __rmw_create_publisher(
     // Error message is already set
     return nullptr;
   }
-
   dds_typesupport = dds_TypeSupport_create(metastring.c_str());
   if (dds_typesupport == nullptr) {
     RMW_SET_ERROR_MSG("failed to create typesupport");
@@ -165,7 +161,6 @@ __rmw_create_publisher(
   publisher_info->topic_writer = topic_writer;
   publisher_info->rosidl_message_typesupport = type_support;
   publisher_info->implementation_identifier = RMW_GURUMDDS_ID;
-  publisher_info->sequence_number = 0;
   publisher_info->ctx = ctx;
 
   entity_get_gid(
@@ -316,13 +311,6 @@ rmw_create_publisher(
     }
   }
 
-  if (publisher_options->require_unique_network_flow_endpoints ==
-    RMW_UNIQUE_NETWORK_FLOW_ENDPOINTS_STRICTLY_REQUIRED)
-  {
-    RMW_SET_ERROR_MSG("Unique network flow endpoints not supported on publishers");
-    return nullptr;
-  }
-
   rmw_context_impl_t * ctx = node->context->impl;
 
   rmw_publisher_t * const rmw_pub =
@@ -382,8 +370,8 @@ rmw_publisher_count_matched_subscriptions(
     dds_InstanceHandleSeq_delete(seq);
     return RMW_RET_ERROR;
   }
-  *subscription_count = static_cast<size_t>(dds_InstanceHandleSeq_length(seq));
 
+  *subscription_count = static_cast<size_t>(dds_InstanceHandleSeq_length(seq));
   dds_InstanceHandleSeq_delete(seq);
 
   return RMW_RET_OK;
@@ -411,35 +399,6 @@ rmw_publisher_assert_liveliness(const rmw_publisher_t * publisher)
   }
 
   return RMW_RET_OK;
-}
-
-rmw_ret_t
-rmw_publisher_wait_for_all_acked(const rmw_publisher_t * publisher, rmw_time_t wait_timeout)
-{
-  RMW_CHECK_ARGUMENT_FOR_NULL(publisher, RMW_RET_INVALID_ARGUMENT);
-  RMW_CHECK_TYPE_IDENTIFIERS_MATCH(
-    publisher,
-    publisher->implementation_identifier,
-    RMW_GURUMDDS_ID,
-    return RMW_RET_INCORRECT_RMW_IMPLEMENTATION);
-
-  auto publisher_info = static_cast<GurumddsPublisherInfo *>(publisher->data);
-  if (publisher_info == nullptr) {
-    RMW_SET_ERROR_MSG("publisher internal data is invalid");
-    return RMW_RET_ERROR;
-  }
-
-  dds_Duration_t timeout = rmw_time_to_dds(wait_timeout);
-  dds_ReturnCode_t ret = dds_DataWriter_wait_for_acknowledgments(
-    publisher_info->topic_writer, &timeout);
-
-  if (ret == dds_RETCODE_OK) {
-    return RMW_RET_OK;
-  } else if (ret == dds_RETCODE_TIMEOUT) {
-    return RMW_RET_TIMEOUT;
-  } else {
-    return RMW_RET_ERROR;
-  }
 }
 
 rmw_ret_t
@@ -612,15 +571,7 @@ rmw_publish(
     return RMW_RET_ERROR;
   }
 
-  dds_SampleInfoEx sampleinfo_ex;
-  memset(&sampleinfo_ex, 0, sizeof(dds_SampleInfoEx));
-  ros_sn_to_dds_sn(++publisher_info->sequence_number, &sampleinfo_ex.seq);
-  ros_guid_to_dds_guid(
-    reinterpret_cast<int8_t *>(publisher_info->publisher_gid.data),
-    reinterpret_cast<int8_t *>(&sampleinfo_ex.src_guid));
-
-  dds_ReturnCode_t ret = dds_DataWriter_raw_write_w_sampleinfoex(
-    topic_writer, dds_message, size, &sampleinfo_ex);
+  dds_ReturnCode_t ret = dds_DataWriter_raw_write(topic_writer, dds_message, size);
 
   const char * errstr;
   if (ret == dds_RETCODE_OK) {
@@ -669,18 +620,10 @@ rmw_publish_serialized_message(
   dds_DataWriter * topic_writer = publisher_info->topic_writer;
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(topic_writer, RMW_RET_ERROR);
 
-  dds_SampleInfoEx sampleinfo_ex;
-  memset(&sampleinfo_ex, 0, sizeof(dds_SampleInfoEx));
-  ros_sn_to_dds_sn(++publisher_info->sequence_number, &sampleinfo_ex.seq);
-  ros_guid_to_dds_guid(
-    reinterpret_cast<int8_t *>(publisher_info->publisher_gid.data),
-    reinterpret_cast<int8_t *>(&sampleinfo_ex.src_guid));
-
-  dds_ReturnCode_t ret = dds_DataWriter_raw_write_w_sampleinfoex(
+  dds_ReturnCode_t ret = dds_DataWriter_raw_write(
     topic_writer,
     serialized_message->buffer,
-    static_cast<uint32_t>(serialized_message->buffer_length),
-    &sampleinfo_ex
+    static_cast<uint32_t>(serialized_message->buffer_length)
   );
 
   const char * errstr;
