@@ -49,9 +49,7 @@ __rmw_create_node(
   const char * implementation_identifier,
   rmw_context_t * context,
   const char * name,
-  const char * namespace_,
-  size_t domain_id,
-  bool localhost_only)
+  const char * namespace_)
 {
   /* Validate node's name and namespace */
   int validation_result = RMW_NODE_NAME_VALID;
@@ -75,6 +73,9 @@ __rmw_create_node(
     return nullptr;
   }
 
+  bool node_localhost_only =
+    context->options.localhost_only == RMW_LOCALHOST_ONLY_ENABLED;
+
   rmw_context_impl_t * ctx = context->impl;
   std::lock_guard<std::mutex> guard(ctx->initialization_mutex);
 
@@ -83,17 +84,7 @@ __rmw_create_node(
     return nullptr;
   }
 
-  if (0u == ctx->node_count) {
-    ctx->domain_id = domain_id;
-  } else if ((size_t)ctx->domain_id != domain_id) {
-    RCUTILS_LOG_ERROR_NAMED(
-      RMW_GURUMDDS_ID,
-      "invalid domain id: context=%d, node=%ld\n",
-      ctx->domain_id, domain_id);
-    return nullptr;
-  }
-
-  ret = ctx->initialize_node(namespace_, name, localhost_only);
+  ret = ctx->initialize_node(namespace_, name, node_localhost_only);
   if (ret != RMW_RET_OK) {
     RCUTILS_LOG_ERROR_NAMED(RMW_GURUMDDS_ID, "failed to initialize node in context");
     return nullptr;
@@ -265,9 +256,7 @@ rmw_node_t *
 rmw_create_node(
   rmw_context_t * context,
   const char * name,
-  const char * namespace_,
-  size_t domain_id,
-  bool localhost_only)
+  const char * namespace_)
 {
   RCUTILS_CHECK_ARGUMENT_FOR_NULL(context, nullptr);
   RMW_CHECK_FOR_NULL_WITH_MSG(
@@ -280,7 +269,7 @@ rmw_create_node(
     RMW_GURUMDDS_ID,
     return nullptr);
   return __rmw_create_node(
-    RMW_GURUMDDS_ID, context, name, namespace_, domain_id, localhost_only);
+    RMW_GURUMDDS_ID, context, name, namespace_);
 }
 
 rmw_ret_t
