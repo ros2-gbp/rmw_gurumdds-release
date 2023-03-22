@@ -1,4 +1,4 @@
-From 73e9e3f008bb0be0ec5b9429f5208b94fac25d93 Mon Sep 17 00:00:00 2001
+From 89ea1d3142f931f303b6169e12561e5bb9a789f0 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Thu, 11 Feb 2021 18:39:10 -0800
 Subject: [PATCH] Drop membership in rmw_implementation_packages group
@@ -14,10 +14,10 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/package.xml b/package.xml
-index 75142a0..c63a13e 100644
+index 2fac5e1..832817e 100644
 --- a/package.xml
 +++ b/package.xml
-@@ -35,8 +35,6 @@
+@@ -36,8 +36,6 @@
    <test_depend>ament_lint_auto</test_depend>
    <test_depend>ament_lint_common</test_depend>
  
@@ -40,5 +40,5 @@ index bebb96b..549f602 100644
  %bcond_without weak_deps
  
 -- 
-2.25.1
+2.39.2
 
