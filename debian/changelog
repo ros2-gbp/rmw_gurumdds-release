@@ -1,0 +1,366 @@
+ros-rolling-rmw-gurumdds-cpp (4.2.0-2jammy) jammy; urgency=high
+
+  * Add maintainer
+  * Add null handling
+  * Apply loop to take sequence
+  * Make writer_guid uint8_t[] for consistency with rmw_request_id_t
+  * Make sure to add semicolons to the RMW_CHECK_TYPE_IDENTIFIERS_MATCH
+  * Contributors: Youngjin Yun, donghee811
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 07 Mar 2023 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (4.1.2-2jammy) jammy; urgency=high
+
+  * Remove sleep from entity creation
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 30 Nov 2022 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (4.1.1-2jammy) jammy; urgency=high
+
+  * Add rmw_get_gid_for_client method
+  * 4.1.0
+  * Apply graph cache (#17 <https://github.com/YoungJin-gurum/rmw_gurumdds/issues/17>)
+    * graph_cache 0718
+    * Add topic name creation
+    * graph_cache 0722
+    * Sync api
+    * add context::finalize()
+    * Wrap-up pub and sub
+    * fix gid
+    * Wrap-up client and service
+    * fix segfault
+    * Add set on callback empty stub
+    * Add content filter topic feature empty stub
+    * Change the behavior of take response to a loop
+    * Add missing dependency
+    * Fix bug and remove unnecessary struct
+    * Synk for log
+    * Amend log and scope exit for node
+    * Apply on_remote_changed callback & fix typo
+    * Cleanup log
+    * Reposition message handling timing of response
+    Co-authored-by: donghee811 <mailto:donghee@gurum.cc>
+  * Redefine rmw gurumdds identifier
+  * Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
+  * 4.0.2
+  * Add missing guid comparison conditional statement
+  * Add sequence numbers to message info structure
+  * Handle null string
+  * Fix rclcpp test(test_serialized_message) failure
+  * 4.0.1
+  * Fix cast style and relative paths for cpplint
+  * 4.0.0
+  * Contributors: Youngjin Yun, donghee811
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 07 Nov 2022 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (4.1.0-2jammy) jammy; urgency=high
+
+  * Apply graph cache (#17 <https://github.com/ros2/rmw_gurumdds/issues/17>)
+    * graph_cache 0718
+    * Add topic name creation
+    * graph_cache 0722
+    * Sync api
+    * add context::finalize()
+    * Wrap-up pub and sub
+    * fix gid
+    * Wrap-up client and service
+    * fix segfault
+    * Add set on callback empty stub
+    * Add content filter topic feature empty stub
+    * Change the behavior of take response to a loop
+    * Add missing dependency
+    * Fix bug and remove unnecessary struct
+    * Synk for log
+    * Amend log and scope exit for node
+    * Apply on_remote_changed callback & fix typo
+    * Cleanup log
+    * Reposition message handling timing of response
+    Co-authored-by: donghee811 <mailto:donghee@gurum.cc>
+  * Redefine rmw gurumdds identifier
+  * Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 05 Oct 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (4.0.2-2jammy) jammy; urgency=high
+
+  * Add missing guid comparison conditional statement
+  * Add sequence numbers to message info structure
+  * Handle null string
+  * Fix rclcpp test(test_serialized_message) failure
+  * Contributors: Youngjin Yun, donghee811
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 05 Jul 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (4.0.1-2jammy) jammy; urgency=high
+
+  * Fix cast style and relative paths for cpplint
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 10 May 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (4.0.0-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 09 May 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.2.0-2jammy) jammy; urgency=high
+
+  * Enhanced rpc with sampleinfoex
+  * Basic rpc
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 26 Apr 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.6-2jammy) jammy; urgency=high
+
+  * Remove minimum dds version as raw typesupport removed
+  * Revert raw typesupport patch
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 26 Apr 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.5-2jammy) jammy; urgency=high
+
+  * Remove dead store
+  * Adjust minimum dds version
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 17 Mar 2022 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.4-2jammy) jammy; urgency=high
+
+  * Use raw typesupport instead of typesupport
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 16 Feb 2022 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.3-2jammy) jammy; urgency=high
+
+  * Add omitted free
+  * Change to delete only the entities created by the user
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 16 Feb 2022 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.2-2jammy) jammy; urgency=high
+
+  * Update packages to use gurumdds-2.8 & Update README
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 03 Jan 2022 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.1-2jammy) jammy; urgency=high
+
+  * Add public to qos convert api& fix for uncrustify
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 21 Dec 2021 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.1.0-2jammy) jammy; urgency=high
+
+  * Use convert api for publisher/subscription Qos getters
+  * Add client/service Qos getters
+  * Remove dds_typesupport from Publisher/Subscriber Info
+  * Change the return time when destroying entities
+  * Add ommited memory manage code
+  * Modify unnecessary code
+  * Fix typo
+  * Update return value
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 25 Nov 2021 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.9-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 14 Oct 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.8-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 14 Oct 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.7-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 27 Sep 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.6-2jammy) jammy; urgency=high
+
+  * Revise for lint
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 23 Sep 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.5-2jammy) jammy; urgency=high
+
+  * Update rmw_context_impl_t definition
+  * Add rmw_publisher_wait_for_all_acked
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 23 Sep 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.4-2jammy) jammy; urgency=high
+
+  * Fix unbounded sequence size
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 02 Sep 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.3-2jammy) jammy; urgency=high
+
+  * Remove datareader listener patch
+  * Remove unnecessary operation
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 19 Aug 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.2-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 14 Jul 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.1-2jammy) jammy; urgency=high
+
+  * Use variable attempt to take the number of times equal to count
+  * Check if the queue is empty before using it
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 07 Jul 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (3.0.0-2jammy) jammy; urgency=high
+
+  * Revise for lint
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 29 Apr 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.1.4-2jammy) jammy; urgency=high
+
+  * Indicate missing support for unique network flows
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 22 Apr 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.1.3-2jammy) jammy; urgency=high
+
+  * Use dds_free instead of free for dll library
+  * Contributors: Youngjin Yun
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 12 Apr 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.1.2-2jammy) jammy; urgency=high
+
+  * Update code about build error on windows
+  * Add RMW function to check QoS compatibility
+  * Contributors: Youngjin Yun, youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Mon, 22 Mar 2021 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.1.1-2jammy) jammy; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * Contributors: youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Fri, 12 Mar 2021 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.1.0-2jammy) jammy; urgency=high
+
+  * Change maintainer
+  * Handle typesupport errors on retrieval
+  * Set actual domain id into context
+  * Fix wrong error messages
+  * Use DataReader listener for taking data samples
+  * Contributors: junho, youngjin
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Tue, 23 Feb 2021 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.0.1-2jammy) jammy; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 29 Jul 2020 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (2.0.0-2jammy) jammy; urgency=high
+
+  * Removed parameters domain_id and localhost_only from rmw_create_node()
+  * Updated init/shutdown/init option functions
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 09 Jul 2020 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (1.1.0-2jammy) jammy; urgency=high
+
+  * Finalize rmw context only if it's shutdown
+  * Added support for sample_lost event
+  * Renamed rmw_gurumdds_dynamic_cpp to rmw_gurumdds_cpp
+  * Renamed rmw_gurumdds_cpp to rmw_gurumdds_static_cpp
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 09 Jul 2020 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (1.0.0-2jammy) jammy; urgency=high
+
+  * Fixed wrong package version
+  * MANUAL_BY_NODE liveliness is deprecated
+  * Updated packages to use gurumdds-2.6
+  * Replaced rosidl_message_bounds_t with rosidl_runtime_c__Sequence__bound
+  * Replaced rmw_request_id_t with rmw_service_info_t
+  * Added rmw_take_sequence()
+  * Fill timestamps in message info
+  * Fixed template specialization
+  * security_context is renamed to enclave
+  * Replaced rosidl_generator_* with rosidl_runtime_*
+  * Added incompatible qos support
+  * Apply one participant per context API changes
+  * Fixed serialization/deserialization errors
+  * Fixed some errors
+    * added missing qos finalization
+    * fixed issue that topic endpoint info was not handled correctly
+    * added null check to builtin datareader callbacks
+  * Added qos finalization after creating publisher/subscriber
+  * Added event init functions
+  * Implemented rmw_serialize/rmw_deserialize
+  * Implemented client
+  * Implemented service
+  * Fixed code style divergence
+  * Implemented subscription
+  * Fixed some errors in cdr buffer
+  * Implemented publisher
+  * Implemented serialization/deserialization
+  * Suppress complie warnings
+  * Modified structures in types.hpp
+  * Implemented create_metastring()
+  * added rmw_gurumdds_cpp
+  * Contributors: junho
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 04 Jun 2020 07:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (0.8.2-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Thu, 19 Dec 2019 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (0.8.1-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Fri, 15 Nov 2019 08:00:00 -0000
+
+ros-rolling-rmw-gurumdds-cpp (0.8.0-2jammy) jammy; urgency=high
+
+
+
+ -- Youngjin Yun <youngjin@gurum.cc>  Wed, 06 Nov 2019 08:00:00 -0000
+
+
