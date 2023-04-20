@@ -1,4 +1,4 @@
-From 89ea1d3142f931f303b6169e12561e5bb9a789f0 Mon Sep 17 00:00:00 2001
+From a9992f0db26f0aa5c2383ac7086a75acd9eea998 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Thu, 11 Feb 2021 18:39:10 -0800
 Subject: [PATCH] Drop membership in rmw_implementation_packages group
@@ -40,5 +40,5 @@ index bebb96b..549f602 100644
  %bcond_without weak_deps
  
 -- 
-2.39.2
+2.40.0
 
