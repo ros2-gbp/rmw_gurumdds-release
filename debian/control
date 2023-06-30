@@ -1,0 +1,12 @@
+Source: ros-iron-rmw-gurumdds-cpp
+Section: misc
+Priority: optional
+Maintainer: Youngjin Yun <youngjin@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-2.8, ros-iron-ament-cmake-ros, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-gurumdds-cmake-module, ros-iron-rcutils, ros-iron-rmw, ros-iron-rmw-dds-common, ros-iron-rosidl-cmake, ros-iron-rosidl-generator-dds-idl, ros-iron-rosidl-runtime-c, ros-iron-rosidl-runtime-cpp, ros-iron-rosidl-typesupport-introspection-c, ros-iron-rosidl-typesupport-introspection-cpp, ros-iron-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-iron-rmw-gurumdds-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gurumdds-2.8, ros-iron-gurumdds-cmake-module, ros-iron-rcutils, ros-iron-rmw, ros-iron-rmw-dds-common, ros-iron-rosidl-runtime-c, ros-iron-rosidl-runtime-cpp, ros-iron-rosidl-typesupport-introspection-c, ros-iron-rosidl-typesupport-introspection-cpp, ros-iron-ros-workspace
+Description: Implement the ROS middleware interface using GurumNetworks GurumDDS static code generation in C++.
