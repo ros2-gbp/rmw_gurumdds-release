@@ -1,0 +1,12 @@
+Source: ros-iron-gurumdds-cmake-module
+Section: misc
+Priority: optional
+Maintainer: Youngjin Yun <youngjin@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-2.8, ros-iron-ament-cmake, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-iron-gurumdds-cmake-module
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-iron-ament-cmake, ros-iron-ros-workspace
+Description: Provide CMake module to find GurumNetworks GurumDDS.
