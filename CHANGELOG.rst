@@ -2,6 +2,14 @@
 Changelog for package gurumdds_cmake_module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.4.2 (2023-09-18)
+------------------
+* Update packages to use gurumdds-3.0 & Update README
+* Contributors: Jaemin Jo
+
+3.4.1 (2023-09-13)
+------------------
+
 3.4.0 (2023-03-08)
 ------------------
 * Add maintainer
