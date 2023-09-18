@@ -1,3 +1,28 @@
+## rmw_gurumdds (humble) - 3.4.2-1
+
+The packages in the `rmw_gurumdds` repository were released into the `humble` distro by running `/usr/bin/bloom-release --rosdistro humble rmw_gurumdds` on `Mon, 18 Sep 2023 07:18:31 -0000`
+
+These packages were released:
+- `gurumdds_cmake_module`
+- `rmw_gurumdds_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `3.4.0-1`
+- old version: `3.4.0-1`
+- new version: `3.4.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (iron) - 5.0.0-1
 
 The packages in the `rmw_gurumdds` repository were released into the `iron` distro by running `/usr/bin/bloom-release --rosdistro iron --track iron rmw_gurumdds --edit` on `Fri, 30 Jun 2023 04:02:27 -0000`
