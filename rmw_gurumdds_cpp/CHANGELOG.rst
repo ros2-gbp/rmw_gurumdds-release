@@ -2,7 +2,117 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4.1.0 (2022-10-05)
+5.0.0 (2024-10-17)
+------------------
+* Refactor type_support_service
+* Place copyright notice
+* Refactor event info types
+* Fix failure when receiving a message
+* Refactor type_support_common
+* Update feature support
+* Refactor rmw_take
+  Use dds_DataReader_take_next_sample_w_info_ex instead of dds_DataReader_raw_take for reduce allocation and free
+* Refactor GID/GUID
+* Change SampleInfo's received_timestamp
+* Change Subscription
+  Add SubscriberInfo::on_data_available
+* Refactor rmw_wait
+  * move rmw_gurumdds_cpp::wait to a source file
+  * make check once that the use_polling env var in rmw_gurumdds_cpp::wait
+* Remove unnecessary underscores
+* Remove unnecessary typedef
+* refactor: use namespace rmw_gurumdds_cpp
+* Remove unused header files
+* Use RCUTILS_UNUSED macro instead of `static_cast<void>`
+* Use RCUTILS_UNUSED macro instead of `(void)`
+* Refactor include guard
+* docs: update README.md and maintainers
+* refactor: clean up files
+* Refactor CDR
+  * Refactor MessageSerializer class
+  * Refactor CdrSerializationBuffer class
+  * Refactor MessageDeserializer class
+  * Refactor CdrDeserializationBuffer class
+* Fix failure of serialization
+* Reduce calling dds_ConditionSeq_length in __rmw_wait function
+* Implement set_on_new_event_callback
+  * new GurumddsEventInfo::get_guard_condition method for waiting when a callback is set
+  * new GurumddsTopicEventListener class for managing of the topic's listener
+  * change signature and behavior of __gather_event_conditions for use guard condition
+  * replace GurumddsEventInfo::get_status_changes method to GurumddsEventInfo::is_status_changed
+  * new GurumddsEventInfo::has_callback for checking callback is set
+  * change signature and behavior of GurumddsEventInfo::get_status for use callback listener
+* Add received_timestamp
+* Implement set_on_new\_[message/request/response]_callback
+* Fix graph_on_node/publisher/subscriber/service/client_created/deleted
+* Add setup publish_callback in common context
+  * Add rmw_gurumdds::publish function
+* Add event type added in rmw 7.1.0
+* Fix typo
+  * Replace 'NULL' to nullptr
+  * Remove unnecessary cast
+  * Remove unnecessary condition
+* Refactor check_dds_ret_code
+  Make it use switch-cast instead if-else
+* Handle 'best available' QoS policies
+* Support minimal functionalities for Jazzy
+  - Add `rmw_count_clients` and `rmw_count_services`
+  - Add `rmw_get_gid_for_client`
+  - Put unimplemented error in `rmw_take_dynamic_message`, `rmw_take_dynamic_message_with_info`, and `rmw_serialization_support_init`
+  - Include <cstdint> in types.cpp
+  - Ignore PRECONDITION_NOT_MET when checking WaitSet detach condition
+* Add type hash
+* Fix failure of build
+* Fix deserialization wstring
+* Fix initialize_node
+* Contributors: gurum, kumazuma
+
+3.6.1 (2024-04-19)
+------------------
+* Increase `ros_discovery_info` history depth
+* Contributors: Donghyeon Lee
+
+3.6.0 (2024-04-04)
+------------------
+* Use gurumdds-3.1
+* Revert "Support zero copy API"
+  This reverts commit fc3807d20aa0603f78293e11635e90ececd0d1fa.
+* Contributors: hyeonwoo
+
+3.5.1 (2024-01-30)
+------------------
+* Fix struct array deserialization
+* Contributors: Jaemin Jo
+
+3.5.0 (2023-09-27)
+------------------
+* Change maintainer list
+* Support zero copy API
+* Contributors: Jaemin Jo
+
+3.4.2 (2023-09-18)
+------------------
+* Update packages to use gurumdds-3.0 & Update README
+* Contributors: Jaemin Jo
+
+3.4.1 (2023-09-13)
+------------------
+* Fix interoperability errors: Remove buffer roundup at the end of messeage deserialize function
+* Contributors: Jaemin Jo
+
+3.4.0 (2023-03-08)
+------------------
+* Add maintainer
+* Add null handling
+* Apply loop to take sequence
+* Contributors: Youngjin Yun
+
+3.3.1 (2022-11-30)
+------------------
+* Remove sleep from entity creation
+* Contributors: Youngjin Yun
+
+3.3.0 (2022-10-05)
 ------------------
 * Apply graph cache (`#17 <https://github.com/ros2/rmw_gurumdds/issues/17>`_)
   * graph_cache 0718
@@ -29,72 +139,18 @@ Changelog for package rmw_gurumdds_cpp
 * Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
 * Contributors: Youngjin Yun
 
-4.0.2 (2022-07-05)
+3.2.2 (2022-07-05)
 ------------------
 * Add missing guid comparison conditional statement
 * Add sequence numbers to message info structure
+* Contributors: Youngjin Yun, donghee811
+
+3.2.1 (2022-06-02)
+------------------
 * Handle null string
 * Fix rclcpp test(test_serialized_message) failure
-* Contributors: Youngjin Yun, donghee811
-
-4.0.1 (2022-05-10)
-------------------
 * Fix cast style and relative paths for cpplint
 * Contributors: Youngjin Yun
-
-4.0.0 (2022-05-09)
-------------------
-
-4.2.0 (2023-03-07)
-------------------
-* Add maintainer
-* Add null handling
-* Apply loop to take sequence
-* Make writer_guid uint8_t[] for consistency with rmw_request_id_t
-* Make sure to add semicolons to the RMW_CHECK_TYPE_IDENTIFIERS_MATCH
-* Contributors: Youngjin Yun, donghee811
-
-4.1.2 (2022-11-30)
-------------------
-* Remove sleep from entity creation
-* Contributors: Youngjin Yun
-
-4.1.1 (2022-11-07)
-------------------
-* Add rmw_get_gid_for_client method
-* 4.1.0
-* Apply graph cache (`#17 <https://github.com/YoungJin-gurum/rmw_gurumdds/issues/17>`_)
-  * graph_cache 0718
-  * Add topic name creation
-  * graph_cache 0722
-  * Sync api
-  * add context::finalize()
-  * Wrap-up pub and sub
-  * fix gid
-  * Wrap-up client and service
-  * fix segfault
-  * Add set on callback empty stub
-  * Add content filter topic feature empty stub
-  * Change the behavior of take response to a loop
-  * Add missing dependency
-  * Fix bug and remove unnecessary struct
-  * Synk for log
-  * Amend log and scope exit for node
-  * Apply on_remote_changed callback & fix typo
-  * Cleanup log
-  * Reposition message handling timing of response
-  Co-authored-by: donghee811 <donghee@gurum.cc>
-* Redefine rmw gurumdds identifier
-* Integrate rmw_gurumdds_shared_cpp into rmw_gurumdds_cpp
-* 4.0.2
-* Add missing guid comparison conditional statement
-* Add sequence numbers to message info structure
-* Handle null string
-* Fix rclcpp test(test_serialized_message) failure
-* 4.0.1
-* Fix cast style and relative paths for cpplint
-* 4.0.0
-* Contributors: Youngjin Yun, donghee811
 
 3.2.0 (2022-04-26)
 ------------------
