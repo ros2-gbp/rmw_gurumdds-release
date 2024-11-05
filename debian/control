@@ -1,0 +1,12 @@
+Source: ros-jazzy-gurumdds-cmake-module
+Section: misc
+Priority: optional
+Maintainer: Donghyeon Lee <donghyeon@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-3.2, ros-jazzy-ament-cmake, ros-jazzy-ament-lint-auto <!nocheck>, ros-jazzy-ament-lint-common <!nocheck>, ros-jazzy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-gurumdds-cmake-module
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-ament-cmake, ros-jazzy-ros-workspace
+Description: Provide CMake module to find GurumNetworks GurumDDS.
