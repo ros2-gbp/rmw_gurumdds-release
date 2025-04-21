@@ -1,0 +1,162 @@
+ros-rolling-gurumdds-cmake-module (5.0.0-3noble) noble; urgency=high
+
+  * docs: update README.md and maintainers
+  * Contributors: gurum
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 17 Oct 2024 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.6.1-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Fri, 19 Apr 2024 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.6.0-3noble) noble; urgency=high
+
+  * Use gurumdds-3.1
+  * Contributors: hyeonwoo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 04 Apr 2024 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.5.1-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 30 Jan 2024 06:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.5.0-3noble) noble; urgency=high
+
+  * Change maintainer list
+  * Contributors: Jaemin Jo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 27 Sep 2023 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.4.2-3noble) noble; urgency=high
+
+  * Update packages to use gurumdds-3.0 & Update README
+  * Contributors: Jaemin Jo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 18 Sep 2023 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.4.1-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 13 Sep 2023 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.4.0-3noble) noble; urgency=high
+
+  * Add maintainer
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 08 Mar 2023 06:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.3.1-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 30 Nov 2022 06:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.3.0-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 05 Oct 2022 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.2.2-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 05 Jul 2022 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.2.1-3noble) noble; urgency=high
+
+  * Reorganize package
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 02 Jun 2022 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.2.0-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 02 Jun 2022 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.1.1-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 09 May 2022 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.1.0-3noble) noble; urgency=high
+
+  * Update packages to use gurumdds-2.8
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 03 Jan 2022 06:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (3.0.0-3noble) noble; urgency=high
+
+  * Modify cmake according to library path format
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 08 Jul 2021 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (2.0.0-3noble) noble; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * Change maintainer
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 16 Mar 2021 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (1.0.2-3noble) noble; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 29 Jul 2020 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (1.0.1-3noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 28 Jul 2020 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (1.0.0-3noble) noble; urgency=high
+
+  * Updated packages to use gurumdds-2.6
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 04 Jun 2020 05:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (0.8.2-3noble) noble; urgency=high
+
+  * updated packages to use gurumdds-2.5
+  * Contributors: hyeonwoo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 19 Dec 2019 06:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (0.8.1-3noble) noble; urgency=high
+
+  * CoreDDS is renamed to GurumDDS
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Fri, 15 Nov 2019 06:00:00 -0000
+
+ros-rolling-gurumdds-cmake-module (0.8.0-3noble) noble; urgency=high
+
+  * added changelog
+  * added gurumdds dependency to package.xml
+  * rewrote build scripts
+  * fixed 'command not found' error
+  * Implemented Wstring support
+  * fixed typos
+  * fixed code style divergence
+  * updated cmake to fit new library paths
+  * migration from gitlab
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 06 Nov 2019 06:00:00 -0000
+
+
