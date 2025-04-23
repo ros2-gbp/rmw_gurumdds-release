@@ -1,0 +1,12 @@
+Source: ros-kilted-rmw-gurumdds-cpp
+Section: misc
+Priority: optional
+Maintainer: Donghyeon Lee <donghyeon@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-3.2, ros-kilted-ament-cmake, ros-kilted-ament-cmake-ros-core, ros-kilted-ament-lint-auto <!nocheck>, ros-kilted-ament-lint-common <!nocheck>, ros-kilted-gurumdds-cmake-module, ros-kilted-rcutils, ros-kilted-rmw, ros-kilted-rmw-dds-common, ros-kilted-rosidl-cmake, ros-kilted-rosidl-generator-dds-idl, ros-kilted-rosidl-runtime-c, ros-kilted-rosidl-runtime-cpp, ros-kilted-rosidl-typesupport-introspection-c, ros-kilted-rosidl-typesupport-introspection-cpp, ros-kilted-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-rmw-gurumdds-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gurumdds-3.2, ros-kilted-gurumdds-cmake-module, ros-kilted-rcutils, ros-kilted-rmw, ros-kilted-rmw-dds-common, ros-kilted-rosidl-runtime-c, ros-kilted-rosidl-runtime-cpp, ros-kilted-rosidl-typesupport-introspection-c, ros-kilted-rosidl-typesupport-introspection-cpp, ros-kilted-ros-workspace
+Description: Implement the ROS middleware interface using GurumNetworks GurumDDS static code generation in C++.
