@@ -25,6 +25,8 @@
 
 #include "rmw_dds_common/qos.hpp"
 
+#include "tracetools/tracetools.h"
+
 #include "rmw_gurumdds_cpp/event_converter.hpp"
 #include "rmw_gurumdds_cpp/graph_cache.hpp"
 #include "rmw_gurumdds_cpp/identifier.hpp"
@@ -36,6 +38,7 @@
 #include "rmw_gurumdds_cpp/event_info_common.hpp"
 #include "rmw_gurumdds_cpp/event_info_service.hpp"
 
+#include "rmw_gurumdds_cpp/type_support.hpp"
 #include "rmw_gurumdds_cpp/type_support_service.hpp"
 
 extern "C"
@@ -101,8 +104,8 @@ rmw_create_service(
   dds_Publisher * publisher = ctx->publisher;
   dds_Subscriber * subscriber = ctx->subscriber;
 
-  dds_DataReaderQos datareader_qos;
-  dds_DataWriterQos datawriter_qos;
+  dds_DataReaderQos datareader_qos{};
+  dds_DataWriterQos datawriter_qos{};
 
   dds_DataReader * request_reader = nullptr;
   dds_DataReaderListener request_listener;
@@ -128,6 +131,8 @@ rmw_create_service(
   std::string response_type_name;
   std::string request_metastring;
   std::string response_metastring;
+  std::string writer_profile_name;
+  std::string reader_profile_name;
 
   const rosidl_type_hash_t* type_hash;
 
@@ -140,6 +145,12 @@ rmw_create_service(
     RMW_SET_ERROR_MSG("failed to create type name");
     return nullptr;
   }
+
+  writer_profile_name = service_name;
+  writer_profile_name += "Reply";
+
+  reader_profile_name = service_name;
+  reader_profile_name += "Request";
 
   request_topic_name.reserve(256);
   response_topic_name.reserve(256);
@@ -257,8 +268,17 @@ rmw_create_service(
     }
   }
 
+  ret = dds_DomainParticipantFactory_get_datareader_qos_from_profile(reader_profile_name.c_str(), &datareader_qos);
+  if(ret != dds_RETCODE_OK) {
+    ret = dds_Subscriber_get_default_datareader_qos(subscriber, &datareader_qos);
+    if (ret != dds_RETCODE_OK) {
+      RMW_SET_ERROR_MSG("failed to get default datareader qos");
+      return nullptr;
+    }
+  }
+
   type_hash = type_support->request_typesupport->get_type_hash_func(type_support->request_typesupport);
-  if (!rmw_gurumdds_cpp::get_datareader_qos(subscriber, &adapted_qos_policies, *type_hash, &datareader_qos)) {
+  if (!rmw_gurumdds_cpp::get_datareader_qos(&adapted_qos_policies, *type_hash, &datareader_qos)) {
     // Error message already set
     goto fail;
   }
@@ -284,8 +304,23 @@ rmw_create_service(
     goto fail;
   }
 
+  ret = dds_Publisher_get_default_datawriter_qos(publisher, &datawriter_qos);
+  if (ret != dds_RETCODE_OK) {
+    RMW_SET_ERROR_MSG("failed to get default datawriter qos");
+    return nullptr;
+  }
+
+  ret = dds_DomainParticipantFactory_get_datawriter_qos_from_profile(writer_profile_name.c_str(), &datawriter_qos);
+  if(ret != dds_RETCODE_OK) {
+    ret = dds_Publisher_get_default_datawriter_qos(publisher, &datawriter_qos);
+    if (ret != dds_RETCODE_OK) {
+      RMW_SET_ERROR_MSG("failed to get default datawriter qos");
+      return nullptr;
+    }
+  }
+
   type_hash = type_support->response_typesupport->get_type_hash_func(type_support->response_typesupport);
-  if (!rmw_gurumdds_cpp::get_datawriter_qos(publisher, &adapted_qos_policies, *type_hash, &datawriter_qos)) {
+  if (!rmw_gurumdds_cpp::get_datawriter_qos(&adapted_qos_policies, *type_hash, &datawriter_qos)) {
     // Error message already set
     goto fail;
   }
@@ -370,6 +405,7 @@ rmw_create_service(
   }
   std::memcpy(const_cast<char *>(rmw_service->service_name), service_name, strlen(service_name) + 1);
 
+  rmw_gurumdds_cpp::set_service_typesupport(response_writer, request_reader, type_support);
   if (rmw_gurumdds_cpp::graph_cache::on_service_created(ctx, node, service_info) != RMW_RET_OK) {
     RCUTILS_LOG_ERROR_NAMED(RMW_GURUMDDS_ID, "failed to update graph for service creation");
     goto fail;
@@ -803,6 +839,15 @@ rmw_take_request(
   }
 
   *taken = true;
+
+  TRACETOOLS_TRACEPOINT(
+    rmw_take_request,
+    static_cast<const void *>(service),
+    static_cast<const void *>(ros_request),
+    request_header->request_id.writer_guid,
+    request_header->request_id.sequence_number,
+    *taken);
+
   return RMW_RET_OK;
 }
 
@@ -875,47 +920,27 @@ rmw_send_response(
     }
     free(dds_response);
   } else {
-    void * dds_response = rmw_gurumdds_cpp::allocate_response_enhanced(
-      type_support->data,
-      type_support->typesupport_identifier,
-      ros_response,
-      &size
-    );
-
-    if (dds_response == nullptr) {
-      // Error message already set
-      return RMW_RET_ERROR;
-    }
-
-    bool res = rmw_gurumdds_cpp::serialize_response_enhanced(
-      type_support->data,
-      type_support->typesupport_identifier,
-      ros_response,
-      dds_response,
-      size
-    );
-
-    if (!res) {
-      // Error message already set
-      free(dds_response);
-      return RMW_RET_ERROR;
-    }
-
-    dds_SampleInfoEx sampleinfo_ex;
-    std::memset(&sampleinfo_ex, 0, sizeof(dds_SampleInfoEx));
+    dds_SampleInfoEx sampleinfo_ex{};
     rmw_gurumdds_cpp::ros_sn_to_dds_sn(request_header->sequence_number, &sampleinfo_ex.seq);
     rmw_gurumdds_cpp::ros_guid_to_dds_guid(
       request_header->writer_guid,
       reinterpret_cast<uint8_t *>(&sampleinfo_ex.src_guid));
 
-    if (dds_DataWriter_raw_write_w_sampleinfoex(
-        response_writer, dds_response, size, &sampleinfo_ex) != dds_RETCODE_OK)
+    dds_Time_get_current_time(&sampleinfo_ex.info.source_timestamp);
+    TRACETOOLS_TRACEPOINT(
+      rmw_send_response,
+      static_cast<const void *>(service),
+      static_cast<const void *>(ros_response),
+      request_header->writer_guid,
+      request_header->sequence_number,
+      rmw_gurumdds_cpp::dds_time_to_i64(sampleinfo_ex.info.source_timestamp));
+
+    if (dds_DataWriter_write_w_sampleinfoex(
+        response_writer, ros_response, &sampleinfo_ex) != dds_RETCODE_OK)
     {
       RMW_SET_ERROR_MSG("failed to send response");
-      free(dds_response);
       return RMW_RET_ERROR;
     }
-    free(dds_response);
   }
 
   return RMW_RET_OK;
