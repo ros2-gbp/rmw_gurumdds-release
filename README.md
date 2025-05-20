@@ -1,3 +1,28 @@
+## rmw_gurumdds (rolling) - 5.0.1-1
+
+The packages in the `rmw_gurumdds` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling rmw_gurumdds --edit` on `Tue, 20 May 2025 04:16:59 -0000`
+
+These packages were released:
+- `gurumdds_cmake_module`
+- `rmw_gurumdds_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `5.0.0-3`
+- old version: `5.0.0-3`
+- new version: `5.0.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.25.1`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (rolling) - 5.0.0-3
 
 The packages in the `rmw_gurumdds` repository were released into the `rolling` distro by running `/home/cottsay/infra_ws/install/bloom/bin/bloom-release rmw_gurumdds -r rolling` on `Mon, 21 Apr 2025 21:34:05 -0000`
