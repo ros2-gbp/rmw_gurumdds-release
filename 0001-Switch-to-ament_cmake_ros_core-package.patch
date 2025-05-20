@@ -1,4 +1,4 @@
-From 988a2756f0b4386d7a516685f455cc4f7a9c27f1 Mon Sep 17 00:00:00 2001
+From 5d62ed1665114aa47012b9d8ebccf2fb91ffbdd2 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Fri, 18 Apr 2025 19:53:59 -0500
 Subject: [PATCH] Switch to ament_cmake_ros_core package
@@ -9,7 +9,7 @@ Subject: [PATCH] Switch to ament_cmake_ros_core package
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d8415b02df82..4a4f87d3d6bf 100644
+index d8415b0..4a4f87d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -10,7 +10,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -23,7 +23,7 @@ index d8415b02df82..4a4f87d3d6bf 100644
  find_package(rcutils REQUIRED)
  find_package(gurumdds_cmake_module REQUIRED)
 diff --git a/package.xml b/package.xml
-index 8cfce4954276..7414c20cdf7d 100644
+index 8cfce49..7414c20 100644
 --- a/package.xml
 +++ b/package.xml
 @@ -9,7 +9,8 @@
@@ -37,5 +37,5 @@ index 8cfce4954276..7414c20cdf7d 100644
  
    <build_depend>gurumdds-3.2</build_depend>
 -- 
-2.49.0
+2.43.0
 
