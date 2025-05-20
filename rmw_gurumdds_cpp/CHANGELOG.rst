@@ -2,9 +2,13 @@
 Changelog for package rmw_gurumdds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5.0.1 (2025-05-16)
+6.0.0 (2025-05-19)
 -----------
+* Update rmw event impl
+  * Use RMW_EVENT_TYPE_MAX instead of RMW_EVENT_INVALID
+  * Implement rmw_event_type_is_supported
 * Fix a segfault on the dpf's initialization is failed
+* Switch to ament_cmake_ros_core package
 * Remove ament dependency of GurumDDS
 * Improve performance of `rmw_wait`
 * Reduce memcpy and memset
@@ -19,7 +23,7 @@ Changelog for package rmw_gurumdds_cpp
 * Make rmw_service_server_is_available return RMW_RET_INVALID_ARGUMENT
 * Use rmw_namespace_validation_result_string() in rmw_create_node
 * Remove rmw_localhost_only_t
-* Contributors: gurum, kumazuma
+* Contributors: gurum, kumazuma, Scott K Logan
 
 5.0.0 (2024-10-17)
 ------------------
