@@ -49,8 +49,14 @@ find_package(rmw_dds_common REQUIRED)
 find_package(rosidl_runtime_c REQUIRED)
 find_package(rosidl_runtime_cpp REQUIRED)
 
+find_package(tracetools REQUIRED)
+if(NOT tracetools_FOUND)
+  ament_package()
+  message(WARNING "Could not find tracetools for GurumDDS - skipping '${PROJECT_NAME}'")
+  return()
+endif()
+
 include_directories(include)
-ament_export_include_directories(include ${GurumDDS_INCLUDE_DIR})
 include_directories(${GurumDDS_INCLUDE_DIR})
 link_directories(${GurumDDS_LIBRARY_DIRS})
 
@@ -98,17 +104,18 @@ add_library(rmw_gurumdds_cpp
   src/type_support_service.cpp
   src/wait.cpp
 )
-
-ament_target_dependencies(rmw_gurumdds_cpp
-  "GurumDDS"
-  "rcpputils"
-  "rcutils"
-  "rmw"
-  "rmw_dds_common"
-  "rosidl_runtime_c"
-  "rosidl_runtime_cpp"
-  "rosidl_typesupport_introspection_c"
-  "rosidl_typesupport_introspection_cpp"
+target_link_libraries(rmw_gurumdds_cpp PUBLIC
+  ${rmw_dds_common_TARGETS}
+  GurumDDS
+  "rcpputils::rcpputils"
+  "rcutils::rcutils"
+  "rmw::rmw"
+  "rmw_dds_common::rmw_dds_common_library"
+  "rosidl_runtime_c::rosidl_runtime_c"
+  "rosidl_runtime_cpp::rosidl_runtime_cpp"
+  "rosidl_typesupport_introspection_c::rosidl_typesupport_introspection_c"
+  "rosidl_typesupport_introspection_cpp::rosidl_typesupport_introspection_cpp"
+  "tracetools::tracetools"
 )
 ament_export_libraries(rmw_gurumdds_cpp)
 
@@ -121,6 +128,7 @@ ament_export_dependencies(
   rosidl_runtime_cpp
   rosidl_typesupport_introspection_c
   rosidl_typesupport_introspection_cpp
+  tracetools
 )
 
 register_rmw_implementation(

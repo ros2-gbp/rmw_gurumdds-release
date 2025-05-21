@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS__TYPE_SUPPORT_SERVICE_INL
-#define RMW_GURUMDDS__TYPE_SUPPORT_SERVICE_INL
+#ifndef RMW_GURUMDDS_CPP__TYPE_SUPPORT_SERVICE_INL
+#define RMW_GURUMDDS_CPP__TYPE_SUPPORT_SERVICE_INL
 
 namespace rmw_gurumdds_cpp
 {
@@ -48,14 +48,8 @@ create_service_metastring(const void * untyped_members)
   }
 
   return {
-    create_metastring<GET_TYPENAME(members->request_members_)>(
-      static_cast<const void *>(members->request_members_),
-      true
-      ),
-    create_metastring<GET_TYPENAME(members->response_members_)>(
-      static_cast<const void *>(members->response_members_),
-      true
-      )
+    create_metastring<GET_TYPENAME(members->request_members_)>(static_cast<const void *>(members->request_members_)),
+    create_metastring<GET_TYPENAME(members->response_members_)>(static_cast<const void *>(members->response_members_))
   };
 }
 
@@ -75,8 +69,7 @@ allocate_request_basic(
   return allocate_message<GET_TYPENAME(members->request_members_)>(
     static_cast<const void *>(members->request_members_),
     static_cast<const uint8_t *>(ros_request),
-    size,
-    true
+    size
   );
 }
 
@@ -96,8 +89,7 @@ allocate_response_basic(
   return allocate_message<GET_TYPENAME(members->response_members_)>(
     static_cast<const void *>(members->response_members_),
     static_cast<const uint8_t *>(ros_response),
-    size,
-    true
+    size
   );
 }
 
@@ -117,8 +109,7 @@ allocate_request_enhanced(
   return allocate_message<GET_TYPENAME(members->request_members_)>(
     static_cast<const void *>(members->request_members_),
     static_cast<const uint8_t *>(ros_request),
-    size,
-    false
+    size
   );
 }
 
@@ -138,8 +129,7 @@ allocate_response_enhanced(
   return allocate_message<GET_TYPENAME(members->response_members_)>(
     static_cast<const void *>(members->response_members_),
     static_cast<const uint8_t *>(ros_response),
-    size,
-    false
+    size
   );
 }
 
@@ -495,6 +485,6 @@ dds_sn_to_ros_sn(uint64_t sn_dds, int64_t * sn_ros)
 {
   *sn_ros = ((sn_dds & 0x00000000FFFFFFFF) << 32) | ((sn_dds & 0xFFFFFFFF00000000) >> 32);
 }
-} // namespace rmw_gurumdds_cpp
+}  // namespace rmw_gurumdds_cpp
 
-#endif  // RMW_GURUMDDS__TYPE_SUPPORT_SERVICE_INL
+#endif  // RMW_GURUMDDS_CPP__TYPE_SUPPORT_SERVICE_INL
