@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS__TYPE_SUPPORT_COMMON_HPP_
-#define RMW_GURUMDDS__TYPE_SUPPORT_COMMON_HPP_
+#ifndef RMW_GURUMDDS_CPP__TYPE_SUPPORT_COMMON_HPP_
+#define RMW_GURUMDDS_CPP__TYPE_SUPPORT_COMMON_HPP_
 
 #include <string>
+#include <sstream>
 #include <cstdint>
 
 #include "rmw_gurumdds_cpp/message_converter.hpp"
+#include "rmw_gurumdds_cpp/message_serializer.hpp"
+#include "rmw_gurumdds_cpp/message_deserializer.hpp"
+
+#include "rmw/error_handling.h"
+#include "rmw/macros.h"
 
 namespace rmw_gurumdds_cpp
 {
@@ -31,16 +37,15 @@ void *
 allocate_message(
   const void * untyped_members,
   const uint8_t * ros_message,
-  size_t * size,
-  bool is_service);
+  size_t * size);
 
 template<typename MessageMembersT>
 std::string
-create_metastring(const void * untyped_members, bool is_service);
+create_metastring(const void * untyped_members);
 
 template<typename MessageMembersT>
 std::string
-parse_struct(const MessageMembersT * members, const char * field_name, bool is_service);
+parse_struct(const MessageMembersT * members, const char * field_name);
 
 std::string
 create_type_name(const void * untyped_members, const char * identifier);
@@ -53,8 +58,7 @@ allocate_message(
   const void * untyped_members,
   const char * identifier,
   const void * ros_message,
-  size_t * size,
-  bool is_service);
+  size_t * size);
 
 ssize_t
 get_serialized_size(
@@ -77,8 +81,8 @@ deserialize_cdr_to_ros(
   void * ros_message,
   void * dds_message,
   size_t size);
-} // namespace rmw_gurumdds_cpp
+}  // namespace rmw_gurumdds_cpp
 
 #include "rmw_gurumdds_cpp/type_support_common.inl"
 
-#endif // RMW_GURUMDDS__TYPE_SUPPORT_COMMON_HPP_
+#endif  // RMW_GURUMDDS_CPP__TYPE_SUPPORT_COMMON_HPP_

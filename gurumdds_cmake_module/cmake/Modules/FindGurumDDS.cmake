@@ -89,7 +89,7 @@ else()
   if(WIN32)
     set(GurumDDS_FOUND FALSE)
   else()
-    find_package(gurumdds QUIET PATHS /usr /usr/local)
+    find_package(gurumdds QUIET PATHS /usr /usr/lib /usr/local)
     if(gurumdds_FOUND)
       set(GurumDDS_HOME "${GURUMDDS_CONFIG_ROOT_DIR}")
       set(GurumDDS_INCLUDE_DIR ${GURUMDDS_INCLUDE_DIR})
@@ -110,3 +110,10 @@ find_package_handle_standard_args(GurumDDS
   GurumDDS_LIBRARIES
   GurumDDS_GURUMIDL
 )
+
+add_library(GurumDDS SHARED IMPORTED)
+set_target_properties(GurumDDS PROPERTIES
+        IMPORTED_LOCATION ${GurumDDS_LIBRARIES}
+)
+
+target_include_directories(GurumDDS INTERFACE ${GurumDDS_INCLUDE_DIR})
