@@ -1,3 +1,28 @@
+## rmw_gurumdds (kilted) - 6.0.1-1
+
+The packages in the `rmw_gurumdds` repository were released into the `kilted` distro by running `/usr/bin/bloom-release --rosdistro kilted --track kilted rmw_gurumdds --edit` on `Wed, 21 May 2025 01:28:31 -0000`
+
+These packages were released:
+- `gurumdds_cmake_module`
+- `rmw_gurumdds_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `5.0.0-4`
+- old version: `5.0.0-4`
+- new version: `6.0.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.25.1`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (rolling) - 6.0.1-2
 
 The packages in the `rmw_gurumdds` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling rmw_gurumdds --edit` on `Tue, 20 May 2025 05:04:43 -0000`
