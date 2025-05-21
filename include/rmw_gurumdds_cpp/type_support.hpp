@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS__TYPE_SUPPORT_HPP_
-#define RMW_GURUMDDS__TYPE_SUPPORT_HPP_
+#ifndef RMW_GURUMDDS_CPP__TYPE_SUPPORT_HPP_
+#define RMW_GURUMDDS_CPP__TYPE_SUPPORT_HPP_
 
 #include <string>
 
 #include "dds_include.hpp"
 #include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/service_type_support_struct.h"
 namespace rmw_gurumdds_cpp
 {
 dds_TypeSupport*
@@ -32,6 +33,13 @@ void set_type_support_ops(
   dds_TypeSupport* dds_type_support,
   const rosidl_message_type_support_t* type_support
   );
-}
 
-#endif  // RMW_GURUMDDS__TYPE_SUPPORT_HPP_
+void set_service_typesupport(dds_DataWriter* writer, dds_DataReader* reader,
+                             const rosidl_service_type_support_t* rosidl_typesupport);
+
+void set_client_typesupport(dds_DataWriter* writer, dds_DataReader* reader,
+                            const rosidl_service_type_support_t* rosidl_typesupport);
+
+}  // namespace rmw_gurumdds_cpp
+
+#endif  // RMW_GURUMDDS_CPP__TYPE_SUPPORT_HPP_
