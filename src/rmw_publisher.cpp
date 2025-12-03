@@ -28,6 +28,8 @@
 
 #include "rmw_dds_common/qos.hpp"
 
+#include "tracetools/tracetools.h"
+
 #include "rmw_gurumdds_cpp/graph_cache.hpp"
 #include "rmw_gurumdds_cpp/identifier.hpp"
 #include "rmw_gurumdds_cpp/names_and_types_helpers.hpp"
@@ -73,7 +75,7 @@ create_publisher(
   rmw_publisher_t * rmw_publisher = nullptr;
   PublisherInfo * publisher_info = nullptr;
   dds_DataWriter * topic_writer = nullptr;
-  dds_DataWriterQos datawriter_qos;
+  dds_DataWriterQos datawriter_qos{};
   dds_Topic * topic = nullptr;
   dds_TopicDescription * topic_desc = nullptr;
   dds_TypeSupport * dds_typesupport = nullptr;
@@ -137,8 +139,17 @@ create_publisher(
     }
   }
 
+  ret = dds_DomainParticipantFactory_get_datawriter_qos_from_profile(topic_name, &datawriter_qos);
+  if(ret != dds_RETCODE_OK) {
+    ret = dds_Publisher_get_default_datawriter_qos(pub, &datawriter_qos);
+    if (ret != dds_RETCODE_OK) {
+      RMW_SET_ERROR_MSG("failed to get default datawriter qos");
+      return nullptr;
+    }
+  }
+
   const rosidl_type_hash_t& type_hash = *type_support->get_type_hash_func(type_support);
-  if (!rmw_gurumdds_cpp::get_datawriter_qos(pub, qos_policies, type_hash, &datawriter_qos)) {
+  if (!rmw_gurumdds_cpp::get_datawriter_qos(qos_policies, type_hash, &datawriter_qos)) {
     // Error message already set
     return nullptr;
   }
@@ -252,6 +263,11 @@ create_publisher(
   dds_typesupport = nullptr;
 
   scope_exit_rmw_publisher_delete.cancel();
+
+  rmw_gid_t gid;
+  ret = rmw_get_gid_for_publisher(rmw_publisher, &gid);
+  TRACETOOLS_TRACEPOINT(rmw_publisher_init, static_cast<const void *>(rmw_publisher), gid.data);
+
   return rmw_publisher;
 }
 
@@ -330,33 +346,6 @@ rmw_ret_t publish(
     return RMW_RET_ERROR;
   }
 
-  size_t size = 0;
-  void * dds_message = allocate_message(
-    rosidl_typesupport->data,
-    rosidl_typesupport->typesupport_identifier,
-    ros_message,
-    &size,
-    false
-  );
-
-  if (dds_message == nullptr) {
-    // Error message already set
-    return RMW_RET_ERROR;
-  }
-
-  bool result = serialize_ros_to_cdr(
-    rosidl_typesupport->data,
-    rosidl_typesupport->typesupport_identifier,
-    ros_message,
-    dds_message,
-    size
-  );
-  if (!result) {
-    RMW_SET_ERROR_MSG("failed to serialize message");
-    free(dds_message);
-    return RMW_RET_ERROR;
-  }
-
   dds_SampleInfoEx sampleinfo_ex;
   std::memset(&sampleinfo_ex, 0, sizeof(dds_SampleInfoEx));
   ros_sn_to_dds_sn(++publisher_info->sequence_number, &sampleinfo_ex.seq);
@@ -364,21 +353,25 @@ rmw_ret_t publish(
       reinterpret_cast<const uint8_t *>(publisher_info->publisher_gid.data),
       reinterpret_cast<uint8_t *>(&sampleinfo_ex.src_guid));
 
-  dds_ReturnCode_t ret = dds_DataWriter_raw_write_w_sampleinfoex(
-      topic_writer, dds_message, size, &sampleinfo_ex);
+  dds_Time_get_current_time(&sampleinfo_ex.info.source_timestamp);
+  TRACETOOLS_TRACEPOINT(
+    rmw_publish,
+    static_cast<const void *>(publisher),
+    ros_message,
+    rmw_gurumdds_cpp::dds_time_to_i64(sampleinfo_ex.info.source_timestamp)
+  );
+
+  dds_ReturnCode_t ret = dds_DataWriter_write_w_sampleinfoex(
+      topic_writer, ros_message, &sampleinfo_ex);
 
   if (ret != dds_RETCODE_OK) {
     std::stringstream errmsg;
     errmsg << "failed to publish data: " << dds_ReturnCode_to_string(ret) << ", " << ret;
     RMW_SET_ERROR_MSG(errmsg.str().c_str());
-    free(dds_message);
     return RMW_RET_ERROR;
   }
 
   RCUTILS_LOG_DEBUG_NAMED(RMW_GURUMDDS_ID, "Published data on topic %s", publisher->topic_name);
-
-  free(dds_message);
-
   return RMW_RET_OK;
 }
 } // namespace rmw_gurumdds_cpp
@@ -472,7 +465,7 @@ rmw_create_publisher(
     topic_name,
     &adapted_qos_policies,
     publisher_options,
-    ctx->localhost_only);
+    RMW_AUTOMATIC_DISCOVERY_RANGE_LOCALHOST == ctx->base->options.discovery_options.automatic_discovery_range);
 
   if (rmw_pub == nullptr) {
     RMW_SET_ERROR_MSG("failed to create RMW publisher");
@@ -731,6 +724,14 @@ rmw_publish_serialized_message(
   rmw_gurumdds_cpp::ros_guid_to_dds_guid(
     reinterpret_cast<const uint8_t *>(publisher_info->publisher_gid.data),
     reinterpret_cast<uint8_t *>(&sampleinfo_ex.src_guid));
+
+  dds_Time_get_current_time(&sampleinfo_ex.info.source_timestamp);
+  TRACETOOLS_TRACEPOINT(
+    rmw_publish,
+    static_cast<const void *>(publisher),
+    serialized_message,
+    rmw_gurumdds_cpp::dds_time_to_i64(sampleinfo_ex.info.source_timestamp)
+  );
 
   dds_ReturnCode_t ret = dds_DataWriter_raw_write_w_sampleinfoex(
     topic_writer,
