@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS_CPP__MESSAGE_DESERIALIZER_INL_
-#define RMW_GURUMDDS_CPP__MESSAGE_DESERIALIZER_INL_
+#ifndef RMW_GURUMDDS__MESSAGE_DESERIALIZER_INL_
+#define RMW_GURUMDDS__MESSAGE_DESERIALIZER_INL_
 
 namespace rmw_gurumdds_cpp
 {
@@ -47,6 +47,7 @@ inline void MessageDeserializer<MessageMembersT>::deserialize(const MessageMembe
         read_primitive<uint32_t>(member, output);
         break;
       case rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE:
+      case rosidl_typesupport_introspection_cpp::ROS_TYPE_LONG_DOUBLE:
       case rosidl_typesupport_introspection_cpp::ROS_TYPE_UINT64:
       case rosidl_typesupport_introspection_cpp::ROS_TYPE_INT64:
         read_primitive<uint64_t>(member, output);
@@ -393,6 +394,6 @@ inline void MessageDeserializer<MessageMembersT>::read_struct_arr(const MessageM
     );
   }
 }
-}  // namespace rmw_gurumdds_cpp
+} // namespace rmw_gurumdds_cpp
 
-#endif  // RMW_GURUMDDS_CPP__MESSAGE_DESERIALIZER_INL_
+#endif  // RMW_GURUMDDS__MESSAGE_DESERIALIZER_INL_

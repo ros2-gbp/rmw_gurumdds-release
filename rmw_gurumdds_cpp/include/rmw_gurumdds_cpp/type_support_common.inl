@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS_CPP__TYPE_SUPPORT_COMMON_INL
-#define RMW_GURUMDDS_CPP__TYPE_SUPPORT_COMMON_INL
+#ifndef RMW_GURUMDDS__TYPE_SUPPORT_COMMON_INL
+#define RMW_GURUMDDS__TYPE_SUPPORT_COMMON_INL
 
 #include <sstream>
 
@@ -46,7 +46,8 @@ void *
 allocate_message(
   const void * untyped_members,
   const uint8_t * ros_message,
-  size_t * size) {
+  size_t * size,
+  bool is_service) {
   auto members =
     static_cast<const MessageMembersT *>(untyped_members);
   if (nullptr == members) {
@@ -67,9 +68,16 @@ allocate_message(
   rmw_gurumdds_cpp::CdrSerializationBuffer<false> buffer{nullptr, 0};
   rmw_gurumdds_cpp::MessageSerializer<false, MessageMembersT> serializer{buffer};
   serializer.serialize(members, ros_message, true);
+  if (is_service) {
+    uint64_t dummy = 0;
+    buffer << dummy;  // client_guid_0
+    buffer << dummy;  // client_guid_1
+    buffer << dummy;  // sequence_number
+    buffer << dummy;  // padding
+  }
 
   *size = buffer.get_offset() + 4;
-  void * message = malloc(*size);
+  void * message = calloc(1, *size);
   if (nullptr == message) {
     RMW_SET_ERROR_MSG("Failed to allocate memory for dds message");
     return nullptr;
@@ -80,7 +88,7 @@ allocate_message(
 
 template<typename MessageMembersT>
 std::string
-parse_struct(const MessageMembersT * members, const char * field_name)
+parse_struct(const MessageMembersT * members, const char * field_name, bool is_service)
 {
   if (nullptr == members) {
     RMW_SET_ERROR_MSG("Members handle is null");
@@ -94,7 +102,7 @@ parse_struct(const MessageMembersT * members, const char * field_name)
     "type=" <<
     create_type_name<MessageMembersT>(members) <<
     ",member=" <<
-    members->member_count_ <<
+    members->member_count_ + (is_service ? 3 : 0) <<
     ")";
 
   for (size_t i = 0; i < members->member_count_; i++) {
@@ -121,7 +129,8 @@ parse_struct(const MessageMembersT * members, const char * field_name)
       }
 
       auto inner_struct = static_cast<const MessageMembersT *>(member->members_->data);
-      std::string inner_metastring = parse_struct<MessageMembersT>(inner_struct, member->is_array_ ? nullptr : member->name_);
+      std::string inner_metastring = parse_struct<MessageMembersT>(
+        inner_struct, member->is_array_ ? nullptr : member->name_, false);
       if (inner_metastring.empty()) {
         return "";
       }
@@ -132,6 +141,7 @@ parse_struct(const MessageMembersT * members, const char * field_name)
           metastring << "f";
           break;
         case rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE:
+        case rosidl_typesupport_introspection_c__ROS_TYPE_LONG_DOUBLE:
           metastring << "d";
           break;
         case rosidl_typesupport_introspection_c__ROS_TYPE_CHAR:
@@ -189,7 +199,7 @@ parse_struct(const MessageMembersT * members, const char * field_name)
 
 template<typename MessageMembersT>
 std::string
-create_metastring(const void * untyped_members)
+create_metastring(const void * untyped_members, bool is_service)
 {
   auto members = static_cast<const MessageMembersT *>(untyped_members);
   if (nullptr == members) {
@@ -201,10 +211,17 @@ create_metastring(const void * untyped_members)
   metastring <<
     "!1" <<
     parse_struct<MessageMembersT>(
-      static_cast<const MessageMembersT *>(members), nullptr);
+      static_cast<const MessageMembersT *>(members), nullptr, is_service);
+
+  if (is_service) {
+    metastring <<
+      "L(name=gurumdds__client_guid_0_)" <<
+      "L(name=gurumdds__client_guid_1_)" <<
+      "l(name=gurumdds__sequence_number_)";
+  }
 
   return metastring.str();
 }
-}  // namespace rmw_gurumdds_cpp
+} // namespace rmw_gurumdds_cpp
 
-#endif  // RMW_GURUMDDS_CPP__TYPE_SUPPORT_COMMON_INL
+#endif  // RMW_GURUMDDS__TYPE_SUPPORT_COMMON_INL

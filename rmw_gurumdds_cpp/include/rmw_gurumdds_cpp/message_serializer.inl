@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS_CPP__MESSAGE_SERIALIZER_INL_
-#define RMW_GURUMDDS_CPP__MESSAGE_SERIALIZER_INL_
+#ifndef RMW_GURUMDDS__MESSAGE_SERIALIZER_INL_
+#define RMW_GURUMDDS__MESSAGE_SERIALIZER_INL_
 
 namespace rmw_gurumdds_cpp
 {
@@ -50,6 +50,7 @@ inline void MessageSerializer<SERIALIZE, MessageMembersT>::serialize(
         serialize_primitive<uint32_t>(member, input);
         break;
       case rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE:
+      case rosidl_typesupport_introspection_cpp::ROS_TYPE_LONG_DOUBLE:
       case rosidl_typesupport_introspection_cpp::ROS_TYPE_UINT64:
       case rosidl_typesupport_introspection_cpp::ROS_TYPE_INT64:
         serialize_primitive<uint64_t>(member, input);
@@ -304,6 +305,6 @@ inline void MessageSerializer<SERIALIZE, MessageMembersT>::serialize_primitive(
     buffer << *reinterpret_cast<const T *>(input + member->offset_);
   }
 }
-}  // namespace rmw_gurumdds_cpp
+} // namespace rmw_gurumdds_cpp
 
-#endif  // RMW_GURUMDDS_CPP__MESSAGE_SERIALIZER_INL_
+#endif  // RMW_GURUMDDS__MESSAGE_SERIALIZER_INL_

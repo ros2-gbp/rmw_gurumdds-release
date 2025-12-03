@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS_CPP__EVENT_INFO_COMMON_HPP_
-#define RMW_GURUMDDS_CPP__EVENT_INFO_COMMON_HPP_
+#ifndef RMW_GURUMDDS__EVENT_INFO_COMMON_HPP_
+#define RMW_GURUMDDS__EVENT_INFO_COMMON_HPP_
 
 #include <map>
 #include <mutex>
@@ -59,6 +59,7 @@ struct EventInfo
     int32_t total_count,
     int32_t total_count_change
     ) = 0;
+
 };
 
 struct PublisherInfo : EventInfo
@@ -71,9 +72,9 @@ struct PublisherInfo : EventInfo
   rmw_gid_t publisher_gid;
   dds_DataWriter * topic_writer;
   std::mutex mutex_event;
-  rmw_event_callback_t on_new_event_cb[RMW_EVENT_TYPE_MAX] = { };
-  const void * user_data_cb[RMW_EVENT_TYPE_MAX] = { };
-  dds_GuardCondition* event_guard_cond[RMW_EVENT_TYPE_MAX] = { };
+  rmw_event_callback_t on_new_event_cb[RMW_EVENT_INVALID] = { };
+  const void * user_data_cb[RMW_EVENT_INVALID] = { };
+  dds_GuardCondition* event_guard_cond[RMW_EVENT_INVALID] = { };
   dds_StatusMask mask = 0;
   bool inconsistent_topic_changed = false;
   dds_InconsistentTopicStatus inconsistent_topic_status = { };
@@ -129,9 +130,9 @@ struct SubscriberInfo : EventInfo
   const char * implementation_identifier;
   rmw_context_impl_t * ctx;
   std::mutex mutex_event;
-  rmw_event_callback_t on_new_event_cb[RMW_EVENT_TYPE_MAX] = { };
-  const void * user_data_cb[RMW_EVENT_TYPE_MAX] = { };
-  dds_GuardCondition* event_guard_cond[RMW_EVENT_TYPE_MAX] = { };
+  rmw_event_callback_t on_new_event_cb[RMW_EVENT_INVALID] = { };
+  const void * user_data_cb[RMW_EVENT_INVALID] = { };
+  dds_GuardCondition* event_guard_cond[RMW_EVENT_INVALID] = { };
   dds_StatusMask mask = 0;
   bool requested_deadline_missed_changed = false;
   dds_RequestedDeadlineMissedStatus requested_deadline_missed_status = { };
@@ -205,8 +206,7 @@ public:
   void on_inconsistent_topic(const dds_InconsistentTopicStatus& status);
 
 private:
-  static void on_inconsistent_topic(const dds_Topic* the_topic,
-                                    const dds_InconsistentTopicStatus* status);
+  static void on_inconsistent_topic(const dds_Topic* the_topic, const dds_InconsistentTopicStatus* status);
 
 private:
   static std::map<dds_Topic*, TopicEventListener*> table_;
@@ -215,6 +215,6 @@ private:
   std::recursive_mutex mutex_;
   std::vector<EventInfo*> event_list_;
 };
-}  // namespace rmw_gurumdds_cpp
+} // namespace rmw_gurumdds_cpp
 
-#endif  // RMW_GURUMDDS_CPP__EVENT_INFO_COMMON_HPP_
+#endif // RMW_GURUMDDS__EVENT_INFO_COMMON_HPP_

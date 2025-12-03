@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS_CPP__QOS_HPP_
-#define RMW_GURUMDDS_CPP__QOS_HPP_
+#ifndef RMW_GURUMDDS__QOS_HPP_
+#define RMW_GURUMDDS__QOS_HPP_
 
 #include <cassert>
 #include <limits>
@@ -32,17 +32,15 @@ rmw_time_to_dds(const rmw_time_t & time);
 rmw_time_t
 dds_duration_to_rmw(const dds_Duration_t & duration);
 
-int64_t
-dds_time_to_i64(const dds_Time_t & t);
-
 bool
-get_datawriter_qos(
+get_datawriter_qos(dds_Publisher * publisher,
   const rmw_qos_profile_t * qos_profile,
   const rosidl_type_hash_t & type_hash,
   dds_DataWriterQos * datawriter_qos);
 
 bool
 get_datareader_qos(
+  dds_Subscriber * subscriber,
   const rmw_qos_profile_t * qos_profile,
   const rosidl_type_hash_t & type_hash,
   dds_DataReaderQos * datareader_qos);
@@ -70,6 +68,6 @@ convert_liveliness_lease_duration(const dds_LivelinessQosPolicy * const policy);
 
 rmw_qos_policy_kind_t
 convert_qos_policy(const dds_QosPolicyId_t policy_id);
-}  // namespace rmw_gurumdds_cpp
+} // namespace rmw_gurumdds_cpp
 
-#endif  // RMW_GURUMDDS_CPP__QOS_HPP_
+#endif // RMW_GURUMDDS__QOS_HPP_
