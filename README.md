@@ -1,3 +1,28 @@
+## jazzy (jazzy) - 5.0.0-3
+
+The packages in the `jazzy` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release --rosdistro jazzy jazzy --no-pull-request --edit` on `Wed, 03 Dec 2025 08:05:31 -0000`
+
+These packages were released:
+- `gurumdds_cmake_module`
+- `rmw_gurumdds_cpp`
+
+Version of package(s) in repository `jazzy`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `5.0.0-2`
+- new version: `5.0.0-3`
+
+Versions of tools used:
+
+- bloom version: `0.13.0`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (kilted) - 6.0.1-1
 
 The packages in the `rmw_gurumdds` repository were released into the `kilted` distro by running `/usr/bin/bloom-release --rosdistro kilted --track kilted rmw_gurumdds --edit` on `Wed, 21 May 2025 01:28:31 -0000`
