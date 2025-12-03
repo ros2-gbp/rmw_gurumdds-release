@@ -1,0 +1,168 @@
+ros-jazzy-gurumdds-cmake-module (5.0.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 15 May 2025 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (5.0.0-1noble) noble; urgency=high
+
+  * docs: update README.md and maintainers
+  * Contributors: gurum
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 16 Oct 2024 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.6.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 18 Apr 2024 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.6.0-1noble) noble; urgency=high
+
+  * Use gurumdds-3.1
+  * Contributors: hyeonwoo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 03 Apr 2024 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.5.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 29 Jan 2024 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.5.0-1noble) noble; urgency=high
+
+  * Change maintainer list
+  * Contributors: Jaemin Jo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 26 Sep 2023 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.4.2-1noble) noble; urgency=high
+
+  * Update packages to use gurumdds-3.0 & Update README
+  * Contributors: Jaemin Jo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Sun, 17 Sep 2023 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.4.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 12 Sep 2023 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.4.0-1noble) noble; urgency=high
+
+  * Add maintainer
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 07 Mar 2023 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.3.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 29 Nov 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.3.0-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 04 Oct 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.2.2-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 04 Jul 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.2.1-1noble) noble; urgency=high
+
+  * Reorganize package
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 01 Jun 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.2.0-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 01 Jun 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.1.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Sun, 08 May 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.1.0-1noble) noble; urgency=high
+
+  * Update packages to use gurumdds-2.8
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Sun, 02 Jan 2022 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (3.0.0-1noble) noble; urgency=high
+
+  * Modify cmake according to library path format
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 07 Jul 2021 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (2.0.0-1noble) noble; urgency=high
+
+  * Update packages to use gurumdds-2.7
+  * Change maintainer
+  * Contributors: Youngjin Yun
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 15 Mar 2021 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (1.0.2-1noble) noble; urgency=high
+
+  * Change maintainer
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 28 Jul 2020 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (1.0.1-1noble) noble; urgency=high
+
+
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Mon, 27 Jul 2020 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (1.0.0-1noble) noble; urgency=high
+
+  * Updated packages to use gurumdds-2.6
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 03 Jun 2020 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (0.8.2-1noble) noble; urgency=high
+
+  * updated packages to use gurumdds-2.5
+  * Contributors: hyeonwoo
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Wed, 18 Dec 2019 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (0.8.1-1noble) noble; urgency=high
+
+  * CoreDDS is renamed to GurumDDS
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Thu, 14 Nov 2019 15:00:00 -0000
+
+ros-jazzy-gurumdds-cmake-module (0.8.0-1noble) noble; urgency=high
+
+  * added changelog
+  * added gurumdds dependency to package.xml
+  * rewrote build scripts
+  * fixed 'command not found' error
+  * Implemented Wstring support
+  * fixed typos
+  * fixed code style divergence
+  * updated cmake to fit new library paths
+  * migration from gitlab
+  * Contributors: junho
+
+ -- Donghyeon Lee <donghyeon@gurum.cc>  Tue, 05 Nov 2019 15:00:00 -0000
+
+
