@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS__NAMESPACE_PREFIX_HPP_
-#define RMW_GURUMDDS__NAMESPACE_PREFIX_HPP_
+#ifndef RMW_GURUMDDS_CPP__NAMESPACE_PREFIX_HPP_
+#define RMW_GURUMDDS_CPP__NAMESPACE_PREFIX_HPP_
 
 #include <string>
 #include <vector>
 
 namespace rmw_gurumdds_cpp
 {
-extern const char * const ros_topic_prefix;
-extern const char * const ros_service_requester_prefix;
-extern const char * const ros_service_response_prefix;
+extern const char *const ros_topic_prefix;
+extern const char *const ros_service_requester_prefix;
+extern const char *const ros_service_response_prefix;
 extern const std::vector<std::string> ros_prefixes;
 
 /// Returns `name` stripped of `prefix` if exists, if not return "".
@@ -38,4 +38,4 @@ std::string strip_ros_prefix_if_exists(const std::string & topic_name);
 const std::vector<std::string> & get_all_ros_prefixes();
 } // namespace rmw_gurumdds_cpp
 
-#endif // RMW_GURUMDDS__NAMESPACE_PREFIX_HPP_
+#endif // RMW_GURUMDDS_CPP__NAMESPACE_PREFIX_HPP_

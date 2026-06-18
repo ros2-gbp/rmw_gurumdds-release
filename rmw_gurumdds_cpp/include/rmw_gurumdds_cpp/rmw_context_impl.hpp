@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS__RMW_CONTEXT_IMPL_HPP_
-#define RMW_GURUMDDS__RMW_CONTEXT_IMPL_HPP_
+#ifndef RMW_GURUMDDS_CPP__RMW_CONTEXT_IMPL_HPP_
+#define RMW_GURUMDDS_CPP__RMW_CONTEXT_IMPL_HPP_
 
 #include <memory>
 #include <mutex>
@@ -40,9 +40,11 @@
 #include "rmw_gurumdds_cpp/dds_include.hpp"
 #include "rmw_gurumdds_cpp/graph_cache.hpp"
 #include "rmw_gurumdds_cpp/identifier.hpp"
+#include "rmw_gurumdds_cpp/backend_buffer.hpp"
 
 namespace rmw_gurumdds_cpp
 {
+
 void on_participant_changed(
   const dds_DomainParticipant * a_participant,
   const dds_ParticipantBuiltinTopicData * data,
@@ -57,7 +59,7 @@ void on_subscription_changed(
   const dds_DomainParticipant * a_participant,
   const dds_SubscriptionBuiltinTopicData * data,
   dds_InstanceHandle_t handle);
-} // namespace rmw_gurumdds_cpp
+}  // namespace rmw_gurumdds_cpp
 
 struct rmw_context_impl_s
 {
@@ -66,8 +68,11 @@ struct rmw_context_impl_s
 
   dds_DomainId_t domain_id;
   dds_DomainParticipant * participant;
+  dds_DomainParticipantListener participant_listener {};
 
-  /* used for all DDS writers/readers created to support rmw_gurumdds_cpp::(Publisher/Subscriber)Info. */
+  /* used for all DDS writers/readers created to support
+   * rmw_gurumdds_cpp::(Publisher/Subscriber)Info.
+   * */
   dds_Publisher * publisher;
   dds_Subscriber * subscriber;
 
@@ -83,6 +88,15 @@ struct rmw_context_impl_s
   bool is_shutdown;
 
   std::mutex endpoint_mutex;
+
+  //backend buffer
+  rmw_gurumdds_cpp::BufferBackendContext * buffer_serialization_context;
+  rmw_gurumdds_cpp::BufferEndpointRegistry * buffer_endpoint_registry;
+
+  //local publisher registry
+  //ignore_local_publish 기능을 위해 추가.
+  std::mutex local_pub_mutex;
+  std::vector<rmw_gid_t> local_publishers;
 
   explicit rmw_context_impl_s(rmw_context_t * const base);
   ~rmw_context_impl_s();
@@ -108,4 +122,4 @@ struct rmw_context_impl_s
   finalize();
 };
 
-#endif // RMW_GURUMDDS__RMW_CONTEXT_IMPL_HPP_
+#endif  // RMW_GURUMDDS_CPP__RMW_CONTEXT_IMPL_HPP_

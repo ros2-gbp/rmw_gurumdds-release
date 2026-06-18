@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_GURUMDDS__CDR_BUFFER_HPP_
-#define RMW_GURUMDDS__CDR_BUFFER_HPP_
+#ifndef RMW_GURUMDDS_CPP__CDR_BUFFER_HPP_
+#define RMW_GURUMDDS_CPP__CDR_BUFFER_HPP_
 
 #include <cstring>
-#include <string>
-#include <stdexcept>
 #include <limits>
+#include <stdexcept>
+#include <string>
 
 #include "rosidl_runtime_c/string.h"
 #include "rosidl_runtime_c/string_functions.h"
@@ -45,10 +45,11 @@ public:
 
   size_t get_offset() const;
 
+  size_t get_remaining_size() const;
+
   void roundup(uint32_t align);
 
 protected:
-
   void advance(size_t cnt);
 
   uint8_t * buf_;
@@ -57,7 +58,7 @@ protected:
 };
 
 template<bool SERIALIZE>
-class CdrSerializationBuffer: public CdrBuffer {
+class CdrSerializationBuffer : public CdrBuffer {
 public:
   CdrSerializationBuffer(uint8_t * buf, size_t size);
 
@@ -86,7 +87,7 @@ public:
   void copy_arr(const uint64_t * arr, size_t cnt);
 };
 
-class CdrDeserializationBuffer: public CdrBuffer {
+class CdrDeserializationBuffer : public CdrBuffer {
 public:
   CdrDeserializationBuffer(uint8_t * buf, size_t size);
 
@@ -121,4 +122,4 @@ private:
 
 #include "rmw_gurumdds_cpp/cdr_serialization_buffer.inl"
 
-#endif  // RMW_GURUMDDS__CDR_BUFFER_HPP_
+#endif // RMW_GURUMDDS_CPP__CDR_BUFFER_HPP_
