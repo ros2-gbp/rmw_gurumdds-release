@@ -1,3 +1,28 @@
+## rmw_gurumdds (lyrical) - 7.0.0-1
+
+The packages in the `rmw_gurumdds` repository were released into the `lyrical` distro by running `/usr/bin/bloom-release --rosdistro lyrical --track lyrical rmw_gurumdds --edit` on `Thu, 18 Jun 2026 08:18:28 -0000`
+
+These packages were released:
+- `gurumdds_cmake_module`
+- `rmw_gurumdds_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `null`
+- old version: `null`
+- new version: `7.0.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.14.3`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## jazzy (jazzy) - 5.0.1-1
 
 The packages in the `jazzy` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release --rosdistro jazzy jazzy --no-pull-request --edit` on `Wed, 03 Dec 2025 08:08:59 -0000`
