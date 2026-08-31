@@ -1,0 +1,12 @@
+Source: ros-lyrical-gurumdds-cmake-module
+Section: misc
+Priority: optional
+Maintainer: "Donghyeon Lee" <donghyeon@gurum.cc>
+Build-Depends: debhelper (>= 9.0.0), gurumdds-3.2, ros-lyrical-ament-cmake, ros-lyrical-ament-lint-auto <!nocheck>, ros-lyrical-ament-lint-common <!nocheck>, ros-lyrical-ros-workspace
+Homepage: https://index.ros.org/p/gurumdds_cmake_module/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-gurumdds-cmake-module
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-ament-cmake, ros-lyrical-ros-workspace
+Description: Provide CMake module to find GurumNetworks GurumDDS.
