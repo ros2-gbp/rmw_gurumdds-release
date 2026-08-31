@@ -1,3 +1,28 @@
+## rmw_gurumdds (lyrical) - 7.0.0-3
+
+The packages in the `rmw_gurumdds` repository were released into the `lyrical` distro by running `/usr/bin/bloom-release rmw_gurumdds -r lyrical -t lyrical` on `Mon, 31 Aug 2026 01:33:13 -0000`
+
+These packages were released:
+- `gurumdds_cmake_module`
+- `rmw_gurumdds_cpp`
+
+Version of package(s) in repository `rmw_gurumdds`:
+
+- upstream repository: https://github.com/ros2/rmw_gurumdds.git
+- release repository: https://github.com/ros2-gbp/rmw_gurumdds-release.git
+- rosdistro version: `7.0.0-1`
+- old version: `7.0.0-2`
+- new version: `7.0.0-3`
+
+Versions of tools used:
+
+- bloom version: `0.14.3`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rmw_gurumdds (lyrical) - 7.0.0-2
 
 The packages in the `rmw_gurumdds` repository were released into the `lyrical` distro by running `/usr/bin/bloom-release rmw_gurumdds -r lyrical -t lyrical` on `Mon, 31 Aug 2026 01:16:15 -0000`
